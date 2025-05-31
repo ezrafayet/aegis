@@ -1,0 +1,10 @@
+
+On every side project I'm just rewriting auth every time, or depending on Auth0, Supabase, Firebase, with heavy vendor lock-in and echosystems to learn.
+
+I want to have just this: a simple drop-in auth service that I can just use in a docker for any project, with a single config file... Pretty much as one would add Nginx.
+
+Also it won't support passwords since it is bad practise.
+
+For now it will only support GitHub OAuth, and only a pg DB with basic config.
+
+Let's see if I can do that over night...

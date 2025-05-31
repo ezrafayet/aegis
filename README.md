@@ -17,3 +17,5 @@ It must handle:
 - adding metadata (just a stringified json is fine there)
 
 In the future I should provide snippets for other projects to use (nextjs, go, node)
+
+The user should be able to host it on a subdomain (auth.domain.com) or behind some gateway at domain.com/auth

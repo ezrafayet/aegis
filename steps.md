@@ -69,15 +69,6 @@
     expires_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT NOW()
   );
-
-  -- Session tracking
-  CREATE TABLE sessions (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-    jwt_token_id VARCHAR(255) UNIQUE NOT NULL,
-    expires_at TIMESTAMP NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW()
-  );
   ```
 
 ### 3. Core Authentication Implementation

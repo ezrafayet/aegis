@@ -2,7 +2,8 @@
     "app": {
         "name": "myAppName",
         "url": "https://myapp.com",
-        "log_level": "debug"
+        "log_level": "debug",
+        "api_keys": ["xxxxxxxxxxxx"]
     },
     "db": {
         "postgres_url": "xxxxx" 

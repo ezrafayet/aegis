@@ -38,6 +38,7 @@ v0.1.0
 		AllowOrigins: conf.Auth.AllowedOrigins,
 		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
+		AllowCredentials: true,
 	}))
 
 	// OAuth initiation - redirects to GitHub
@@ -47,11 +48,12 @@ v0.1.0
 			conf.Auth.Providers.GitHub.ClientID,
 			"random_state_here", // TODO: generate proper state token
 		)
-		return c.Redirect(http.StatusTemporaryRedirect, redirectURL)
+		return c.JSON(http.StatusOK, map[string]string{"redirect_url": redirectURL})
 	})
 
 	// /!\ issues an access token
 	e.POST("/auth/github/callback", func(c echo.Context) error {
+		fmt.Printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ok 1")
 		type GithubCallbackRequest struct {
 			Code  string `json:"code"`
 			State string `json:"state"`
@@ -90,7 +92,9 @@ v0.1.0
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to decode access token"})
 		}
 
-		return c.String(http.StatusOK, "Hello, World!")
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ok 2", tokenResponse)
+
+		return c.JSON(http.StatusOK, map[string]string{"access_token": tokenResponse.AccessToken})
 	})
 
 	e.GET("/me", func(c echo.Context) error {

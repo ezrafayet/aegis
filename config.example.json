@@ -1,0 +1,48 @@
+{
+    "app": {
+        "name": "myAppName",
+        "url": "https://myapp.com",
+        "log_level": "debug"
+    },
+    "db": {
+        "postgres_url": "xxxxx" 
+    },
+    "jwt": {
+        "secret": "xxxxxx",
+        "access_token_expiration_minutes": 15,
+        "refresh_token_expiration_days": 30
+    },
+    "auth": {
+        "providers": {
+            "github": {
+                "enabled": true,
+                "client_id": "xxxxxx",
+                "client_secret": "xxxxxx"
+            }
+        },
+        "redirect_urls": {
+            "success": ["http://localhost:3000/dashboard"],
+            "failure": ["http://localhost:3000/login"]
+        },
+        "allowed_origins": [
+            "http://localhost:3000"
+        ]
+    },
+    "cookie": {
+        "domain": "localhost",
+        "secure": false,
+        "http_only": true,
+        "same_site": "Lax",
+        "max_age": 3600
+    },
+    "user": {
+        "roles": ["platform_admin", "user"],
+        "metadata": {
+            "foo": {
+                "type": "string",
+                "default": "bar",
+                "enum": ["bar", "baz"]
+            }
+        }
+    }
+}

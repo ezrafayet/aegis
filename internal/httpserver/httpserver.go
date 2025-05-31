@@ -94,22 +94,62 @@ v0.1.0
 
 		fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ok 2", tokenResponse)
 
-		return c.JSON(http.StatusOK, map[string]string{"access_token": tokenResponse.AccessToken})
+		req2, err := http.NewRequest("GET", "https://api.github.com/user/emails", nil)
+		if err != nil {
+			return err
+		}
+
+		req2.Header.Set("Authorization", "Bearer "+tokenResponse.AccessToken)
+		req2.Header.Set("User-Agent", "your-app-name") // required by GitHub
+
+		client := &http.Client{}
+		resp2, err := client.Do(req2)
+		if err != nil {
+			return err
+		}
+		defer resp2.Body.Close()
+
+		type GitHubEmail struct {
+			Email    string `json:"email"`
+			Primary  bool   `json:"primary"`
+			Verified bool   `json:"verified"`
+		}
+
+		var emails []GitHubEmail
+		if err := json.NewDecoder(resp2.Body).Decode(&emails); err != nil {
+			return err
+		}
+
+		var em string
+
+		for _, email := range emails {
+			if email.Primary && email.Verified {
+				em = email.Email
+			}
+		}
+
+		// here, save the user / get more data and set the jwt
+
+		return c.JSON(http.StatusOK, map[string]string{"email": em})
 	})
 
 	e.GET("/me", func(c echo.Context) error {
+		// decode and return the jwt, refresh if needed
 		return c.String(http.StatusOK, "Hello, World!")
 	})
 
 	e.POST("/refresh", func(c echo.Context) error {
+		// refresh the jwt
 		return c.String(http.StatusOK, "Hello, World!")
 	})
 
 	e.GET("/logout", func(c echo.Context) error {
+		// delete the jwt
 		return c.String(http.StatusOK, "Hello, World!")
 	})
 
 	e.POST("/authorize", func(c echo.Context) error {
+		// ask auth service if a jwt is valid, and get user's details from jwt
 		return c.String(http.StatusOK, "Hello, World!")
 	})
 

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 
 	"aegix/pkg/config"
 
@@ -41,10 +40,20 @@ v0.1.0
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
 	}))
 
+	// OAuth initiation - redirects to GitHub
+	e.GET("/auth/github", func(c echo.Context) error {
+		redirectURL := fmt.Sprintf(
+			"https://github.com/login/oauth/authorize?client_id=%s&scope=user:email&state=%s",
+			conf.Auth.Providers.GitHub.ClientID,
+			"random_state_here", // TODO: generate proper state token
+		)
+		return c.Redirect(http.StatusTemporaryRedirect, redirectURL)
+	})
+
 	// /!\ issues an access token
 	e.POST("/auth/github/callback", func(c echo.Context) error {
 		type GithubCallbackRequest struct {
-			Code string `json:"code"`
+			Code  string `json:"code"`
 			State string `json:"state"`
 		}
 		var args GithubCallbackRequest
@@ -56,20 +65,20 @@ v0.1.0
 			TokenType   string `json:"token_type"`
 			Scope       string `json:"scope"`
 		}
-		
+
 		data := map[string]string{
 			"client_id":     conf.Auth.Providers.GitHub.ClientID,
 			"client_secret": conf.Auth.Providers.GitHub.ClientSecret,
 			"code":          args.Code,
 			// "redirect_uri":  "http://localhost:3000/auth/callback", // needed ?
-			"state":         args.State,
+			"state": args.State,
 		}
 		body, _ := json.Marshal(data)
-		
+
 		req, _ := http.NewRequest("POST", "https://github.com/login/oauth/access_token", bytes.NewBuffer(body))
 		req.Header.Set("Accept", "application/json")
 		req.Header.Set("Content-Type", "application/json")
-		
+
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to get access token"})
@@ -96,13 +105,16 @@ v0.1.0
 		return c.String(http.StatusOK, "Hello, World!")
 	})
 
-	e.POST("/internal/authorize", func(c echo.Context) error {
+	e.POST("/authorize", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
 
-	e.POST("/internal/authorize-api-key", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
-	})
+	// must also retrieve and set
+	// e.POST("/authorize-api-token", func(c echo.Context) error {
+	// 	return c.String(http.StatusOK, "Hello, World!")
+	// })
+
+	// get/set user metadata
 
 	if err := e.Start(":5666"); err != nil && err != http.ErrServerClosed {
 		return fmt.Errorf("failed to start server: %w", err)

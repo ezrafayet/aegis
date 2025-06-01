@@ -37,11 +37,12 @@ type Config struct {
 	} `json:"auth"`
 
 	Cookie struct {
+		Name     string `json:"name"`
 		Domain   string `json:"domain"`
 		Secure   bool   `json:"secure"`
 		HTTPOnly bool   `json:"http_only"`
 		SameSite string `json:"same_site"`
-		MaxAge   int    `json:"max_age"`
+		Path     string `json:"path"`
 	} `json:"cookie"`
 
 	User struct {

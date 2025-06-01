@@ -103,6 +103,27 @@ func (s OAuthGithubService) ExchangeCode(code, state string) (http.Cookie, http.
 		SameSite: http.SameSiteLaxMode,
 		Path:     "/",
 	}
+	if s.Config.Cookie.Domain != "" {
+		accessCookie.Domain = s.Config.Cookie.Domain
+	}
+	if s.Config.Cookie.Path != "" {
+		accessCookie.Path = s.Config.Cookie.Path
+	}
+	if s.Config.Cookie.Secure {
+		accessCookie.Secure = true
+	}
+	if s.Config.Cookie.HTTPOnly {
+		accessCookie.HttpOnly = true
+	}
+	if s.Config.Cookie.SameSite != "" {
+		if s.Config.Cookie.SameSite == "Lax" {
+			accessCookie.SameSite = http.SameSiteLaxMode
+		} else if s.Config.Cookie.SameSite == "Strict" {
+			accessCookie.SameSite = http.SameSiteStrictMode
+		} else if s.Config.Cookie.SameSite == "None" {
+			accessCookie.SameSite = http.SameSiteNoneMode
+		}
+	}
 
 	refreshCookie := http.Cookie{
 		Name:     "refresh_token",
@@ -113,6 +134,27 @@ func (s OAuthGithubService) ExchangeCode(code, state string) (http.Cookie, http.
 		Secure:   false, // change
 		SameSite: http.SameSiteLaxMode,
 		Path:     "/",
+	}
+	if s.Config.Cookie.Domain != "" {
+		refreshCookie.Domain = s.Config.Cookie.Domain
+	}
+	if s.Config.Cookie.Path != "" {
+		refreshCookie.Path = s.Config.Cookie.Path
+	}
+	if s.Config.Cookie.Secure {
+		refreshCookie.Secure = true
+	}
+	if s.Config.Cookie.HTTPOnly {
+		refreshCookie.HttpOnly = true
+	}
+	if s.Config.Cookie.SameSite != "" {
+		if s.Config.Cookie.SameSite == "Lax" {
+			refreshCookie.SameSite = http.SameSiteLaxMode
+		} else if s.Config.Cookie.SameSite == "Strict" {
+			refreshCookie.SameSite = http.SameSiteStrictMode
+		} else if s.Config.Cookie.SameSite == "None" {
+			refreshCookie.SameSite = http.SameSiteNoneMode
+		}
 	}
 
 	return accessCookie, refreshCookie, nil

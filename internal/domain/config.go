@@ -2,9 +2,9 @@ package domain
 
 type Config struct {
 	App struct {
-		Name     string `json:"name"`
-		URL      string `json:"url"`
-		LogLevel string `json:"log_level"`
+		Name     string   `json:"name"`
+		URL      string   `json:"url"`
+		LogLevel string   `json:"log_level"`
 		APIKeys  []string `json:"api_keys"`
 	} `json:"app"`
 

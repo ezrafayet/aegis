@@ -85,8 +85,8 @@ func (p OAuthGithubProvider) GetUserInfos(code, state, redirectUri string) (*pro
 		}
 	}
 	return &providers.OAuthUser{
-		Name: "",
-		Email: em,
+		Name:   "",
+		Email:  em,
 		Avatar: "",
 	}, nil
 }

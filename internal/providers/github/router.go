@@ -7,7 +7,7 @@ import (
 )
 
 type OAuthGithubRouter struct {
-	Handlers providers.OAuthProviderHandlers
+	Handlers       providers.OAuthProviderHandlers
 	AuthMiddleware providers.OAuthMiddlewares
 }
 
@@ -15,7 +15,7 @@ var _ providers.OAuthRouter = OAuthGithubRouter{}
 
 func NewOAuthGithubRouter(h providers.OAuthProviderHandlers, m providers.OAuthMiddlewares) OAuthGithubRouter {
 	return OAuthGithubRouter{
-		Handlers: h,
+		Handlers:       h,
 		AuthMiddleware: m,
 	}
 }

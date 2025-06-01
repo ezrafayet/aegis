@@ -18,7 +18,7 @@ var _ providers.OAuthProviderHandlers = OAuthGithubHandlers{}
 
 func NewOAuthGithubHandlers(c domain.Config, s providers.OAuthProviderService) OAuthGithubHandlers {
 	return OAuthGithubHandlers{
-		Config: c,
+		Config:  c,
 		Service: s,
 	}
 }

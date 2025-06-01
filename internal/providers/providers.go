@@ -27,7 +27,7 @@ type OAuthProvider interface {
 }
 
 type OAuthUser struct {
-	Name string
-	Email    string
-	Avatar   string
+	Name   string
+	Email  string
+	Avatar string
 }

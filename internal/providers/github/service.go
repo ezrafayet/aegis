@@ -77,14 +77,21 @@ func (s OAuthGithubService) ExchangeCode(code, state string) (string, error) {
 
 	_ = s.RefreshTokenRepository.CleanExpiredTokens(user.ID)
 
-	refreshToken := domain.NewRefreshToken(user.ID, s.Config.JWT.RefreshTokenExpirationDays)
+	refreshToken, _ := domain.NewRefreshToken(user.ID, s.Config)
 	err = s.RefreshTokenRepository.CreateRefreshToken(refreshToken)
 	if err != nil {
 		return "", err
 	}
 
-	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> refreshToken", refreshToken)
-	// create jwt and cookie
+	accessToken, _, err := domain.NewAccessToken(domain.CustomClaims{
+		UserID: user.ID,
+		Roles:  []string{"user"},
+	}, s.Config)
+	if err != nil {
+		return "", err
+	}
+
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> refreshToken", refreshToken, accessToken)
 
 	return userInfos.Email, nil
 }

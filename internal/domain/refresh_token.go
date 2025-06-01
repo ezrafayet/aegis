@@ -7,10 +7,10 @@ import (
 )
 
 type RefreshToken struct {
-	UserID            string    `json:"id" gorm:"type:uuid"`
-	CreatedAt         time.Time `json:"created_at" gorm:"index;not null"`
-	ExpiresAt         time.Time `json:"expires_at" gorm:"index;not null"`
-	Token             string    `json:"token" gorm:"primaryKey;type:varchar(150);not null"`
+	UserID    string    `json:"id" gorm:"type:uuid"`
+	CreatedAt time.Time `json:"created_at" gorm:"index;not null"`
+	ExpiresAt time.Time `json:"expires_at" gorm:"index;not null"`
+	Token     string    `json:"token" gorm:"primaryKey;type:varchar(150);not null"`
 	// DeviceFingerprint string   `json:"device_fingerprint" gorm:"type:varchar(150)"`
 }
 
@@ -18,15 +18,15 @@ func (r RefreshToken) IsExpired() bool {
 	return r.ExpiresAt.Before(time.Now())
 }
 
-func NewRefreshToken(userID string, validityInDays int) RefreshToken {
+func NewRefreshToken(userID string, config Config) (RefreshToken, int64) {
 	createdAt := time.Now()
-	expiresAt := createdAt.AddDate(0, 0, validityInDays)
+	expiresAt := createdAt.AddDate(0, 0, config.JWT.RefreshTokenExpirationDays)
 	return RefreshToken{
 		UserID:    userID,
 		CreatedAt: createdAt,
 		ExpiresAt: expiresAt,
 		Token:     uuid.New().String(),
-	}
+	}, expiresAt.Unix()
 }
 
 type RefreshTokenRepository interface {

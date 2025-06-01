@@ -1,6 +1,8 @@
 package providers
 
 import (
+	"net/http"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -19,7 +21,7 @@ type OAuthMiddlewares interface {
 
 type OAuthProviderService interface {
 	GetAuthURL(redirectUri string) (string, error)
-	ExchangeCode(code, state string) (string, error) // returns a cookie
+	ExchangeCode(code, state string) (http.Cookie, http.Cookie, error) // returns a cookie
 }
 
 type OAuthProvider interface {

@@ -41,11 +41,12 @@ func (h OAuthGithubHandlers) ExchangeCode(c echo.Context) error {
 	if err := c.Bind(&body); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid request"})
 	}
-	accessToken, err := h.Service.ExchangeCode(body.Code, body.State)
+	accessCookie, refreshCookie, err := h.Service.ExchangeCode(body.Code, body.State)
 	if err != nil {
 		fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> err", err)
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "an error occurred"})
 	}
-	// todo: save access token to cookie
-	return c.JSON(http.StatusOK, map[string]string{"access_token": accessToken})
+	c.SetCookie(&accessCookie)
+	c.SetCookie(&refreshCookie)
+	return c.JSON(http.StatusOK, map[string]string{"accessCookie": accessCookie.String(), "refreshCookie": refreshCookie.String()})
 }

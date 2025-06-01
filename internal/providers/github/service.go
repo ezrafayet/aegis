@@ -4,6 +4,8 @@ import (
 	"aegix/internal/domain"
 	"aegix/internal/providers"
 	"fmt"
+	"net/http"
+	"time"
 )
 
 type OAuthGithubService struct {
@@ -33,65 +35,85 @@ func (s OAuthGithubService) GetAuthURL(redirectUri string) (string, error) {
 	return redirectURL, nil
 }
 
-func (s OAuthGithubService) ExchangeCode(code, state string) (string, error) {
+func (s OAuthGithubService) ExchangeCode(code, state string) (http.Cookie, http.Cookie, error) {
 	// todo: verify state, pass original state
 	userInfos, err := s.Provider.GetUserInfos(code, state, "")
 	if err != nil {
-		return "", err
+		return http.Cookie{}, http.Cookie{}, err
 	}
 
 	user, err := s.UserRepository.GetUserByEmail(userInfos.Email)
 	if err != nil && err.Error() != providers.ErrNoUser.Error() {
-		return "", err
+		return http.Cookie{}, http.Cookie{}, err
 	}
 
 	if err != nil && err.Error() == providers.ErrNoUser.Error() {
 		user = domain.NewUser(userInfos.Name, userInfos.Avatar, userInfos.Email, "github")
 		err = s.UserRepository.CreateUser(user)
 		if err != nil {
-			return "", err
+			return http.Cookie{}, http.Cookie{}, err
 		}
 	}
 
 	if user.IsBlocked() {
-		return "", providers.ErrUserBlocked
+		return http.Cookie{}, http.Cookie{}, providers.ErrUserBlocked
 	}
 
 	if user.IsDeleted() {
-		return "", providers.ErrUserDeleted
+		return http.Cookie{}, http.Cookie{}, providers.ErrUserDeleted
 	}
 
 	if user.AuthMethod != "github" {
-		return "", providers.ErrWrongAuthMethod
+		return http.Cookie{}, http.Cookie{}, providers.ErrWrongAuthMethod
 	}
 
 	validRefreshTokens, err := s.RefreshTokenRepository.GetValidRefreshTokensByUserID(user.ID)
 	if err != nil {
-		return "", err
+		return http.Cookie{}, http.Cookie{}, err
 	}
 
 	// arbitrary naive check, will replace with device fingerprints
 	if len(validRefreshTokens) > 10 {
-		return "", providers.ErrTooManyRefreshTokens
+		return http.Cookie{}, http.Cookie{}, providers.ErrTooManyRefreshTokens
 	}
 
 	_ = s.RefreshTokenRepository.CleanExpiredTokens(user.ID)
 
-	refreshToken, _ := domain.NewRefreshToken(user.ID, s.Config)
+	refreshToken, rtExpiresAt := domain.NewRefreshToken(user.ID, s.Config)
 	err = s.RefreshTokenRepository.CreateRefreshToken(refreshToken)
 	if err != nil {
-		return "", err
+		return http.Cookie{}, http.Cookie{}, err
 	}
 
-	accessToken, _, err := domain.NewAccessToken(domain.CustomClaims{
+	accessToken, atExpiresAt, err := domain.NewAccessToken(domain.CustomClaims{
 		UserID: user.ID,
-		Roles:  []string{"user"},
+		Roles:  []string{}, // replace with user roles
 	}, s.Config)
 	if err != nil {
-		return "", err
+		return http.Cookie{}, http.Cookie{}, err
 	}
 
-	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> refreshToken", refreshToken, accessToken)
+	accessCookie := http.Cookie{
+		Name:     "access_token",
+		Domain:   s.Config.App.URL,
+		Value:    accessToken,
+		Expires:  time.Unix(atExpiresAt, 0),
+		HttpOnly: true,
+		Secure:   false, // change
+		SameSite: http.SameSiteLaxMode,
+		Path:     "/",
+	}
 
-	return userInfos.Email, nil
+	refreshCookie := http.Cookie{
+		Name:     "refresh_token",
+		Domain:   s.Config.App.URL,
+		Value:    refreshToken.Token,
+		Expires:  time.Unix(rtExpiresAt, 0),
+		HttpOnly: true,
+		Secure:   false, // change
+		SameSite: http.SameSiteLaxMode,
+		Path:     "/",
+	}
+
+	return accessCookie, refreshCookie, nil
 }

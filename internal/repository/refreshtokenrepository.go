@@ -46,3 +46,11 @@ func (r *RefreshTokenRepository) GetValidRefreshTokensByUserID(userID string) ([
 	}
 	return refreshTokens, nil
 }
+
+func (r *RefreshTokenRepository) CleanExpiredTokens(userID string) error {
+	result := r.db.Model(&domain.RefreshToken{}).Where("user_id = ? AND expires_at < ?", userID, time.Now()).Delete(&domain.RefreshToken{})
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}

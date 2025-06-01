@@ -65,21 +65,22 @@ func (s OAuthGithubService) ExchangeCode(code, state string) (string, error) {
 		return "", providers.ErrWrongAuthMethod
 	}
 
-	var refreshToken domain.RefreshToken
-
 	validRefreshTokens, err := s.RefreshTokenRepository.GetValidRefreshTokensByUserID(user.ID)
 	if err != nil {
 		return "", err
 	}
 
-	if len(validRefreshTokens) == 0 {
-		refreshToken = domain.NewRefreshToken(user.ID, s.Config.JWT.RefreshTokenExpirationDays)
-		err = s.RefreshTokenRepository.CreateRefreshToken(refreshToken)
-		if err != nil {
-			return "", err
-		}
-	} else {
-		refreshToken = validRefreshTokens[0]
+	// arbitrary naive check, will replace with device fingerprints
+	if len(validRefreshTokens) > 10 {
+		return "", providers.ErrTooManyRefreshTokens
+	}
+
+	_ = s.RefreshTokenRepository.CleanExpiredTokens(user.ID)
+
+	refreshToken := domain.NewRefreshToken(user.ID, s.Config.JWT.RefreshTokenExpirationDays)
+	err = s.RefreshTokenRepository.CreateRefreshToken(refreshToken)
+	if err != nil {
+		return "", err
 	}
 
 	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> refreshToken", refreshToken)

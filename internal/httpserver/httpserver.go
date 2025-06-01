@@ -30,7 +30,7 @@ v0.1.0
 		return err
 	}
 
-	db, err := gorm.Open(postgres.Open(c.DB.PostgresURL), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(c.DB.PostgresURL))
 	if err != nil {
 		return fmt.Errorf("failed to connect to database: %w", err)
 	}

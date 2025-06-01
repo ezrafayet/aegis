@@ -37,7 +37,11 @@ v0.1.0
 
 	fmt.Println("Connected to database")
 
-	db.AutoMigrate(&domain.User{}, &domain.RefreshToken{})
+	if err := db.AutoMigrate(&domain.User{}, &domain.RefreshToken{}); err != nil {
+		return fmt.Errorf("failed to run database migrations: %w", err)
+	}
+
+	fmt.Println("Database migrations completed successfully")
 
 	e := echo.New()
 	e.HideBanner = true

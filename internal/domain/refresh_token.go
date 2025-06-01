@@ -11,7 +11,7 @@ type RefreshToken struct {
 	CreatedAt         time.Time `json:"created_at" gorm:"index;not null"`
 	ExpiresAt         time.Time `json:"expires_at" gorm:"index;not null"`
 	Token             string    `json:"token" gorm:"primaryKey;type:varchar(150);not null"`
-	DeviceFingerprint string    `json:"device_fingerprint" gorm:"type:varchar(150);not null"`
+	// DeviceFingerprint string   `json:"device_fingerprint" gorm:"type:varchar(150)"`
 }
 
 func (r RefreshToken) IsExpired() bool {

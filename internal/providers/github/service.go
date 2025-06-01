@@ -65,12 +65,24 @@ func (s OAuthGithubService) ExchangeCode(code, state string) (string, error) {
 		return "", providers.ErrWrongAuthMethod
 	}
 
-	refreshToken := domain.NewRefreshToken(user.ID, s.Config.JWT.RefreshTokenExpirationDays)
-	err = s.RefreshTokenRepository.CreateRefreshToken(refreshToken)
+	var refreshToken domain.RefreshToken
+
+	validRefreshTokens, err := s.RefreshTokenRepository.GetValidRefreshTokensByUserID(user.ID)
 	if err != nil {
 		return "", err
 	}
 
+	if len(validRefreshTokens) == 0 {
+		refreshToken = domain.NewRefreshToken(user.ID, s.Config.JWT.RefreshTokenExpirationDays)
+		err = s.RefreshTokenRepository.CreateRefreshToken(refreshToken)
+		if err != nil {
+			return "", err
+		}
+	} else {
+		refreshToken = validRefreshTokens[0]
+	}
+
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> refreshToken", refreshToken)
 	// create jwt and cookie
 
 	return userInfos.Email, nil

@@ -3,6 +3,7 @@ package repository
 import (
 	"aegix/internal/domain"
 	"aegix/internal/providers"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -35,4 +36,13 @@ func (r *RefreshTokenRepository) GetRefreshTokenByToken(token string) (domain.Re
 		return domain.RefreshToken{}, providers.ErrNoRefreshToken
 	}
 	return domain.RefreshToken{}, nil
+}
+
+func (r *RefreshTokenRepository) GetValidRefreshTokensByUserID(userID string) ([]domain.RefreshToken, error) {
+	var refreshTokens []domain.RefreshToken
+	result := r.db.Model(&domain.RefreshToken{}).Where("user_id = ? AND expires_at > ?", userID, time.Now()).Find(&refreshTokens)
+	if result.Error != nil {
+		return []domain.RefreshToken{}, result.Error
+	}
+	return refreshTokens, nil
 }

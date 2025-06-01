@@ -7,28 +7,37 @@ import (
 )
 
 type User struct {
-	ID        string     `json:"id"`
-	CreatedAt time.Time  `json:"created_at"`
-	DeletedAt *time.Time `json:"deleted_at"`
-	BlockedAt *time.Time `json:"blocked_at"`
-	Username  string     `json:"username"`
-	Avatar    string     `json:"avatar"`
-	Email     string     `json:"email"`
-	Metadata  string     `json:"metadata"`
-	Roles     []string   `json:"roles"`
-	AuthMethod string    `json:"auth_method"`
+	ID         string     `json:"id"`
+	CreatedAt  time.Time  `json:"created_at"`
+	DeletedAt  *time.Time `json:"deleted_at"`
+	BlockedAt  *time.Time `json:"blocked_at"`
+	Name       string     `json:"name"`
+	Avatar     string     `json:"avatar"`
+	Email      string     `json:"email"`
+	Metadata   string     `json:"metadata"`
+	Roles      []string   `json:"roles"`
+	AuthMethod string     `json:"auth_method"`
 }
 
-func NewUser(username, avatar, email string, roles []string, authMethod string) User {
+func (u User) IsBlocked() bool {
+	return u.BlockedAt != nil
+}
+
+func (u User) IsDeleted() bool {
+	return u.DeletedAt != nil
+}
+
+func NewUser(name, avatar, email string, roles []string, authMethod string) User {
 	return User{
-		ID:        uuid.New().String(),
-		CreatedAt: time.Now(),
-		DeletedAt: nil,
-		BlockedAt: nil,
-		Username:  username,
-		Email:     email,
-		Metadata:  "{}",
-		Roles:     roles,
+		ID:         uuid.New().String(),
+		CreatedAt:  time.Now(),
+		DeletedAt:  nil,
+		BlockedAt:  nil,
+		Name:       name,
+		Avatar:     avatar,
+		Email:      email,
+		Metadata:   "{}",
+		Roles:      roles,
 		AuthMethod: authMethod,
 	}
 }

@@ -23,7 +23,7 @@ func NewOAuthGithubMiddlewares(c domain.Config) OAuthGithubMiddlewares {
 func (m OAuthGithubMiddlewares) CheckAuthEnabled(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		if !m.Config.Auth.Providers.GitHub.Enabled {
-			return c.JSON(http.StatusForbidden, map[string]string{"error": "auth method not enabled"})
+			return c.JSON(http.StatusForbidden, map[string]string{"error": providers.AuthMethodNotEnabled.Error()})
 		}
 		return next(c)
 	}

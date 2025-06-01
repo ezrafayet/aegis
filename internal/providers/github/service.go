@@ -7,9 +7,9 @@ import (
 )
 
 type OAuthGithubService struct {
-	Config   domain.Config
-	Provider providers.OAuthProvider
-	UserRepository domain.UserRepository
+	Config                 domain.Config
+	Provider               providers.OAuthProvider
+	UserRepository         domain.UserRepository
 	RefreshTokenRepository domain.RefreshTokenRepository
 }
 
@@ -17,9 +17,9 @@ var _ providers.OAuthProviderService = OAuthGithubService{}
 
 func NewOAuthGithubService(c domain.Config, p providers.OAuthProvider, userRepository domain.UserRepository, refreshTokenRepository domain.RefreshTokenRepository) OAuthGithubService {
 	return OAuthGithubService{
-		Config:               c,
-		Provider:             p,
-		UserRepository:       userRepository,
+		Config:                 c,
+		Provider:               p,
+		UserRepository:         userRepository,
 		RefreshTokenRepository: refreshTokenRepository,
 	}
 }
@@ -40,9 +40,38 @@ func (s OAuthGithubService) ExchangeCode(code, state string) (string, error) {
 		return "", err
 	}
 
-	// save the user, generate token
+	user, err := s.UserRepository.GetUserByEmail(userInfos.Email)
+	if err != nil && err.Error() != providers.ErrorNoUser.Error() {
+		return "", err
+	}
 
-	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> userInfos", userInfos)
+	if err.Error() == providers.ErrorNoUser.Error() {
+		user = domain.NewUser(userInfos.Name, userInfos.Avatar, userInfos.Email, []string{"user"}, "github")
+		err = s.UserRepository.CreateUser(user)
+		if err != nil {
+			return "", err
+		}
+	}
+
+	if user.IsBlocked() {
+		return "", providers.ErrorUserBlocked
+	}
+
+	if user.IsDeleted() {
+		return "", providers.ErrorUserDeleted
+	}
+
+	if user.AuthMethod != "github" {
+		return "", providers.ErrorWrongAuthMethod
+	}
+
+	refreshToken := domain.NewRefreshToken(user.ID, s.Config.JWT.RefreshTokenExpirationDays)
+	err = s.RefreshTokenRepository.CreateRefreshToken(refreshToken)
+	if err != nil {
+		return "", err
+	}
+
+	// create jwt and cookie
 
 	return userInfos.Email, nil
 }

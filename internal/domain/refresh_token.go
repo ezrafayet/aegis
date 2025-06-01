@@ -13,6 +13,10 @@ type RefreshToken struct {
 	Token     string    `json:"token"`
 }
 
+func (r RefreshToken) IsExpired() bool {
+	return r.ExpiresAt.Before(time.Now())
+}
+
 func NewRefreshToken(userID string, validityInDays int) RefreshToken {
 	createdAt := time.Now()
 	expiresAt := createdAt.AddDate(0, 0, validityInDays)

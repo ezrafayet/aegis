@@ -14,16 +14,6 @@ import (
 )
 
 func Start() error {
-	c, err := config.ReadConfig("config.json")
-	if err != nil {
-		return err
-	}
-
-	db, err := gorm.Open(postgres.Open(c.DB.PostgresURL), &gorm.Config{})
-	if err != nil {
-		return err
-	}
-
 	fmt.Println(`
  █████╗ ██╗   ██╗████████╗██╗  ██╗     █████╗ ███████╗ ██████╗ ██╗██╗  ██╗
 ██╔══██╗██║   ██║╚══██╔══╝██║  ██║    ██╔══██╗██╔════╝██╔════╝ ██║╚██╗██╔╝
@@ -34,6 +24,17 @@ func Start() error {
 Drop-in auth service - no SaaS, no lock-in
 v0.1.0
 	`)
+	c, err := config.ReadConfig("config.json")
+	if err != nil {
+		return err
+	}
+
+	db, err := gorm.Open(postgres.Open(c.DB.PostgresURL), &gorm.Config{})
+	if err != nil {
+		return fmt.Errorf("failed to connect to database: %w", err)
+	}
+
+	fmt.Println("Connected to database")
 
 	e := echo.New()
 	e.HideBanner = true

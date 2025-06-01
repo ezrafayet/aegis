@@ -1,11 +1,10 @@
 package httpserver
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
 
+	"aegix/internal/registry"
 	"aegix/pkg/config"
 
 	"github.com/labstack/echo/v4"
@@ -13,7 +12,7 @@ import (
 )
 
 func Start() error {
-	conf, err := config.ReadConfig("config.json")
+	c, err := config.ReadConfig("config.json")
 	if err != nil {
 		return err
 	}
@@ -35,103 +34,15 @@ v0.1.0
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: conf.Auth.AllowedOrigins,
+		AllowOrigins: c.Auth.AllowedOrigins,
 		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
 		AllowCredentials: true,
 	}))
 
-	// OAuth initiation - redirects to GitHub
-	e.GET("/auth/github", func(c echo.Context) error {
-		redirectURL := fmt.Sprintf(
-			"https://github.com/login/oauth/authorize?client_id=%s&scope=user:email&state=%s",
-			conf.Auth.Providers.GitHub.ClientID,
-			"random_state_here", // TODO: generate proper state token
-		)
-		return c.JSON(http.StatusOK, map[string]string{"redirect_url": redirectURL})
-	})
+	r := registry.NewRegistry(c)
 
-	// /!\ issues an access token
-	e.POST("/auth/github/callback", func(c echo.Context) error {
-		fmt.Printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ok 1")
-		type GithubCallbackRequest struct {
-			Code  string `json:"code"`
-			State string `json:"state"`
-		}
-		var args GithubCallbackRequest
-		if err := c.Bind(&args); err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
-		}
-		type GitHubTokenResponse struct {
-			AccessToken string `json:"access_token"`
-			TokenType   string `json:"token_type"`
-			Scope       string `json:"scope"`
-		}
-
-		data := map[string]string{
-			"client_id":     conf.Auth.Providers.GitHub.ClientID,
-			"client_secret": conf.Auth.Providers.GitHub.ClientSecret,
-			"code":          args.Code,
-			// "redirect_uri":  "http://localhost:3000/auth/callback", // needed ?
-			"state": args.State,
-		}
-		body, _ := json.Marshal(data)
-
-		req, _ := http.NewRequest("POST", "https://github.com/login/oauth/access_token", bytes.NewBuffer(body))
-		req.Header.Set("Accept", "application/json")
-		req.Header.Set("Content-Type", "application/json")
-
-		resp, err := http.DefaultClient.Do(req)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to get access token"})
-		}
-		defer resp.Body.Close()
-
-		var tokenResponse GitHubTokenResponse
-		if err := json.NewDecoder(resp.Body).Decode(&tokenResponse); err != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to decode access token"})
-		}
-
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ok 2", tokenResponse)
-
-		req2, err := http.NewRequest("GET", "https://api.github.com/user/emails", nil)
-		if err != nil {
-			return err
-		}
-
-		req2.Header.Set("Authorization", "Bearer "+tokenResponse.AccessToken)
-		req2.Header.Set("User-Agent", "your-app-name") // required by GitHub
-
-		client := &http.Client{}
-		resp2, err := client.Do(req2)
-		if err != nil {
-			return err
-		}
-		defer resp2.Body.Close()
-
-		type GitHubEmail struct {
-			Email    string `json:"email"`
-			Primary  bool   `json:"primary"`
-			Verified bool   `json:"verified"`
-		}
-
-		var emails []GitHubEmail
-		if err := json.NewDecoder(resp2.Body).Decode(&emails); err != nil {
-			return err
-		}
-
-		var em string
-
-		for _, email := range emails {
-			if email.Primary && email.Verified {
-				em = email.Email
-			}
-		}
-
-		// here, save the user / get more data and set the jwt
-
-		return c.JSON(http.StatusOK, map[string]string{"email": em})
-	})
+	r.GitHubRouter.AttachRoutes(e)
 
 	e.GET("/me", func(c echo.Context) error {
 		// decode and return the jwt, refresh if needed

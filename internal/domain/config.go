@@ -22,6 +22,7 @@ type Config struct {
 		Providers struct {
 			GitHub struct {
 				Enabled      bool   `json:"enabled"`
+				AppName      string `json:"app_name"`
 				ClientID     string `json:"client_id"`
 				ClientSecret string `json:"client_secret"`
 			} `json:"github"`

@@ -17,6 +17,7 @@
         "providers": {
             "github": {
                 "enabled": true,
+                "app_name": "xxxxx",
                 "client_id": "xxxxxx",
                 "client_secret": "xxxxxx"
             }

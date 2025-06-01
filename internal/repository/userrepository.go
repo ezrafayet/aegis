@@ -1,4 +1,4 @@
-package pgrepository
+package repository
 
 import (
 	"aegix/internal/domain"

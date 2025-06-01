@@ -27,7 +27,7 @@ func (r *UserRepository) CreateUser(user domain.User) error {
 
 func (r *UserRepository) GetUserByEmail(email string) (domain.User, error) {
 	var user domain.User
-	result := r.db.Model(&domain.User{}).Where("email = ?", email).First(&user)
+	result := r.db.Where("email = ?", email).First(&user)
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
 		return domain.User{}, result.Error
 	}

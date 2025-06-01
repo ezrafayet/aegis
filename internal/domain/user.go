@@ -11,11 +11,11 @@ type User struct {
 	CreatedAt  time.Time  `json:"created_at" gorm:"index;not null"`
 	DeletedAt  *time.Time `json:"deleted_at" gorm:"index"`
 	BlockedAt  *time.Time `json:"blocked_at" gorm:"index"`
-	Name       string     `json:"name" gorm:"type:varchar(100);not null"`
+	Name       string     `json:"name" gorm:"type:varchar(100)"`
 	Avatar     string     `json:"avatar" gorm:"type:varchar(1000)"`
 	Email      string     `json:"email" gorm:"type:varchar(150);uniqueIndex;not null"`
 	Metadata   string     `json:"metadata" gorm:"type:varchar(1000)"`
-	Roles      []string   `json:"roles" gorm:"type:jsonb"`
+	// Roles      postgres.StringArray   `json:"roles" gorm:"type:text[]"`
 	AuthMethod string     `json:"auth_method" gorm:"type:varchar(20);not null"`
 }
 
@@ -27,7 +27,7 @@ func (u User) IsDeleted() bool {
 	return u.DeletedAt != nil
 }
 
-func NewUser(name, avatar, email string, roles []string, authMethod string) User {
+func NewUser(name, avatar, email string, authMethod string) User {
 	return User{
 		ID:         uuid.New().String(),
 		CreatedAt:  time.Now(),
@@ -37,7 +37,7 @@ func NewUser(name, avatar, email string, roles []string, authMethod string) User
 		Avatar:     avatar,
 		Email:      email,
 		Metadata:   "{}",
-		Roles:      roles,
+		// Roles:      roles,
 		AuthMethod: authMethod,
 	}
 }

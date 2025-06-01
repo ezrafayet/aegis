@@ -35,10 +35,10 @@ func NewUser(username, avatar, email string, roles []string, authMethod string) 
 
 type UserRepository interface {
 	CreateUser(user User) error
-	GetUserByID(id string) (User, error)
+	// GetUserByID(userID string) (User, error)
 	GetUserByEmail(email string) (User, error)
-	SoftDeleteUser(id string) error
-	HardDeleteUser(id string) error
-	BlockUser(id string) error
-	UnblockUser(id string) error
+	// SoftDeleteUser(userID string) error
+	// HardDeleteUser(userID string) error
+	// BlockUser(userID string) error
+	// UnblockUser(userID string) error
 }

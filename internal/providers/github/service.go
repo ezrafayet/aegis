@@ -9,15 +9,18 @@ import (
 type OAuthGithubService struct {
 	Config   domain.Config
 	Provider providers.OAuthProvider
-	// DB
+	UserRepository domain.UserRepository
+	RefreshTokenRepository domain.RefreshTokenRepository
 }
 
 var _ providers.OAuthProviderService = OAuthGithubService{}
 
-func NewOAuthGithubService(c domain.Config, p providers.OAuthProvider) OAuthGithubService {
+func NewOAuthGithubService(c domain.Config, p providers.OAuthProvider, userRepository domain.UserRepository, refreshTokenRepository domain.RefreshTokenRepository) OAuthGithubService {
 	return OAuthGithubService{
-		Config:   c,
-		Provider: p,
+		Config:               c,
+		Provider:             p,
+		UserRepository:       userRepository,
+		RefreshTokenRepository: refreshTokenRepository,
 	}
 }
 

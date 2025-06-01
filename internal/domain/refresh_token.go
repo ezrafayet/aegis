@@ -27,6 +27,6 @@ func NewRefreshToken(userID string, validityInDays int) RefreshToken {
 type RefreshTokenRepository interface {
 	CreateRefreshToken(refreshToken RefreshToken) error
 	GetRefreshTokenByToken(token string) (RefreshToken, error)
-	GetRefreshTokensByUserID(userID string) ([]RefreshToken, error)
-	DeleteRefreshToken(token string) error
+	// GetRefreshTokensByUserID(userID string) ([]RefreshToken, error)
+	// DeleteRefreshToken(token string) error
 }

@@ -9,10 +9,17 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 func Start() error {
 	c, err := config.ReadConfig("config.json")
+	if err != nil {
+		return err
+	}
+
+	db, err := gorm.Open(postgres.Open(c.DB.PostgresURL), &gorm.Config{})
 	if err != nil {
 		return err
 	}
@@ -37,7 +44,7 @@ v0.1.0
 		XSSProtection:         "1; mode=block",
 		ContentTypeNosniff:    "nosniff",
 		XFrameOptions:         "DENY",
-		HSTSMaxAge:           3600,
+		HSTSMaxAge:            3600,
 	}))
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -47,7 +54,7 @@ v0.1.0
 		AllowCredentials: true,
 	}))
 
-	r := registry.NewRegistry(c)
+	r := registry.NewRegistry(c, db)
 
 	r.GitHubRouter.AttachRoutes(e)
 

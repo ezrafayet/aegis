@@ -72,18 +72,16 @@ v0.1.0
 	})
 
 	e.POST("/refresh", func(c echo.Context) error {
-		// refresh the jwt
-		return c.String(http.StatusOK, "Hello, World!")
+		return c.NoContent(http.StatusOK)
 	})
 
 	e.GET("/logout", func(c echo.Context) error {
-		// delete the jwt
-		return c.String(http.StatusOK, "Hello, World!")
+		return c.NoContent(http.StatusOK)
 	})
 
 	e.POST("/authorize", func(c echo.Context) error {
 		// ask auth service if a jwt is valid, and get user's details from jwt
-		return c.String(http.StatusOK, "Hello, World!")
+		return c.NoContent(http.StatusOK)
 	})
 
 	// must also retrieve and set

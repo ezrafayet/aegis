@@ -45,7 +45,7 @@ func (s OAuthGithubService) ExchangeCode(code, state string) (string, error) {
 		return "", err
 	}
 
-	if err.Error() == providers.ErrNoUser.Error() {
+	if err != nil && err.Error() == providers.ErrNoUser.Error() {
 		user = domain.NewUser(userInfos.Name, userInfos.Avatar, userInfos.Email, "github")
 		err = s.UserRepository.CreateUser(user)
 		if err != nil {

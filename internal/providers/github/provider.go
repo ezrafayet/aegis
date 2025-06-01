@@ -27,6 +27,13 @@ type gitHubTokenResponse struct {
 	Scope       string `json:"scope"`
 }
 
+type gitHubUser struct {
+	Login     string `json:"login"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	AvatarURL string `json:"avatar_url"`
+}
+
 type gitHubEmail struct {
 	Email    string `json:"email"`
 	Primary  bool   `json:"primary"`
@@ -34,7 +41,6 @@ type gitHubEmail struct {
 }
 
 func (p OAuthGithubProvider) GetUserInfos(code, state, redirectUri string) (*providers.OAuthUser, error) {
-	fmt.Println("hit1")
 	// Step 1: get access token
 	data := map[string]string{
 		"client_id":     p.Config.Auth.Providers.GitHub.ClientID,
@@ -59,8 +65,23 @@ func (p OAuthGithubProvider) GetUserInfos(code, state, redirectUri string) (*pro
 	if err := json.NewDecoder(resp1.Body).Decode(&tokenResponse); err != nil {
 		return nil, fmt.Errorf("failed to decode access token: %w", err)
 	}
-	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> tokenResponse", tokenResponse)
+
 	// Step 2: get user infos
+	req2, err := http.NewRequest("GET", "https://api.github.com/user", nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create user info request: %w", err)
+	}
+	req2.Header.Set("Authorization", "Bearer "+tokenResponse.AccessToken)
+	resp2, err := http.DefaultClient.Do(req2)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user info: %w", err)
+	}
+	defer resp2.Body.Close()
+	var user gitHubUser
+	if err := json.NewDecoder(resp2.Body).Decode(&user); err != nil {
+		return nil, fmt.Errorf("failed to decode user info: %w", err)
+	}
+
 	// Step 3: get user emails
 	req3, err := http.NewRequest("GET", "https://api.github.com/user/emails", nil)
 	if err != nil {
@@ -74,7 +95,6 @@ func (p OAuthGithubProvider) GetUserInfos(code, state, redirectUri string) (*pro
 	}
 	defer resp3.Body.Close()
 	var emails []gitHubEmail
-	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> resp3", resp3)
 	if err := json.NewDecoder(resp3.Body).Decode(&emails); err != nil {
 		return nil, fmt.Errorf("failed to decode user emails: %w", err)
 	}
@@ -84,9 +104,16 @@ func (p OAuthGithubProvider) GetUserInfos(code, state, redirectUri string) (*pro
 			em = email.Email
 		}
 	}
+
+	if em == "" && user.Email != "" {
+		em = user.Email
+	}
+
+	userName := user.Name
+
 	return &providers.OAuthUser{
-		Name:   "",
+		Name:   userName,
 		Email:  em,
-		Avatar: "",
+		Avatar: user.AvatarURL,
 	}, nil
 }

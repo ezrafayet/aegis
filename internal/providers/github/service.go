@@ -41,11 +41,11 @@ func (s OAuthGithubService) ExchangeCode(code, state string) (string, error) {
 	}
 
 	user, err := s.UserRepository.GetUserByEmail(userInfos.Email)
-	if err != nil && err.Error() != providers.ErrorNoUser.Error() {
+	if err != nil && err.Error() != providers.ErrNoUser.Error() {
 		return "", err
 	}
 
-	if err.Error() == providers.ErrorNoUser.Error() {
+	if err.Error() == providers.ErrNoUser.Error() {
 		user = domain.NewUser(userInfos.Name, userInfos.Avatar, userInfos.Email, []string{"user"}, "github")
 		err = s.UserRepository.CreateUser(user)
 		if err != nil {
@@ -54,15 +54,15 @@ func (s OAuthGithubService) ExchangeCode(code, state string) (string, error) {
 	}
 
 	if user.IsBlocked() {
-		return "", providers.ErrorUserBlocked
+		return "", providers.ErrUserBlocked
 	}
 
 	if user.IsDeleted() {
-		return "", providers.ErrorUserDeleted
+		return "", providers.ErrUserDeleted
 	}
 
 	if user.AuthMethod != "github" {
-		return "", providers.ErrorWrongAuthMethod
+		return "", providers.ErrWrongAuthMethod
 	}
 
 	refreshToken := domain.NewRefreshToken(user.ID, s.Config.JWT.RefreshTokenExpirationDays)

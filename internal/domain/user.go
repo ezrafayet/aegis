@@ -7,16 +7,16 @@ import (
 )
 
 type User struct {
-	ID         string     `json:"id"`
-	CreatedAt  time.Time  `json:"created_at"`
-	DeletedAt  *time.Time `json:"deleted_at"`
-	BlockedAt  *time.Time `json:"blocked_at"`
-	Name       string     `json:"name"`
-	Avatar     string     `json:"avatar"`
-	Email      string     `json:"email"`
-	Metadata   string     `json:"metadata"`
-	Roles      []string   `json:"roles"`
-	AuthMethod string     `json:"auth_method"`
+	ID         string     `json:"id" gorm:"primaryKey;type:uuid"`
+	CreatedAt  time.Time  `json:"created_at" gorm:"index;not null"`
+	DeletedAt  *time.Time `json:"deleted_at" gorm:"index"`
+	BlockedAt  *time.Time `json:"blocked_at" gorm:"index"`
+	Name       string     `json:"name" gorm:"type:varchar(100);not null"`
+	Avatar     string     `json:"avatar" gorm:"type:varchar(1000)"`
+	Email      string     `json:"email" gorm:"type:varchar(150);uniqueIndex;not null"`
+	Metadata   string     `json:"metadata" gorm:"type:varchar(1000)"`
+	Roles      []string   `json:"roles" gorm:"type:jsonb"`
+	AuthMethod string     `json:"auth_method" gorm:"type:varchar(20);not null"`
 }
 
 func (u User) IsBlocked() bool {

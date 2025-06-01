@@ -2,6 +2,7 @@ package repository
 
 import (
 	"aegix/internal/domain"
+	"aegix/internal/providers"
 
 	"gorm.io/gorm"
 )
@@ -17,9 +18,21 @@ func NewRefreshTokenRepository(db *gorm.DB) RefreshTokenRepository {
 }
 
 func (r *RefreshTokenRepository) CreateRefreshToken(refreshToken domain.RefreshToken) error {
+	result := r.db.Model(&domain.RefreshToken{}).Create(&refreshToken)
+	if result.Error != nil {
+		return result.Error
+	}
 	return nil
 }
 
 func (r *RefreshTokenRepository) GetRefreshTokenByToken(token string) (domain.RefreshToken, error) {
+	var refreshToken domain.RefreshToken
+	result := r.db.Model(&domain.RefreshToken{}).Where("token = ?", token).First(&refreshToken)
+	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
+		return domain.RefreshToken{}, result.Error
+	}
+	if result.Error == gorm.ErrRecordNotFound {
+		return domain.RefreshToken{}, providers.ErrNoRefreshToken
+	}
 	return domain.RefreshToken{}, nil
 }

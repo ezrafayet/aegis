@@ -7,10 +7,10 @@ import (
 )
 
 type RefreshToken struct {
-	UserID    string    `json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-	ExpiresAt time.Time `json:"expires_at"`
-	Token     string    `json:"token"`
+	UserID    string    `json:"id" gorm:"primaryKey;type:uuid"`
+	CreatedAt time.Time `json:"created_at" gorm:"index;not null"`
+	ExpiresAt time.Time `json:"expires_at" gorm:"index;not null"`
+	Token     string    `json:"token" gorm:"type:varchar(150);uniqueIndex;not null"`
 }
 
 func (r RefreshToken) IsExpired() bool {

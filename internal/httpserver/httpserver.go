@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"aegix/internal/domain"
 	"aegix/internal/registry"
 	"aegix/pkg/config"
 
@@ -35,6 +36,8 @@ v0.1.0
 	}
 
 	fmt.Println("Connected to database")
+
+	db.AutoMigrate(&domain.User{}, &domain.RefreshToken{})
 
 	e := echo.New()
 	e.HideBanner = true

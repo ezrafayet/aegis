@@ -2,6 +2,7 @@ package repository
 
 import (
 	"aegix/internal/domain"
+	"aegix/internal/providers"
 
 	"gorm.io/gorm"
 )
@@ -17,9 +18,21 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 }
 
 func (r *UserRepository) CreateUser(user domain.User) error {
+	result := r.db.Model(&domain.User{}).Create(&user)
+	if result.Error != nil {
+		return result.Error
+	}
 	return nil
 }
 
 func (r *UserRepository) GetUserByEmail(email string) (domain.User, error) {
-	return domain.User{}, nil
+	var user domain.User
+	result := r.db.Model(&domain.User{}).Where("email = ?", email).First(&user)
+	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
+		return domain.User{}, result.Error
+	}
+	if result.Error == gorm.ErrRecordNotFound {
+		return domain.User{}, providers.ErrNoUser
+	}
+	return user, nil
 }

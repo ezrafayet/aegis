@@ -12,6 +12,7 @@ import (
 type CustomClaims struct {
 	UserID string   `json:"user_id"`
 	Roles  []string `json:"roles"`
+	Metadata string `json:"metadata"`
 }
 
 func NewAccessToken(customClaims CustomClaims, config Config) (accessToken string, expiresAt int64, err error) {
@@ -26,6 +27,7 @@ func NewAccessToken(customClaims CustomClaims, config Config) (accessToken strin
 	claims["iss"] = config.App.Name
 	claims["user_id"] = customClaims.UserID
 	claims["roles"] = strings.Join(customClaims.Roles, ",")
+	claims["metadata"] = customClaims.Metadata
 	tokenString, err := token.SignedString([]byte(config.JWT.Secret))
 	if err != nil {
 		return "", -1, err

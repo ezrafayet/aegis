@@ -3,9 +3,9 @@ package github
 import (
 	"aegix/internal/domain"
 	"aegix/internal/providers"
+	"aegix/internal/components/cookies"
 	"fmt"
 	"net/http"
-	"time"
 )
 
 type OAuthGithubService struct {
@@ -13,6 +13,7 @@ type OAuthGithubService struct {
 	Provider               providers.OAuthProvider
 	UserRepository         domain.UserRepository
 	RefreshTokenRepository domain.RefreshTokenRepository
+	CookieBuilder          cookies.CookieBuilderMethods
 }
 
 var _ providers.OAuthProviderService = OAuthGithubService{}
@@ -87,75 +88,15 @@ func (s OAuthGithubService) ExchangeCode(code, state string) (http.Cookie, http.
 
 	accessToken, atExpiresAt, err := domain.NewAccessToken(domain.CustomClaims{
 		UserID: user.ID,
-		Roles:  []string{}, // replace with user roles
+		Roles:  []string{},
+		Metadata: user.Metadata,
 	}, s.Config)
 	if err != nil {
 		return http.Cookie{}, http.Cookie{}, err
 	}
 
-	accessCookie := http.Cookie{
-		Name:     "access_token",
-		Domain:   s.Config.App.URL,
-		Value:    accessToken,
-		Expires:  time.Unix(atExpiresAt, 0),
-		HttpOnly: true,
-		Secure:   false, // change
-		SameSite: http.SameSiteLaxMode,
-		Path:     "/",
-	}
-	if s.Config.Cookie.Domain != "" {
-		accessCookie.Domain = s.Config.Cookie.Domain
-	}
-	if s.Config.Cookie.Path != "" {
-		accessCookie.Path = s.Config.Cookie.Path
-	}
-	if s.Config.Cookie.Secure {
-		accessCookie.Secure = true
-	}
-	if s.Config.Cookie.HTTPOnly {
-		accessCookie.HttpOnly = true
-	}
-	if s.Config.Cookie.SameSite != "" {
-		if s.Config.Cookie.SameSite == "Lax" {
-			accessCookie.SameSite = http.SameSiteLaxMode
-		} else if s.Config.Cookie.SameSite == "Strict" {
-			accessCookie.SameSite = http.SameSiteStrictMode
-		} else if s.Config.Cookie.SameSite == "None" {
-			accessCookie.SameSite = http.SameSiteNoneMode
-		}
-	}
-
-	refreshCookie := http.Cookie{
-		Name:     "refresh_token",
-		Domain:   s.Config.App.URL,
-		Value:    refreshToken.Token,
-		Expires:  time.Unix(rtExpiresAt, 0),
-		HttpOnly: true,
-		Secure:   false, // change
-		SameSite: http.SameSiteLaxMode,
-		Path:     "/",
-	}
-	if s.Config.Cookie.Domain != "" {
-		refreshCookie.Domain = s.Config.Cookie.Domain
-	}
-	if s.Config.Cookie.Path != "" {
-		refreshCookie.Path = s.Config.Cookie.Path
-	}
-	if s.Config.Cookie.Secure {
-		refreshCookie.Secure = true
-	}
-	if s.Config.Cookie.HTTPOnly {
-		refreshCookie.HttpOnly = true
-	}
-	if s.Config.Cookie.SameSite != "" {
-		if s.Config.Cookie.SameSite == "Lax" {
-			refreshCookie.SameSite = http.SameSiteLaxMode
-		} else if s.Config.Cookie.SameSite == "Strict" {
-			refreshCookie.SameSite = http.SameSiteStrictMode
-		} else if s.Config.Cookie.SameSite == "None" {
-			refreshCookie.SameSite = http.SameSiteNoneMode
-		}
-	}
+	accessCookie := s.CookieBuilder.NewAccessCookie(accessToken, atExpiresAt, true)
+	refreshCookie := s.CookieBuilder.NewRefreshCookie(refreshToken.Token, rtExpiresAt, true)
 
 	return accessCookie, refreshCookie, nil
 }

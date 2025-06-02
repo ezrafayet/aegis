@@ -66,29 +66,17 @@ v0.1.0
 
 	r.GitHubRouter.AttachRoutes(e)
 
-	e.GET("/me", func(c echo.Context) error {
-		// decode and return the jwt, refresh if needed
-		return c.String(http.StatusOK, "Hello, World!")
-	})
+	r.AuthRouter.AttachRoutes(e)
 
-	e.POST("/refresh", func(c echo.Context) error {
-		return c.NoContent(http.StatusOK)
-	})
-
-	e.GET("/logout", func(c echo.Context) error {
-		return c.NoContent(http.StatusOK)
-	})
-
-	e.POST("/authorize", func(c echo.Context) error {
-		// ask auth service if a jwt is valid, and get user's details from jwt
-		return c.NoContent(http.StatusOK)
-	})
-
+	// r.PrivateAuthRouter.AttachRoutes(e)
+	// e.POST("/authorize", func(c echo.Context) error {
+	// 	// ask auth service if a jwt is valid, and get user's details from jwt
+	// 	return c.NoContent(http.StatusOK)
+	// })
 	// must also retrieve and set
 	// e.POST("/authorize-api-token", func(c echo.Context) error {
 	// 	return c.String(http.StatusOK, "Hello, World!")
 	// })
-
 	// get/set user metadata
 
 	if err := e.Start(":5666"); err != nil && err != http.ErrServerClosed {

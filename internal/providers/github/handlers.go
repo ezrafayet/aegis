@@ -48,5 +48,5 @@ func (h OAuthGithubHandlers) ExchangeCode(c echo.Context) error {
 	}
 	c.SetCookie(&accessCookie)
 	c.SetCookie(&refreshCookie)
-	return c.JSON(http.StatusOK, map[string]string{"accessCookie": accessCookie.String(), "refreshCookie": refreshCookie.String()})
+	return c.NoContent(http.StatusOK)
 }

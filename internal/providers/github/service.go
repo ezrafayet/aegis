@@ -43,6 +43,7 @@ func (s OAuthGithubService) ExchangeCode(code, state string) (http.Cookie, http.
 		return http.Cookie{}, http.Cookie{}, err
 	}
 
+	// move all that block somewhere to be reused across providers
 	user, err := s.UserRepository.GetUserByEmail(userInfos.Email)
 	if err != nil && err.Error() != providers.ErrNoUser.Error() {
 		return http.Cookie{}, http.Cookie{}, err
@@ -68,29 +69,24 @@ func (s OAuthGithubService) ExchangeCode(code, state string) (http.Cookie, http.
 		return http.Cookie{}, http.Cookie{}, providers.ErrWrongAuthMethod
 	}
 
+	// arbitrary naive check, will replace with device fingerprints
 	validRefreshTokens, err := s.RefreshTokenRepository.GetValidRefreshTokensByUserID(user.ID)
 	if err != nil {
 		return http.Cookie{}, http.Cookie{}, err
 	}
-
-	// arbitrary naive check, will replace with device fingerprints
 	if len(validRefreshTokens) > 10 {
 		return http.Cookie{}, http.Cookie{}, providers.ErrTooManyRefreshTokens
 	}
 
 	_ = s.RefreshTokenRepository.CleanExpiredTokens(user.ID)
 
-	refreshToken, rtExpiresAt := domain.NewRefreshToken(user.ID, s.Config)
+	refreshToken, rtExpiresAt := domain.NewRefreshToken(user, s.Config)
 	err = s.RefreshTokenRepository.CreateRefreshToken(refreshToken)
 	if err != nil {
 		return http.Cookie{}, http.Cookie{}, err
 	}
 
-	accessToken, atExpiresAt, err := domain.NewAccessToken(domain.CustomClaims{
-		UserID: user.ID,
-		Roles:  []string{},
-		Metadata: user.Metadata,
-	}, s.Config)
+	accessToken, atExpiresAt, err := domain.NewAccessToken(user, s.Config)
 	if err != nil {
 		return http.Cookie{}, http.Cookie{}, err
 	}

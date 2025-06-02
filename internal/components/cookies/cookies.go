@@ -1,3 +1,4 @@
+// tbh I dont know where the hell to put this yet...
 package cookies
 
 import (

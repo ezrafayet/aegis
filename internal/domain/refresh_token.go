@@ -18,11 +18,11 @@ func (r RefreshToken) IsExpired() bool {
 	return r.ExpiresAt.Before(time.Now())
 }
 
-func NewRefreshToken(userID string, config Config) (RefreshToken, int64) {
+func NewRefreshToken(user User, config Config) (RefreshToken, int64) {
 	createdAt := time.Now()
 	expiresAt := createdAt.AddDate(0, 0, config.JWT.RefreshTokenExpirationDays)
 	return RefreshToken{
-		UserID:    userID,
+		UserID:    user.ID,
 		CreatedAt: createdAt,
 		ExpiresAt: expiresAt,
 		Token:     uuid.New().String(),

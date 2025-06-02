@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -15,7 +14,7 @@ type CustomClaims struct {
 	Metadata string `json:"metadata"`
 }
 
-func NewAccessToken(customClaims CustomClaims, config Config) (accessToken string, expiresAt int64, err error) {
+func NewAccessToken(user User, config Config) (accessToken string, expiresAt int64, err error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	issuedAt := time.Now()
 	secondsOfValidity := config.JWT.AccessTokenExpirationMin * 60
@@ -25,9 +24,9 @@ func NewAccessToken(customClaims CustomClaims, config Config) (accessToken strin
 	claims["exp"] = expiresAt
 	claims["issued_at"] = issuedAt.Unix()
 	claims["iss"] = config.App.Name
-	claims["user_id"] = customClaims.UserID
-	claims["roles"] = strings.Join(customClaims.Roles, ",")
-	claims["metadata"] = customClaims.Metadata
+	claims["user_id"] = user.ID
+	// claims["roles"] = strings.Join(customClaims.Roles, ",") // todo
+	claims["metadata"] = user.Metadata
 	tokenString, err := token.SignedString([]byte(config.JWT.Secret))
 	if err != nil {
 		return "", -1, err

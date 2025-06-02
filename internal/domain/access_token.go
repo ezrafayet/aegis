@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"errors"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -32,4 +33,35 @@ func NewAccessToken(user User, config Config) (accessToken string, expiresAt int
 		return "", -1, err
 	}
 	return tokenString, expiresAt, nil
+}
+
+func ReadAccessTokenClaims(accessToken string, config Config) (CustomClaims, error) {
+	parsedToken, err := jwt.Parse(accessToken, func(token *jwt.Token) (any, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("invalid_token")
+		}
+		return []byte(config.JWT.Secret), nil
+	})
+	if err != nil {
+		if validationError, ok := err.(*jwt.ValidationError); ok {
+			if validationError.Errors&jwt.ValidationErrorExpired != 0 {
+				return CustomClaims{}, errors.New("access_token_expired")
+			}
+		}
+		return CustomClaims{}, err
+	}
+	if !parsedToken.Valid {
+		return CustomClaims{}, errors.New("invalid_token")
+	}
+
+	var customClaims CustomClaims
+
+	if claims, ok := parsedToken.Claims.(jwt.MapClaims); ok {
+		// /!\ This code can fail if the claims are not in the expected format
+		customClaims.UserID = claims["user_id"].(string)
+		// customClaims.Roles = strings.Split(claims["roles"].(string), " ")
+		customClaims.Metadata = claims["metadata"].(string)
+	}
+
+	return customClaims, nil
 }

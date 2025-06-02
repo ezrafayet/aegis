@@ -24,6 +24,7 @@ func NewOAuthGithubService(c domain.Config, p providers.OAuthProvider, userRepos
 		Provider:               p,
 		UserRepository:         userRepository,
 		RefreshTokenRepository: refreshTokenRepository,
+		CookieBuilder:          cookies.NewCookieBuilder(c), // how bad is that?
 	}
 }
 
@@ -69,6 +70,7 @@ func (s OAuthGithubService) ExchangeCode(code, state string) (http.Cookie, http.
 		return http.Cookie{}, http.Cookie{}, providers.ErrWrongAuthMethod
 	}
 
+	// duplicated code btw
 	// arbitrary naive check, will replace with device fingerprints
 	validRefreshTokens, err := s.RefreshTokenRepository.GetValidRefreshTokensByUserID(user.ID)
 	if err != nil {

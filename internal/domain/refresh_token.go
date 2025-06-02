@@ -34,6 +34,5 @@ type RefreshTokenRepository interface {
 	GetRefreshTokenByToken(token string) (RefreshToken, error)
 	GetValidRefreshTokensByUserID(userID string) ([]RefreshToken, error)
 	CleanExpiredTokens(userID string) error
-	// GetRefreshTokensByUserID(userID string) ([]RefreshToken, error)
-	// DeleteRefreshToken(token string) error
+	DeleteRefreshToken(token string) error
 }

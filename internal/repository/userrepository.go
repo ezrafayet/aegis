@@ -36,3 +36,12 @@ func (r *UserRepository) GetUserByEmail(email string) (domain.User, error) {
 	}
 	return user, nil
 }
+
+func (r *UserRepository) GetUserByID(userID string) (domain.User, error) {
+	var user domain.User
+	result := r.db.Where("id = ?", userID).First(&user)
+	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
+		return domain.User{}, result.Error
+	}
+	return user, nil
+}

@@ -43,7 +43,6 @@ v0.1.0
 
 	e := echo.New()
 	e.HideBanner = true
-
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.SecureWithConfig(middleware.SecureConfig{
@@ -63,17 +62,6 @@ v0.1.0
 	r := registry.NewRegistry(c, db)
 	r.GitHubRouter.AttachRoutes(e)
 	r.AuthRouter.AttachRoutes(e)
-
-	// r.PrivateAuthRouter.AttachRoutes(e)
-	// e.POST("/authorize", func(c echo.Context) error {
-	// 	// ask auth service if a jwt is valid, and get user's details from jwt
-	// 	return c.NoContent(http.StatusOK)
-	// })
-	// must also retrieve and set
-	// e.POST("/authorize-api-token", func(c echo.Context) error {
-	// 	return c.String(http.StatusOK, "Hello, World!")
-	// })
-	// get/set user metadata
 
 	return e.Start(fmt.Sprintf(":%d", c.App.Port))
 }

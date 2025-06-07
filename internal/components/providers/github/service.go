@@ -56,7 +56,7 @@ func (s OAuthGithubService) ExchangeCode(code, state string) (http.Cookie, http.
 		return http.Cookie{}, http.Cookie{}, err
 	}
 
-	accessCookie := cookies.NewAccessCookie(accessToken, atExpiresAt, true, s.Config)
-	refreshCookie := cookies.NewRefreshCookie(newRefreshToken, rtExpiresAt, true, s.Config)
+	accessCookie := cookies.NewAccessCookie(accessToken, atExpiresAt, s.Config)
+	refreshCookie := cookies.NewRefreshCookie(newRefreshToken, rtExpiresAt, s.Config)
 	return accessCookie, refreshCookie, nil
 }

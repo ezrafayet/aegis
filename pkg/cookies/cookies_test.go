@@ -7,7 +7,7 @@ import (
 
 func TestNewCookie(t *testing.T) {
 	t.Run("basic test", func(t *testing.T) {
-		cookie := newCookie("access_token", "test_value", 1717795200, true, domain.Config{})
+		cookie := newCookie("access_token", "test_value", 1717795200, domain.Config{})
 		if cookie.Name != "access_token" {
 			t.Errorf("expected cookie name to be 'access_token', got %s", cookie.Name)
 		}

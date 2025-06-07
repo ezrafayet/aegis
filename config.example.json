@@ -27,7 +27,7 @@
         "domain": "https://myapp.com",
         "secure": true,
         "http_only": true,
-        "same_site": "Lax",
+        "same_site": 1,
         "path": "/"
     },
     "user": {

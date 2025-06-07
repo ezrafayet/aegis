@@ -36,18 +36,14 @@ type Config struct {
 				ClientSecret string `json:"client_secret"`
 			} `json:"github"`
 		} `json:"providers"`
-
-		// RedirectURLs struct {
-		// 	Success []string `json:"success"`
-		// 	Failure []string `json:"failure"`
-		// } `json:"redirect_urls"`
 	} `json:"auth"`
 
 	Cookies struct {
 		Domain   string `json:"domain"`
 		Secure   bool   `json:"secure"`
 		HTTPOnly bool   `json:"http_only"`
-		SameSite string `json:"same_site"`
+		// SameSite cookie attribute: 1 = default, 2 = lax, 3 = strict, 4 = none
+		SameSite int `json:"same_site"`
 		Path     string `json:"path"`
 	} `json:"cookie"`
 

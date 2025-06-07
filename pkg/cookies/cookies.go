@@ -27,24 +27,24 @@ func newCookie(name, value string, expiresAt int64, withDefaults bool, config do
 		Path:     "/",
 	}
 	if withDefaults {
-		if config.Cookie.Domain != "" {
-			cookie.Domain = config.Cookie.Domain
+		if config.Cookies.Domain != "" {
+			cookie.Domain = config.Cookies.Domain
 		}
-		if config.Cookie.Path != "" {
-			cookie.Path = config.Cookie.Path
+		if config.Cookies.Path != "" {
+			cookie.Path = config.Cookies.Path
 		}
-		if config.Cookie.Secure {
+		if config.Cookies.Secure {
 			cookie.Secure = true
 		}
-		if config.Cookie.HTTPOnly {
+		if config.Cookies.HTTPOnly {
 			cookie.HttpOnly = true
 		}
-		if config.Cookie.SameSite != "" {
-			if config.Cookie.SameSite == "Lax" {
+		if config.Cookies.SameSite != "" {
+			if config.Cookies.SameSite == "Lax" {
 				cookie.SameSite = http.SameSiteLaxMode
-			} else if config.Cookie.SameSite == "Strict" {
+			} else if config.Cookies.SameSite == "Strict" {
 				cookie.SameSite = http.SameSiteStrictMode
-			} else if config.Cookie.SameSite == "None" {
+			} else if config.Cookies.SameSite == "None" {
 				cookie.SameSite = http.SameSiteNoneMode
 			}
 		}

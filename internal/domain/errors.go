@@ -11,8 +11,5 @@ var (
 	ErrTooManyRefreshTokens = errors.New("too_many_refresh_tokens")
 	ErrInvalidToken         = errors.New("invalid_token")
 	ErrAccessTokenExpired   = errors.New("access_token_expired")
-)
-
-var (
 	ErrAuthMethodNotEnabled = errors.New("auth_method_not_enabled")
 )

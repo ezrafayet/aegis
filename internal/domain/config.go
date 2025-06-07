@@ -2,23 +2,32 @@ package domain
 
 type Config struct {
 	App struct {
-		Name     string   `json:"name"`
-		URL      string   `json:"url"`
-		LogLevel string   `json:"log_level"`
-		APIKeys  []string `json:"api_keys"`
+		// Name of the application
+		Name           string   `json:"name"`
+		// URL of the application (main domain)
+		URL            string   `json:"url"`
+		// Allowed origins for the application (CORS)
+		AllowedOrigins []string `json:"allowed_origins"`
+		// API keys for the application (internal requests)
+		APIKeys []string `json:"api_keys"`
 	} `json:"app"`
 
 	DB struct {
+		// DB connection string
 		PostgresURL string `json:"postgres_url"`
 	} `json:"db"`
 
 	JWT struct {
+		// Secret key for the JWT
 		Secret                     string `json:"secret"`
+		// Access token expiration time in minutes
 		AccessTokenExpirationMin   int    `json:"access_token_expiration_minutes"`
+		// Refresh token expiration time in days
 		RefreshTokenExpirationDays int    `json:"refresh_token_expiration_days"`
 	} `json:"jwt"`
 
 	Auth struct {
+		// Providers configuration
 		Providers struct {
 			GitHub struct {
 				Enabled      bool   `json:"enabled"`
@@ -28,16 +37,13 @@ type Config struct {
 			} `json:"github"`
 		} `json:"providers"`
 
-		RedirectURLs struct {
-			Success []string `json:"success"`
-			Failure []string `json:"failure"`
-		} `json:"redirect_urls"`
-
-		AllowedOrigins []string `json:"allowed_origins"`
+		// RedirectURLs struct {
+		// 	Success []string `json:"success"`
+		// 	Failure []string `json:"failure"`
+		// } `json:"redirect_urls"`
 	} `json:"auth"`
 
-	Cookie struct {
-		Name     string `json:"name"`
+	Cookies struct {
 		Domain   string `json:"domain"`
 		Secure   bool   `json:"secure"`
 		HTTPOnly bool   `json:"http_only"`
@@ -46,13 +52,7 @@ type Config struct {
 	} `json:"cookie"`
 
 	User struct {
+		// Roles for a user, mandatory roles are: "user" and "platform_admin"
 		Roles    []string                      `json:"roles"`
-		Metadata map[string]UserMetadataConfig `json:"metadata"`
 	} `json:"user"`
-}
-
-type UserMetadataConfig struct {
-	Type    string   `json:"type"`
-	Default string   `json:"default"`
-	Enum    []string `json:"enum"`
 }

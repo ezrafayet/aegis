@@ -12,9 +12,8 @@ type CustomClaims struct {
 	Metadata string   `json:"metadata"`
 }
 
-func NewAccessToken(cClaims CustomClaims, config Config) (accessToken string, expiresAt int64, err error) {
+func NewAccessToken(cClaims CustomClaims, config Config, issuedAt time.Time) (accessToken string, expiresAt int64, err error) {
 	token := jwt.New(jwt.SigningMethodHS256)
-	issuedAt := time.Now()
 	secondsOfValidity := config.JWT.AccessTokenExpirationMin * 60
 	expiresAt = issuedAt.Add(time.Second * time.Duration(secondsOfValidity)).Unix()
 	claims := token.Claims.(jwt.MapClaims)

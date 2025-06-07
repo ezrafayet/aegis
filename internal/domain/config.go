@@ -19,14 +19,7 @@ type Config struct {
 		PostgresURL string `json:"postgres_url"`
 	} `json:"db"`
 
-	JWT struct {
-		// Secret key for the JWT
-		Secret string `json:"secret"`
-		// Access token expiration time in minutes
-		AccessTokenExpirationMin int `json:"access_token_expiration_minutes"`
-		// Refresh token expiration time in days
-		RefreshTokenExpirationDays int `json:"refresh_token_expiration_days"`
-	} `json:"jwt"`
+	JWT JWTConfig `json:"jwt"`
 
 	Auth struct {
 		// Providers configuration
@@ -53,4 +46,13 @@ type Config struct {
 		// Roles for a user, mandatory roles are: "user" and "platform_admin"
 		Roles []string `json:"roles"`
 	} `json:"user"`
+}
+
+type JWTConfig struct {
+	// Secret key for the JWT
+	Secret string `json:"secret"`
+	// Access token expiration time in minutes
+	AccessTokenExpirationMin int `json:"access_token_expiration_minutes"`
+	// Refresh token expiration time in days
+	RefreshTokenExpirationDays int `json:"refresh_token_expiration_days"`
 }

@@ -1,5 +1,7 @@
 package domain
 
+import "time"
+
 func GenerateTokensForUser(user User, config Config, refreshTokenRepository RefreshTokenRepository) (accessToken string, atExpiresAt int64, refreshToken string, rtExpiresAt int64, err error) {
 	validRefreshTokens, err := refreshTokenRepository.GetValidRefreshTokensByUserID(user.ID)
 	if err != nil {
@@ -20,7 +22,7 @@ func GenerateTokensForUser(user User, config Config, refreshTokenRepository Refr
 	accessToken, atExpiresAt, err = NewAccessToken(CustomClaims{
 		UserID:   user.ID,
 		Metadata: user.Metadata,
-	}, config)
+	}, config, time.Now())
 	if err != nil {
 		return "", -1, "", -1, err
 	}

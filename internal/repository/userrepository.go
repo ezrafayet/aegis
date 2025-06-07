@@ -2,7 +2,6 @@ package repository
 
 import (
 	"aegix/internal/domain"
-	"aegix/internal/providers"
 
 	"gorm.io/gorm"
 )
@@ -32,7 +31,7 @@ func (r *UserRepository) GetUserByEmail(email string) (domain.User, error) {
 		return domain.User{}, result.Error
 	}
 	if result.Error == gorm.ErrRecordNotFound {
-		return domain.User{}, providers.ErrNoUser
+		return domain.User{}, domain.ErrNoUser
 	}
 	return user, nil
 }

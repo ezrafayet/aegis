@@ -1,10 +1,9 @@
 package auth
 
 import (
-	"aegix/internal/components/cookies"
 	"aegix/internal/domain"
-	"aegix/internal/providers"
 	"aegix/internal/repository"
+	"aegix/pkg/cookies"
 	"errors"
 	"net/http"
 )
@@ -19,7 +18,6 @@ type AuthService struct {
 	Config domain.Config
 	RefreshTokenRepository repository.RefreshTokenRepository
 	UserRepository repository.UserRepository
-	CookieBuilder          cookies.CookieBuilderMethods
 }
 
 var _ AuthServiceInterface = &AuthService{}
@@ -29,7 +27,6 @@ func NewAuthService(c domain.Config, r repository.RefreshTokenRepository, u repo
 		Config: c,
 		RefreshTokenRepository: r,
 		UserRepository: u,
-		CookieBuilder: cookies.NewCookieBuilder(c), // how bad is that?
 	}
 }
 
@@ -45,8 +42,8 @@ func (s AuthService) GetSession(accessToken string) (domain.Session, error) {
 }
 
 func (s AuthService) Logout(refreshToken string) (http.Cookie, http.Cookie, error) {
-	refreshCookie := s.CookieBuilder.NewRefreshCookie("", 0, true)
-	accessCookie := s.CookieBuilder.NewAccessCookie("", 0, true)
+	refreshCookie := cookies.NewRefreshCookie("", 0, true, s.Config)
+	accessCookie := cookies.NewAccessCookie("", 0, true, s.Config)
 	err := s.RefreshTokenRepository.DeleteRefreshToken(refreshToken)
 	if err != nil {
 		return refreshCookie, accessCookie, err
@@ -66,8 +63,8 @@ func (s AuthService) CheckAndRefreshToken(accessToken, refreshToken string) (htt
 	}
 
 	if refreshTokenObject.IsExpired() {
-		refreshCookie := s.CookieBuilder.NewRefreshCookie("", 0, true)
-		accessCookie := s.CookieBuilder.NewAccessCookie("", 0, true)
+		refreshCookie := cookies.NewRefreshCookie("", 0, true, s.Config)
+		accessCookie := cookies.NewAccessCookie("", 0, true, s.Config)
 		return refreshCookie, accessCookie, errors.New("refresh_token_expired")
 	}
 
@@ -77,14 +74,14 @@ func (s AuthService) CheckAndRefreshToken(accessToken, refreshToken string) (htt
 	}
 
 	if user.IsBlocked() {
-		refreshCookie := s.CookieBuilder.NewRefreshCookie("", 0, true)
-		accessCookie := s.CookieBuilder.NewAccessCookie("", 0, true)
+		refreshCookie := cookies.NewRefreshCookie("", 0, true, s.Config)
+		accessCookie := cookies.NewAccessCookie("", 0, true, s.Config)
 		return refreshCookie, accessCookie, errors.New("user_blocked")
 	}
 
 	if user.IsDeleted() {
-		refreshCookie := s.CookieBuilder.NewRefreshCookie("", 0, true)
-		accessCookie := s.CookieBuilder.NewAccessCookie("", 0, true)
+		refreshCookie := cookies.NewRefreshCookie("", 0, true, s.Config)
+		accessCookie := cookies.NewAccessCookie("", 0, true, s.Config)
 		return refreshCookie, accessCookie, errors.New("user_deleted")
 	}
 
@@ -100,7 +97,7 @@ func (s AuthService) CheckAndRefreshToken(accessToken, refreshToken string) (htt
 		return http.Cookie{}, http.Cookie{}, err
 	}
 	if len(validRefreshTokens) > 10 {
-		return http.Cookie{}, http.Cookie{}, providers.ErrTooManyRefreshTokens
+		return http.Cookie{}, http.Cookie{}, domain.ErrTooManyRefreshTokens
 	}
 
 	_ = s.RefreshTokenRepository.CleanExpiredTokens(user.ID)
@@ -116,7 +113,7 @@ func (s AuthService) CheckAndRefreshToken(accessToken, refreshToken string) (htt
 		return http.Cookie{}, http.Cookie{}, err
 	}
 
-	accessCookie := s.CookieBuilder.NewAccessCookie(accessToken, atExpiresAt, true)
-	refreshCookie := s.CookieBuilder.NewRefreshCookie(newRefreshToken.Token, rtExpiresAt, true)
+	accessCookie := cookies.NewAccessCookie(accessToken, atExpiresAt, true, s.Config)
+	refreshCookie := cookies.NewRefreshCookie(newRefreshToken.Token, rtExpiresAt, true, s.Config)
 	return accessCookie, refreshCookie, nil
 }

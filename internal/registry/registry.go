@@ -3,7 +3,7 @@ package registry
 import (
 	"aegix/internal/components/auth"
 	"aegix/internal/domain"
-	"aegix/internal/providers/github"
+	"aegix/internal/components/providers/github"
 	"aegix/internal/repository"
 
 	"gorm.io/gorm"

@@ -27,6 +27,6 @@ func NewAuthRouter(h AuthHandlersInterface, m AuthMiddlewareInterface) AuthRoute
 func (r AuthRouter) AttachRoutes(e *echo.Echo) {
 	group := e.Group("/auth", r.Middlewares.CheckAndRefreshToken)
 	group.GET("/me", r.Handlers.GetSession)
-	group.GET("/logout", r.Handlers.Logout)
-	group.POST("/refresh", func(c echo.Context) error { return c.NoContent(http.StatusOK) })
+	group.GET("/refresh", func(c echo.Context) error { return c.NoContent(http.StatusOK) })
+	e.GET("/logout", r.Handlers.Logout)
 }

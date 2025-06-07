@@ -34,7 +34,7 @@ func NewAccessToken(cClaims CustomClaims, config Config, issuedAt time.Time) (ac
 func ReadAccessTokenClaims(accessToken string, config Config) (CustomClaims, error) {
 	parsedToken, err := jwt.Parse(accessToken, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, ErrInvalidToken
+			return nil, ErrInvalidAccessToken
 		}
 		return []byte(config.JWT.Secret), nil
 	})
@@ -47,7 +47,7 @@ func ReadAccessTokenClaims(accessToken string, config Config) (CustomClaims, err
 		return CustomClaims{}, err
 	}
 	if !parsedToken.Valid {
-		return CustomClaims{}, ErrInvalidToken
+		return CustomClaims{}, ErrInvalidAccessToken
 	}
 
 	var customClaims CustomClaims

@@ -7,6 +7,7 @@ import (
 )
 
 type AuthMiddlewareInterface interface {
+	CheckToken(next echo.HandlerFunc) echo.HandlerFunc
 	CheckAndRefreshToken(next echo.HandlerFunc) echo.HandlerFunc
 }
 
@@ -25,6 +26,12 @@ func NewAuthMiddleware(c domain.Config, s AuthServiceInterface) AuthMiddleware {
 }
 
 func (m AuthMiddleware) CheckAndRefreshToken(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		return next(c)
+	}
+}
+
+func (m AuthMiddleware) CheckToken(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		return next(c)
 	}

@@ -1,8 +1,8 @@
 package github
 
 import (
-	"aegix/internal/domain"
 	"aegix/internal/components/providers"
+	"aegix/internal/domain"
 	"net/http"
 
 	"github.com/labstack/echo/v4"

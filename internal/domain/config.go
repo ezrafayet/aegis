@@ -3,9 +3,9 @@ package domain
 type Config struct {
 	App struct {
 		// Name of the application
-		Name           string   `json:"name"`
+		Name string `json:"name"`
 		// URL of the application (main domain)
-		URL            string   `json:"url"`
+		URL string `json:"url"`
 		// Allowed origins for the application (CORS)
 		AllowedOrigins []string `json:"allowed_origins"`
 		// API keys for the application (internal requests)
@@ -21,11 +21,11 @@ type Config struct {
 
 	JWT struct {
 		// Secret key for the JWT
-		Secret                     string `json:"secret"`
+		Secret string `json:"secret"`
 		// Access token expiration time in minutes
-		AccessTokenExpirationMin   int    `json:"access_token_expiration_minutes"`
+		AccessTokenExpirationMin int `json:"access_token_expiration_minutes"`
 		// Refresh token expiration time in days
-		RefreshTokenExpirationDays int    `json:"refresh_token_expiration_days"`
+		RefreshTokenExpirationDays int `json:"refresh_token_expiration_days"`
 	} `json:"jwt"`
 
 	Auth struct {
@@ -45,12 +45,12 @@ type Config struct {
 		Secure   bool   `json:"secure"`
 		HTTPOnly bool   `json:"http_only"`
 		// SameSite cookie attribute: 1 = default, 2 = lax, 3 = strict, 4 = none
-		SameSite int `json:"same_site"`
+		SameSite int    `json:"same_site"`
 		Path     string `json:"path"`
 	} `json:"cookie"`
 
 	User struct {
 		// Roles for a user, mandatory roles are: "user" and "platform_admin"
-		Roles    []string                      `json:"roles"`
+		Roles []string `json:"roles"`
 	} `json:"user"`
 }

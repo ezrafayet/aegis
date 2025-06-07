@@ -1,8 +1,8 @@
 package github
 
 import (
-	"aegix/internal/domain"
 	"aegix/internal/components/providers"
+	"aegix/internal/domain"
 	"bytes"
 	"encoding/json"
 	"fmt"

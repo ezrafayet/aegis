@@ -18,7 +18,7 @@ func GenerateTokensForUser(user User, config Config, refreshTokenRepository Refr
 	}
 
 	accessToken, atExpiresAt, err = NewAccessToken(CustomClaims{
-		UserID: user.ID,
+		UserID:   user.ID,
 		Metadata: user.Metadata,
 	}, config)
 	if err != nil {

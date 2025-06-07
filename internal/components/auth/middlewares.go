@@ -11,7 +11,7 @@ type AuthMiddlewareInterface interface {
 }
 
 type AuthMiddleware struct {
-	Config domain.Config
+	Config  domain.Config
 	Service AuthServiceInterface
 }
 
@@ -19,7 +19,7 @@ var _ AuthMiddlewareInterface = &AuthMiddleware{}
 
 func NewAuthMiddleware(c domain.Config, s AuthServiceInterface) AuthMiddleware {
 	return AuthMiddleware{
-		Config: c,
+		Config:  c,
 		Service: s,
 	}
 }

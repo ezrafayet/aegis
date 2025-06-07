@@ -7,9 +7,9 @@ import (
 )
 
 type CustomClaims struct {
-	UserID string   `json:"user_id"`
-	Roles  []string `json:"roles"`
-	Metadata string `json:"metadata"`
+	UserID   string   `json:"user_id"`
+	Roles    []string `json:"roles"`
+	Metadata string   `json:"metadata"`
 }
 
 func NewAccessToken(cClaims CustomClaims, config Config) (accessToken string, expiresAt int64, err error) {

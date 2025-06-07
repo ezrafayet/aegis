@@ -15,18 +15,18 @@ type AuthServiceInterface interface {
 }
 
 type AuthService struct {
-	Config domain.Config
+	Config                 domain.Config
 	RefreshTokenRepository repository.RefreshTokenRepository
-	UserRepository repository.UserRepository
+	UserRepository         repository.UserRepository
 }
 
 var _ AuthServiceInterface = &AuthService{}
 
 func NewAuthService(c domain.Config, r repository.RefreshTokenRepository, u repository.UserRepository) AuthService {
 	return AuthService{
-		Config: c,
+		Config:                 c,
 		RefreshTokenRepository: r,
-		UserRepository: u,
+		UserRepository:         u,
 	}
 }
 

@@ -18,7 +18,7 @@ func TestNewCookie(t *testing.T) {
 			t.Errorf("expected cookie expiration to be 1717795200, got %d", cookie.Expires.Unix())
 		}
 	})
-	
+
 	t.Run("with defaults 'true' ovverrides values", func(t *testing.T) {
 		// todo
 	})

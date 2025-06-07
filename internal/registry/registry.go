@@ -2,8 +2,8 @@ package registry
 
 import (
 	"aegix/internal/components/auth"
-	"aegix/internal/domain"
 	"aegix/internal/components/providers/github"
+	"aegix/internal/domain"
 	"aegix/internal/repository"
 
 	"gorm.io/gorm"
@@ -11,7 +11,7 @@ import (
 
 type Registry struct {
 	GitHubRouter github.OAuthGithubRouter
-	AuthRouter auth.AuthRouter
+	AuthRouter   auth.AuthRouter
 }
 
 func NewRegistry(c domain.Config, db *gorm.DB) Registry {
@@ -31,6 +31,6 @@ func NewRegistry(c domain.Config, db *gorm.DB) Registry {
 
 	return Registry{
 		GitHubRouter: githubRouter,
-		AuthRouter: authRouter,
+		AuthRouter:   authRouter,
 	}
 }

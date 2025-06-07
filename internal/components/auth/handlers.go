@@ -13,7 +13,7 @@ type AuthHandlersInterface interface {
 }
 
 type AuthHandlers struct {
-	Config domain.Config
+	Config  domain.Config
 	Service AuthServiceInterface
 }
 
@@ -21,7 +21,7 @@ var _ AuthHandlersInterface = &AuthHandlers{}
 
 func NewAuthHandlers(c domain.Config, s AuthServiceInterface) AuthHandlers {
 	return AuthHandlers{
-		Config: c,
+		Config:  c,
 		Service: s,
 	}
 }

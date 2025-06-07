@@ -21,19 +21,12 @@ func ReadConfig(configPath string) (domain.Config, error) {
 		return domain.Config{}, errors.New("failed to parse config file: " + err.Error())
 	}
 
-	config = mergeDefaults(config)
-
 	err = validateConfig(config)
 	if err != nil {
 		return domain.Config{}, errors.New("invalid config file: " + err.Error())
 	}
 
 	return config, nil
-}
-
-func mergeDefaults(config domain.Config) domain.Config {
-	// todo
-	return config
 }
 
 func validateConfig(config domain.Config) error {

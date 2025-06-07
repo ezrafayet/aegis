@@ -32,7 +32,6 @@ func (h OAuthGithubHandlers) GetAuthURL(c echo.Context) error {
 }
 
 func (h OAuthGithubHandlers) ExchangeCode(c echo.Context) error {
-	// get code and state fromn the json body NOT FORM
 	type ExchangeCodeRequest struct {
 		Code  string `json:"code"`
 		State string `json:"state"`

@@ -2,8 +2,6 @@ package providers
 
 import (
 	"aegix/internal/domain"
-	"aegix/pkg/cookies"
-	"net/http"
 )
 
 func GetOrCreateUserIfAllowed(userRepository domain.UserRepository, userInfos *OAuthUser) (domain.User, error) {
@@ -29,33 +27,4 @@ func GetOrCreateUserIfAllowed(userRepository domain.UserRepository, userInfos *O
 	}
 
 	return user, nil
-}
-
-func GetTokensForUser(user domain.User, refreshTokenRepository domain.RefreshTokenRepository, config domain.Config) (http.Cookie, http.Cookie, error) {
-	// arbitrary naive check, will replace with device fingerprints
-	validRefreshTokens, err := refreshTokenRepository.GetValidRefreshTokensByUserID(user.ID)
-	if err != nil {
-		return http.Cookie{}, http.Cookie{}, err
-	}
-	if len(validRefreshTokens) > 10 {
-		return http.Cookie{}, http.Cookie{}, domain.ErrTooManyRefreshTokens
-	}
-
-	_ = refreshTokenRepository.CleanExpiredTokens(user.ID)
-
-	refreshToken, rtExpiresAt := domain.NewRefreshToken(user, config)
-	err = refreshTokenRepository.CreateRefreshToken(refreshToken)
-	if err != nil {
-		return http.Cookie{}, http.Cookie{}, err
-	}
-
-	accessToken, atExpiresAt, err := domain.NewAccessToken(user, config)
-	if err != nil {
-		return http.Cookie{}, http.Cookie{}, err
-	}
-
-	accessCookie := cookies.NewAccessCookie(accessToken, atExpiresAt, true, config)
-	refreshCookie := cookies.NewRefreshCookie(refreshToken.Token, rtExpiresAt, true, config)
-
-	return accessCookie, refreshCookie, nil
 }

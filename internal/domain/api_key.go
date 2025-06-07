@@ -2,6 +2,8 @@ package domain
 
 import "time"
 
+// todo
+
 type ApiKey struct {
 	ID        string    `json:"id"`
 	Name      string    `json:"name"`

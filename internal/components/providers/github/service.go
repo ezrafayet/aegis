@@ -1,8 +1,9 @@
 package github
 
 import (
-	"aegix/internal/domain"
 	"aegix/internal/components/providers"
+	"aegix/internal/domain"
+	"aegix/pkg/cookies"
 	"fmt"
 	"net/http"
 )
@@ -50,10 +51,12 @@ func (s OAuthGithubService) ExchangeCode(code, state string) (http.Cookie, http.
 		return http.Cookie{}, http.Cookie{}, domain.ErrWrongAuthMethod
 	}
 
-	accessCookie, refreshCookie, err := providers.GetTokensForUser(user, s.RefreshTokenRepository, s.Config)
+	accessToken, atExpiresAt, newRefreshToken, rtExpiresAt, err := domain.GenerateTokensForUser(user, s.Config, s.RefreshTokenRepository)
 	if err != nil {
 		return http.Cookie{}, http.Cookie{}, err
 	}
 
+	accessCookie := cookies.NewAccessCookie(accessToken, atExpiresAt, true, s.Config)
+	refreshCookie := cookies.NewRefreshCookie(newRefreshToken, rtExpiresAt, true, s.Config)
 	return accessCookie, refreshCookie, nil
 }

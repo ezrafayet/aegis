@@ -33,15 +33,13 @@ v0.1.0
 	db, err := gorm.Open(postgres.Open(c.DB.PostgresURL))
 	if err != nil {
 		return fmt.Errorf("failed to connect to database: %w", err)
+	} else {
+		fmt.Println("Connected to database")
 	}
-
-	fmt.Println("Connected to database")
 
 	if err := db.AutoMigrate(&domain.User{}, &domain.RefreshToken{}); err != nil {
 		return fmt.Errorf("failed to run database migrations: %w", err)
 	}
-
-	fmt.Println("Database migrations completed successfully")
 
 	e := echo.New()
 	e.HideBanner = true
@@ -63,9 +61,7 @@ v0.1.0
 	}))
 
 	r := registry.NewRegistry(c, db)
-
 	r.GitHubRouter.AttachRoutes(e)
-
 	r.AuthRouter.AttachRoutes(e)
 
 	// r.PrivateAuthRouter.AttachRoutes(e)
@@ -79,9 +75,5 @@ v0.1.0
 	// })
 	// get/set user metadata
 
-	if err := e.Start(":5666"); err != nil && err != http.ErrServerClosed {
-		return fmt.Errorf("failed to start server: %w", err)
-	}
-
-	return nil
+	return e.Start(fmt.Sprintf(":%d", c.App.Port))
 }

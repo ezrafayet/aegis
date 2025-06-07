@@ -3,7 +3,8 @@
         "name": "myAppName",
         "url": "https://myapp.com",
         "allowed_origins": ["https://myapp.com"],
-        "api_keys": ["xxxxxxxxxxxx"]
+        "api_keys": ["xxxxxxxxxxxx"],
+        "port": 5666
     },
     "db": {
         "postgres_url": "xxxxx" 

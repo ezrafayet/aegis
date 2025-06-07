@@ -10,6 +10,8 @@ type Config struct {
 		AllowedOrigins []string `json:"allowed_origins"`
 		// API keys for the application (internal requests)
 		APIKeys []string `json:"api_keys"`
+		// Port on which the service must run
+		Port int `json:"port"`
 	} `json:"app"`
 
 	DB struct {

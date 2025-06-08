@@ -65,7 +65,7 @@ func NewUser(name, avatar, email string, authMethod string) (User, error) {
 func ComputeNameFingerprint(name string) (string, error) {
 	trimmed := strings.TrimSpace(name)
 	if trimmed == "" {
-		return "", errors.New("no_empty_name")
+		return "", errors.New("empty_name")
 	}
 	normalized := strings.ToLower(trimmed)
 	transformer := transform.Chain(

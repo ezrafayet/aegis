@@ -7,7 +7,7 @@ import (
 
 func TestRefreshToken(t *testing.T) {
 	t.Run("should create a new refresh token", func(t *testing.T) {
-		token, _ := NewRefreshToken(User{ID: "123"}, Config{
+		token, _, _ := NewRefreshToken(User{ID: "123"}, Config{
 			JWT: JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
@@ -31,7 +31,7 @@ func TestRefreshToken(t *testing.T) {
 		}
 	})
 	t.Run("isExpired true", func(t *testing.T) {
-		token, _ := NewRefreshToken(User{ID: "123"}, Config{
+		token, _, _ := NewRefreshToken(User{ID: "123"}, Config{
 			JWT: JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
@@ -44,7 +44,7 @@ func TestRefreshToken(t *testing.T) {
 		}
 	})
 	t.Run("isExpired false", func(t *testing.T) {
-		token, _ := NewRefreshToken(User{ID: "123"}, Config{
+		token, _, _ := NewRefreshToken(User{ID: "123"}, Config{
 			JWT: JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,

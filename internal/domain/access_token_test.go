@@ -21,7 +21,7 @@ func TestAccessToken(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		expected := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIiLCJleHAiOjE2NzI1MzIxMDAsImlzcyI6IiIsImlzc3VlZF9hdCI6MTY3MjUzMTIwMCwibWV0YWRhdGEiOiJ7Zm9vOmJhcn0iLCJ1c2VyX2lkIjoiMTIzIn0.OVxAoDWCBvPbCZOTfV7ReSOAlGnV-gicgInpbKTihA0"
+		expected := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIiLCJlYXJseV9hZG9wdGVyIjpmYWxzZSwiZXhwIjoxNjcyNTMyMTAwLCJpc3MiOiIiLCJpc3N1ZWRfYXQiOjE2NzI1MzEyMDAsIm1ldGFkYXRhIjoie2ZvbzpiYXJ9IiwidXNlcl9pZCI6IjEyMyJ9.lFosZlZyLUl3X4Vx1cXY2BV_BS6KrzYfzN79l7_mxcM"
 		if token != expected {
 			t.Fatal("expected token to not be empty", token)
 		}

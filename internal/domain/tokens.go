@@ -1,6 +1,18 @@
 package domain
 
-import "time"
+import (
+	"crypto/rand"
+	"encoding/hex"
+	"time"
+)
+
+func GenerateRandomToken(prefix string, nPairs int) (string, error) {
+	bytes := make([]byte, nPairs)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", err
+	}
+	return prefix + hex.EncodeToString(bytes), nil
+}
 
 // todo: move this business logic somewhere
 func GenerateTokensForUser(user User, config Config, refreshTokenRepository RefreshTokenRepository) (accessToken string, atExpiresAt int64, refreshToken string, rtExpiresAt int64, err error) {
@@ -14,7 +26,10 @@ func GenerateTokensForUser(user User, config Config, refreshTokenRepository Refr
 
 	_ = refreshTokenRepository.CleanExpiredTokens(user.ID)
 
-	newRefreshToken, rtExpiresAt := NewRefreshToken(user, config)
+	newRefreshToken, rtExpiresAt, err := NewRefreshToken(user, config)
+	if err != nil {
+		return "", -1, "", -1, err
+	}
 	err = refreshTokenRepository.CreateRefreshToken(newRefreshToken)
 	if err != nil {
 		return "", -1, "", -1, err

@@ -11,7 +11,7 @@ type Config struct {
 		// API keys for the application (internal requests)
 		APIKeys []string `json:"api_keys"`
 		// New users need to be approved by an admin
-		BlockUnapprovedUsers bool `json:"block_unapproved_users"`
+		EarlyAdoptersOnly bool `json:"early_adopters_only"`
 		// Port on which the service must run
 		Port int `json:"port"`
 	} `json:"app"`

@@ -7,10 +7,10 @@ var (
 )
 
 var (
-	ErrNoUser               = errors.New("no_user")
-	ErrUserBlocked          = errors.New("user_blocked")
-	ErrUserNotApproved      = errors.New("user_not_approved")
-	ErrUserDeleted          = errors.New("user_deleted")
+	ErrNoUser          = errors.New("no_user")
+	ErrUserBlocked     = errors.New("user_blocked")
+	ErrUserDeleted     = errors.New("user_deleted")
+	ErrEarlyAdoptersOnly = errors.New("early_adopters_only")
 )
 
 var (

@@ -1,10 +1,16 @@
-package providers
+package domain
 
 import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
+
+type OAuthUser struct {
+	Name   string
+	Email  string
+	Avatar string
+}
 
 type OAuthRouter interface {
 	AttachRoutes(e *echo.Echo)
@@ -21,15 +27,9 @@ type OAuthMiddlewares interface {
 
 type OAuthProviderService interface {
 	GetAuthURL(redirectUri string) (string, error)
-	ExchangeCode(code, state string) (http.Cookie, http.Cookie, error) // returns a cookie
+	ExchangeCode(code, state string) (http.Cookie, http.Cookie, error)
 }
 
 type OAuthProvider interface {
 	GetUserInfos(code, state, redirectUri string) (*OAuthUser, error)
-}
-
-type OAuthUser struct {
-	Name   string
-	Email  string
-	Avatar string
 }

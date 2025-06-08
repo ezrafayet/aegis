@@ -1,7 +1,6 @@
 package github
 
 import (
-	"aegix/internal/components/providers"
 	"aegix/internal/domain"
 	"aegix/pkg/cookies"
 	"fmt"
@@ -10,14 +9,14 @@ import (
 
 type OAuthGithubService struct {
 	Config                 domain.Config
-	Provider               providers.OAuthProvider
+	Provider               domain.OAuthProvider
 	UserRepository         domain.UserRepository
 	RefreshTokenRepository domain.RefreshTokenRepository
 }
 
-var _ providers.OAuthProviderService = OAuthGithubService{}
+var _ domain.OAuthProviderService = OAuthGithubService{}
 
-func NewOAuthGithubService(c domain.Config, p providers.OAuthProvider, userRepository domain.UserRepository, refreshTokenRepository domain.RefreshTokenRepository) OAuthGithubService {
+func NewOAuthGithubService(c domain.Config, p domain.OAuthProvider, userRepository domain.UserRepository, refreshTokenRepository domain.RefreshTokenRepository) OAuthGithubService {
 	return OAuthGithubService{
 		Config:                 c,
 		Provider:               p,
@@ -42,7 +41,7 @@ func (s OAuthGithubService) ExchangeCode(code, state string) (http.Cookie, http.
 		return http.Cookie{}, http.Cookie{}, err
 	}
 
-	user, err := providers.GetOrCreateUserIfAllowed(s.UserRepository, userInfos, s.Config)
+	user, err := domain.GetOrCreateUserIfAllowed(s.UserRepository, userInfos, s.Config)
 	if err != nil {
 		return http.Cookie{}, http.Cookie{}, err
 	}

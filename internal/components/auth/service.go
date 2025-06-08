@@ -59,14 +59,14 @@ func (s AuthService) CheckAndRefreshToken(accessToken, refreshToken string) (htt
 		return http.Cookie{}, http.Cookie{}, false, err
 	}
 	if refreshTokenObject.IsExpired() {
-		return cookies.NewAccessCookieZero(s.Config), cookies.NewRefreshCookieZero(s.Config), true,domain.ErrRefreshTokenExpired
+		return cookies.NewAccessCookieZero(s.Config), cookies.NewRefreshCookieZero(s.Config), true, domain.ErrRefreshTokenExpired
 	}
 	user, err := s.UserRepository.GetUserByID(refreshTokenObject.UserID)
 	if err != nil {
 		return http.Cookie{}, http.Cookie{}, false, err
 	}
 	if user.IsDeleted() {
-		return cookies.NewAccessCookieZero(s.Config), cookies.NewRefreshCookieZero(s.Config), true,domain.ErrUserDeleted
+		return cookies.NewAccessCookieZero(s.Config), cookies.NewRefreshCookieZero(s.Config), true, domain.ErrUserDeleted
 	}
 	if user.IsBlocked() {
 		return cookies.NewAccessCookieZero(s.Config), cookies.NewRefreshCookieZero(s.Config), true, domain.ErrUserBlocked

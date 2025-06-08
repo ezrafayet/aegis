@@ -1,7 +1,6 @@
 package github
 
 import (
-	"aegix/internal/components/providers"
 	"aegix/internal/domain"
 	"net/http"
 
@@ -10,12 +9,12 @@ import (
 
 type OAuthGithubHandlers struct {
 	Config  domain.Config
-	Service providers.OAuthProviderService
+	Service domain.OAuthProviderService
 }
 
-var _ providers.OAuthProviderHandlers = OAuthGithubHandlers{}
+var _ domain.OAuthProviderHandlers = OAuthGithubHandlers{}
 
-func NewOAuthGithubHandlers(c domain.Config, s providers.OAuthProviderService) OAuthGithubHandlers {
+func NewOAuthGithubHandlers(c domain.Config, s domain.OAuthProviderService) OAuthGithubHandlers {
 	return OAuthGithubHandlers{
 		Config:  c,
 		Service: s,
@@ -41,8 +40,8 @@ func (h OAuthGithubHandlers) ExchangeCode(c echo.Context) error {
 	}
 	accessCookie, refreshCookie, err := h.Service.ExchangeCode(body.Code, body.State)
 	if err != nil {
-		if err.Error() == domain.ErrUserNotApproved.Error() {
-			return c.JSON(http.StatusUnauthorized, map[string]string{"error": domain.ErrUserNotApproved.Error()})
+		if err.Error() == domain.ErrEarlyAdoptersOnly.Error() {
+			return c.JSON(http.StatusUnauthorized, map[string]string{"error": domain.ErrEarlyAdoptersOnly.Error()})
 		}
 		if err.Error() == domain.ErrUserBlocked.Error() {
 			return c.JSON(http.StatusUnauthorized, map[string]string{"error": domain.ErrUserBlocked.Error()})

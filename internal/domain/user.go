@@ -60,7 +60,13 @@ type UserRepository interface {
 	// UnblockUser(userID string) error
 }
 
-func GetOrCreateUserIfAllowed(userRepository UserRepository, userInfos *OAuthUser, config Config) (User, error) {
+type UserInfos struct {
+	Name   string
+	Email  string
+	Avatar string
+}
+
+func GetOrCreateUserIfAllowed(userRepository UserRepository, userInfos *UserInfos, config Config) (User, error) {
 	user, err := userRepository.GetUserByEmail(userInfos.Email)
 	if err != nil && err.Error() != ErrNoUser.Error() {
 		return User{}, err

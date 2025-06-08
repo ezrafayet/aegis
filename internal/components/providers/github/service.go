@@ -1,6 +1,7 @@
 package github
 
 import (
+	"aegix/internal/components/providers/providersports"
 	"aegix/internal/domain"
 	"aegix/pkg/cookies"
 	"fmt"
@@ -9,14 +10,14 @@ import (
 
 type OAuthGithubService struct {
 	Config                 domain.Config
-	Provider               domain.OAuthProvider
+	Provider               providersports.OAuthProvider
 	UserRepository         domain.UserRepository
 	RefreshTokenRepository domain.RefreshTokenRepository
 }
 
-var _ domain.OAuthProviderService = OAuthGithubService{}
+var _ providersports.OAuthProviderService = OAuthGithubService{}
 
-func NewOAuthGithubService(c domain.Config, p domain.OAuthProvider, userRepository domain.UserRepository, refreshTokenRepository domain.RefreshTokenRepository) OAuthGithubService {
+func NewOAuthGithubService(c domain.Config, p providersports.OAuthProvider, userRepository domain.UserRepository, refreshTokenRepository domain.RefreshTokenRepository) OAuthGithubService {
 	return OAuthGithubService{
 		Config:                 c,
 		Provider:               p,

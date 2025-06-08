@@ -1,6 +1,7 @@
 package github
 
 import (
+	"aegix/internal/components/providers/providersports"
 	"aegix/internal/domain"
 	"net/http"
 
@@ -9,12 +10,12 @@ import (
 
 type OAuthGithubHandlers struct {
 	Config  domain.Config
-	Service domain.OAuthProviderService
+	Service providersports.OAuthProviderService
 }
 
-var _ domain.OAuthProviderHandlers = OAuthGithubHandlers{}
+var _ providersports.OAuthProviderHandlers = OAuthGithubHandlers{}
 
-func NewOAuthGithubHandlers(c domain.Config, s domain.OAuthProviderService) OAuthGithubHandlers {
+func NewOAuthGithubHandlers(c domain.Config, s providersports.OAuthProviderService) OAuthGithubHandlers {
 	return OAuthGithubHandlers{
 		Config:  c,
 		Service: s,

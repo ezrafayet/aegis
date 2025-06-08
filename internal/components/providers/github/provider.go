@@ -1,6 +1,7 @@
 package github
 
 import (
+	"aegix/internal/components/providers/providersports"
 	"aegix/internal/domain"
 	"bytes"
 	"encoding/json"
@@ -12,7 +13,7 @@ type OAuthGithubProvider struct {
 	Config domain.Config
 }
 
-var _ domain.OAuthProvider = OAuthGithubProvider{}
+var _ providersports.OAuthProvider = OAuthGithubProvider{}
 
 func NewOAuthGithubProvider(c domain.Config) OAuthGithubProvider {
 	return OAuthGithubProvider{
@@ -39,7 +40,7 @@ type gitHubEmail struct {
 	Verified bool   `json:"verified"`
 }
 
-func (p OAuthGithubProvider) GetUserInfos(code, state, redirectUri string) (*domain.OAuthUser, error) {
+func (p OAuthGithubProvider) GetUserInfos(code, state, redirectUri string) (*domain.UserInfos, error) {
 	// Step 1: get access token
 	data := map[string]string{
 		"client_id":     p.Config.Auth.Providers.GitHub.ClientID,
@@ -110,7 +111,7 @@ func (p OAuthGithubProvider) GetUserInfos(code, state, redirectUri string) (*dom
 
 	userName := user.Name
 
-	return &domain.OAuthUser{
+	return &domain.UserInfos{
 		Name:   userName,
 		Email:  em,
 		Avatar: user.AvatarURL,

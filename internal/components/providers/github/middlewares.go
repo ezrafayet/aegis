@@ -1,6 +1,7 @@
 package github
 
 import (
+	"aegix/internal/components/providers/providersports"
 	"aegix/internal/domain"
 	"net/http"
 
@@ -11,7 +12,7 @@ type OAuthGithubMiddlewares struct {
 	Config domain.Config
 }
 
-var _ domain.OAuthMiddlewares = OAuthGithubMiddlewares{}
+var _ providersports.OAuthMiddlewares = OAuthGithubMiddlewares{}
 
 func NewOAuthGithubMiddlewares(c domain.Config) OAuthGithubMiddlewares {
 	return OAuthGithubMiddlewares{

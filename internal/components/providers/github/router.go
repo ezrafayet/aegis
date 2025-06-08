@@ -1,19 +1,19 @@
 package github
 
 import (
-	"aegix/internal/domain"
+	"aegix/internal/components/providers/providersports"
 
 	"github.com/labstack/echo/v4"
 )
 
 type OAuthGithubRouter struct {
-	Handlers       domain.OAuthProviderHandlers
-	AuthMiddleware domain.OAuthMiddlewares
+	Handlers       providersports.OAuthProviderHandlers
+	AuthMiddleware providersports.OAuthMiddlewares
 }
 
-var _ domain.OAuthRouter = OAuthGithubRouter{}
+var _ providersports.OAuthRouter = OAuthGithubRouter{}
 
-func NewOAuthGithubRouter(h domain.OAuthProviderHandlers, m domain.OAuthMiddlewares) OAuthGithubRouter {
+func NewOAuthGithubRouter(h providersports.OAuthProviderHandlers, m providersports.OAuthMiddlewares) OAuthGithubRouter {
 	return OAuthGithubRouter{
 		Handlers:       h,
 		AuthMiddleware: m,

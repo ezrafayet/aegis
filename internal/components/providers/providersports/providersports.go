@@ -1,16 +1,11 @@
-package domain
+package providersports
 
 import (
+	"aegix/internal/domain"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
-
-type OAuthUser struct {
-	Name   string
-	Email  string
-	Avatar string
-}
 
 type OAuthRouter interface {
 	AttachRoutes(e *echo.Echo)
@@ -31,5 +26,5 @@ type OAuthProviderService interface {
 }
 
 type OAuthProvider interface {
-	GetUserInfos(code, state, redirectUri string) (*OAuthUser, error)
+	GetUserInfos(code, state, redirectUri string) (*domain.UserInfos, error)
 }

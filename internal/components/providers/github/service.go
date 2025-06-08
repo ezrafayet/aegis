@@ -42,7 +42,7 @@ func (s OAuthGithubService) ExchangeCode(code, state string) (http.Cookie, http.
 		return http.Cookie{}, http.Cookie{}, err
 	}
 
-	user, err := providers.GetOrCreateUserIfAllowed(s.UserRepository, userInfos)
+	user, err := providers.GetOrCreateUserIfAllowed(s.UserRepository, userInfos, s.Config)
 	if err != nil {
 		return http.Cookie{}, http.Cookie{}, err
 	}

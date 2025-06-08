@@ -11,6 +11,7 @@ type User struct {
 	CreatedAt time.Time  `json:"created_at" gorm:"index;not null"`
 	DeletedAt *time.Time `json:"deleted_at" gorm:"index"`
 	BlockedAt *time.Time `json:"blocked_at" gorm:"index"`
+	ApprovedAt *time.Time `json:"approved_at" gorm:"index"`
 	Name      string     `json:"name" gorm:"type:varchar(100);not null"`
 	// NameFingerprint string `json:"name_fingerprint" gorm:"type:varchar(100);uniqueIndex;not null"`
 	AvatarURL string `json:"avatar_url" gorm:"type:varchar(1000)"`
@@ -18,6 +19,10 @@ type User struct {
 	Metadata  string `json:"metadata" gorm:"type:varchar(1000)"`
 	// Roles      postgres.StringArray   `json:"roles" gorm:"type:text[]"`
 	AuthMethod string `json:"auth_method" gorm:"type:varchar(20);not null"`
+}
+
+func (u User) IsApproved() bool {
+	return u.ApprovedAt != nil
 }
 
 func (u User) IsBlocked() bool {
@@ -34,6 +39,7 @@ func NewUser(name, avatar, email string, authMethod string) User {
 		CreatedAt: time.Now(),
 		DeletedAt: nil,
 		BlockedAt: nil,
+		ApprovedAt: nil,
 		Name:      name,
 		// NameFingerprint: compute nameFingerprint,
 		AvatarURL: avatar,

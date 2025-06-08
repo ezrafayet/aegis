@@ -3,7 +3,6 @@ package github
 import (
 	"aegix/internal/components/providers"
 	"aegix/internal/domain"
-	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -42,8 +41,16 @@ func (h OAuthGithubHandlers) ExchangeCode(c echo.Context) error {
 	}
 	accessCookie, refreshCookie, err := h.Service.ExchangeCode(body.Code, body.State)
 	if err != nil {
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> err", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "an error occurred"})
+		if err.Error() == domain.ErrUserNotApproved.Error() {
+			return c.JSON(http.StatusUnauthorized, map[string]string{"error": domain.ErrUserNotApproved.Error()})
+		}
+		if err.Error() == domain.ErrUserBlocked.Error() {
+			return c.JSON(http.StatusUnauthorized, map[string]string{"error": domain.ErrUserBlocked.Error()})
+		}
+		if err.Error() == domain.ErrUserDeleted.Error() {
+			return c.JSON(http.StatusUnauthorized, map[string]string{"error": domain.ErrUserDeleted.Error()})
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": domain.ErrGeneric.Error()})
 	}
 	c.SetCookie(&accessCookie)
 	c.SetCookie(&refreshCookie)

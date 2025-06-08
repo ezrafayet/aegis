@@ -4,7 +4,7 @@ import (
 	"aegix/internal/domain"
 )
 
-func GetOrCreateUserIfAllowed(userRepository domain.UserRepository, userInfos *OAuthUser) (domain.User, error) {
+func GetOrCreateUserIfAllowed(userRepository domain.UserRepository, userInfos *OAuthUser, config domain.Config) (domain.User, error) {
 	user, err := userRepository.GetUserByEmail(userInfos.Email)
 	if err != nil && err.Error() != domain.ErrNoUser.Error() {
 		return domain.User{}, err
@@ -24,6 +24,10 @@ func GetOrCreateUserIfAllowed(userRepository domain.UserRepository, userInfos *O
 
 	if user.IsBlocked() {
 		return domain.User{}, domain.ErrUserBlocked
+	}
+
+	if config.App.BlockUnapprovedUsers && !user.IsApproved()  {
+		return domain.User{}, domain.ErrUserNotApproved
 	}
 
 	return user, nil

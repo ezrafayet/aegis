@@ -2,6 +2,7 @@ package domain
 
 import "time"
 
+// todo: move this business logic somewhere
 func GenerateTokensForUser(user User, config Config, refreshTokenRepository RefreshTokenRepository) (accessToken string, atExpiresAt int64, refreshToken string, rtExpiresAt int64, err error) {
 	validRefreshTokens, err := refreshTokenRepository.GetValidRefreshTokensByUserID(user.ID)
 	if err != nil {

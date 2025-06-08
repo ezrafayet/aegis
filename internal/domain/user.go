@@ -35,12 +35,12 @@ func (u User) IsDeleted() bool {
 
 func NewUser(name, avatar, email string, authMethod string) User {
 	return User{
-		ID:         uuid.New().String(),
-		CreatedAt:  time.Now(),
-		DeletedAt:  nil,
-		BlockedAt:  nil,
+		ID:           uuid.New().String(),
+		CreatedAt:    time.Now(),
+		DeletedAt:    nil,
+		BlockedAt:    nil,
 		EarlyAdopter: false,
-		Name:       name,
+		Name:         name,
 		// NameFingerprint: compute nameFingerprint,
 		AvatarURL: avatar,
 		Email:     email,
@@ -60,6 +60,7 @@ type UserRepository interface {
 	// UnblockUser(userID string) error
 }
 
+// UserInfos is what is returned by the providers (GitHub, Google, etc.)
 type UserInfos struct {
 	Name   string
 	Email  string
@@ -71,7 +72,6 @@ func GetOrCreateUserIfAllowed(userRepository UserRepository, userInfos *UserInfo
 	if err != nil && err.Error() != ErrNoUser.Error() {
 		return User{}, err
 	}
-
 	if err != nil && err.Error() == ErrNoUser.Error() {
 		user = NewUser(userInfos.Name, userInfos.Avatar, userInfos.Email, "github")
 		err = userRepository.CreateUser(user)
@@ -79,18 +79,14 @@ func GetOrCreateUserIfAllowed(userRepository UserRepository, userInfos *UserInfo
 			return User{}, err
 		}
 	}
-
 	if user.IsDeleted() {
 		return User{}, ErrUserDeleted
 	}
-
 	if user.IsBlocked() {
 		return User{}, ErrUserBlocked
 	}
-
 	if config.App.EarlyAdoptersOnly && !user.IsEarlyAdopter() {
 		return User{}, ErrEarlyAdoptersOnly
 	}
-
 	return user, nil
 }

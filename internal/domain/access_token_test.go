@@ -61,7 +61,7 @@ func TestAccessToken(t *testing.T) {
 			t.Fatal("expected metadata to be {foo:bar}", claims.Metadata)
 		}
 	})
-	t.Run("should return an error if the token is invalid (not even a jwt)", func(t *testing.T) {
+	t.Run("should return an error if the token is invalid", func(t *testing.T) {
 		_, err := ReadAccessTokenClaims("token", Config{
 			JWT: JWTConfig{
 				Secret:                     "xxxsecret",
@@ -99,7 +99,7 @@ func TestAccessToken(t *testing.T) {
 			t.Fatal("expected error to be 'access_token_expired'", err)
 		}
 	})
-	t.Run("should return an error if the JWT secret is different", func(t *testing.T) {
+	t.Run("should return an error if the JWT secret is wrong", func(t *testing.T) {
 		token, _, err := NewAccessToken(CustomClaims{
 			UserID:   "123",
 			Roles:    []string{""},

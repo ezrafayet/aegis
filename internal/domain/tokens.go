@@ -21,6 +21,7 @@ func GenerateTokensForUser(user User, config Config, refreshTokenRepository Refr
 
 	accessToken, atExpiresAt, err = NewAccessToken(CustomClaims{
 		UserID:   user.ID,
+		EarlyAdopter: user.EarlyAdopter,
 		Metadata: user.Metadata,
 	}, config, time.Now())
 	if err != nil {

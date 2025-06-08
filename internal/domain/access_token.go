@@ -8,6 +8,7 @@ import (
 
 type CustomClaims struct {
 	UserID   string   `json:"user_id"`
+	EarlyAdopter bool `json:"early_adopter"`
 	Roles    []string `json:"roles"`
 	Metadata string   `json:"metadata"`
 }
@@ -22,6 +23,7 @@ func NewAccessToken(cClaims CustomClaims, config Config, issuedAt time.Time) (ac
 	claims["issued_at"] = issuedAt.Unix()
 	claims["iss"] = config.App.Name
 	claims["user_id"] = cClaims.UserID
+	claims["early_adopter"] = cClaims.EarlyAdopter
 	// claims["roles"] = strings.Join(customClaims.Roles, ",") // todo
 	claims["metadata"] = cClaims.Metadata
 	tokenString, err := token.SignedString([]byte(config.JWT.Secret))
@@ -55,6 +57,7 @@ func ReadAccessTokenClaims(accessToken string, config Config) (CustomClaims, err
 	if claims, ok := parsedToken.Claims.(jwt.MapClaims); ok {
 		// /!\ This code can fail if the claims are not in the expected format
 		customClaims.UserID = claims["user_id"].(string)
+		customClaims.EarlyAdopter = claims["early_adopter"].(bool)
 		// customClaims.Roles = strings.Split(claims["roles"].(string), " ")
 		customClaims.Metadata = claims["metadata"].(string)
 	}

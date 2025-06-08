@@ -44,3 +44,12 @@ func (r *UserRepository) GetUserByID(userID string) (domain.User, error) {
 	}
 	return user, nil
 }
+
+func (r *UserRepository) DoesNameExist(nameFingerprint string) (bool, error) {
+	var user domain.User
+	result := r.db.Where("name_fingerprint = ?", nameFingerprint).First(&user)
+	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
+		return false, result.Error
+	}
+	return result.Error == nil, nil
+}

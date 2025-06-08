@@ -11,6 +11,7 @@ var (
 	ErrUserBlocked       = errors.New("user_blocked")
 	ErrUserDeleted       = errors.New("user_deleted")
 	ErrEarlyAdoptersOnly = errors.New("early_adopters_only")
+	ErrNameAlreadyExists = errors.New("name_already_exists")
 )
 
 var (

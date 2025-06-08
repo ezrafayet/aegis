@@ -27,15 +27,19 @@ func NewAuthHandlers(c domain.Config, s AuthServiceInterface) AuthHandlers {
 }
 
 func (h AuthHandlers) GetSession(c echo.Context) error {
-	cookie, err := c.Cookie("access_token")
-	if err != nil {
+	var accessToken string
+	if cookie, err := c.Cookie("access_token"); err != nil {
 		return c.JSON(http.StatusUnauthorized, map[string]string{"error": domain.ErrGeneric.Error()})
+	} else {
+		accessToken = cookie.Value
 	}
-	accessToken := cookie.Value
 	session, err := h.Service.GetSession(accessToken)
 	if err != nil {
 		if err.Error() == domain.ErrAccessTokenExpired.Error() {
 			return c.JSON(http.StatusUnauthorized, map[string]string{"error": domain.ErrAccessTokenExpired.Error()})
+		}
+		if err.Error() == domain.ErrInvalidAccessToken.Error() {
+			return c.JSON(http.StatusUnauthorized, map[string]string{"error": domain.ErrInvalidAccessToken.Error()})
 		}
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": domain.ErrGeneric.Error()})
 	}
@@ -44,8 +48,7 @@ func (h AuthHandlers) GetSession(c echo.Context) error {
 
 func (h AuthHandlers) Logout(c echo.Context) error {
 	var refreshToken string
-	cookie, err := c.Cookie("refresh_token")
-	if err != nil {
+	if cookie, err := c.Cookie("refresh_token"); err != nil {
 		refreshToken = ""
 	} else {
 		refreshToken = cookie.Value

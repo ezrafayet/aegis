@@ -12,33 +12,42 @@ import (
 func TestUserRepository(t *testing.T) {
 	t.Run("Most basic test", func(t *testing.T) {
 		db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	db.AutoMigrate(&domain.User{})
-	userRepository := NewUserRepository(db)
-	err = userRepository.CreateUser(domain.User{
-		ID:              "123",
-		CreatedAt:       time.Now(),
-		Name:            "Test User",
-		NameFingerprint: "test_fingerprint",
-		Email:           "test@test.com", 
-		Metadata:        "{}",
-		AuthMethod:      "test",
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	user, err := userRepository.GetUserByEmail("test@test.com")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if user.ID != "123" {
-		t.Fatal("expected user id to be 123", user.ID)
-	}
-	if user.Name != "Test User" {
-		t.Fatal("expected user name to be Test User", user.Name)
-	}
+		if err != nil {
+			t.Fatal(err)
+		}
+		db.AutoMigrate(&domain.User{})
+		userRepository := NewUserRepository(db)
+		err = userRepository.CreateUser(domain.User{
+			ID:              "123",
+			CreatedAt:       time.Now(),
+			Name:            "Test User",
+			NameFingerprint: "test_fingerprint",
+			Email:           "test@test.com", 
+			Metadata:        "{}",
+			AuthMethod:      "test",
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		user, err := userRepository.GetUserByEmail("test@test.com")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if user.ID != "123" {
+			t.Fatal("expected user id to be 123", user.ID)
+		}
+		if user.Name != "Test User" {
+			t.Fatal("expected user name to be Test User", user.Name)
+		}
+		if user.NameFingerprint != "test_fingerprint" {
+			t.Fatal("expected user name fingerprint to be test_fingerprint", user.NameFingerprint)
+		}
+		if user.Email != "test@test.com" {
+			t.Fatal("expected user email to be test@test.com", user.Email)
+		}
+		if user.AuthMethod != "test" {
+			t.Fatal("expected user auth method to be test", user.AuthMethod)
+		}
 	})
 	t.Run("Forbid email collision", func(t *testing.T) {
 		db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})

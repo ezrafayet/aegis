@@ -37,13 +37,13 @@ func (r *RefreshTokenRepository) GetRefreshTokenByToken(token string) (domain.Re
 	return domain.RefreshToken{}, nil
 }
 
-func (r *RefreshTokenRepository) GetValidRefreshTokensByUserID(userID string) ([]domain.RefreshToken, error) {
-	var refreshTokens []domain.RefreshToken
-	result := r.db.Model(&domain.RefreshToken{}).Where("user_id = ? AND expires_at > ?", userID, time.Now()).Find(&refreshTokens)
+func (r *RefreshTokenRepository) CountValidRefreshTokensForUser(userID string) (int, error) {
+	var count int64
+	result := r.db.Model(&domain.RefreshToken{}).Where("user_id = ? AND expires_at > ?", userID, time.Now()).Count(&count)
 	if result.Error != nil {
-		return []domain.RefreshToken{}, result.Error
+		return 0, result.Error
 	}
-	return refreshTokens, nil
+	return int(count), nil
 }
 
 func (r *RefreshTokenRepository) CleanExpiredTokens(userID string) error {
@@ -56,6 +56,14 @@ func (r *RefreshTokenRepository) CleanExpiredTokens(userID string) error {
 
 func (r *RefreshTokenRepository) DeleteRefreshToken(token string) error {
 	result := r.db.Model(&domain.RefreshToken{}).Where("token = ?", token).Delete(&domain.RefreshToken{})
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (r *RefreshTokenRepository) DeleteRefreshTokenByDeviceFingerprint(userID, deviceFingerprint string) error {
+	result := r.db.Model(&domain.RefreshToken{}).Where("user_id = ? AND device_fingerprint = ?", userID, deviceFingerprint).Delete(&domain.RefreshToken{})
 	if result.Error != nil {
 		return result.Error
 	}

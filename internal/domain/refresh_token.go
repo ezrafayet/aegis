@@ -24,17 +24,13 @@ func (r RefreshToken) IsExpired() bool {
 	return r.ExpiresAt.Before(time.Now())
 }
 
-func NewRefreshToken(user User, deviceID string, config Config) (RefreshToken, int64, error) {
+func NewRefreshToken(user User, deviceFingerprint string, config Config) (RefreshToken, int64, error) {
 	token, err := GenerateRandomToken("refresh_", 12)
 	if err != nil {
 		return RefreshToken{}, -1, err
 	}
 	createdAt := time.Now()
 	expiresAt := createdAt.AddDate(0, 0, config.JWT.RefreshTokenExpirationDays)
-	deviceFingerprint, err := GenerateDeviceFingerprint(deviceID)
-	if err != nil {
-		return RefreshToken{}, -1, err
-	}
 	return RefreshToken{
 		UserID:            user.ID,
 		CreatedAt:         createdAt,
@@ -47,9 +43,10 @@ func NewRefreshToken(user User, deviceID string, config Config) (RefreshToken, i
 type RefreshTokenRepository interface {
 	CreateRefreshToken(refreshToken RefreshToken) error
 	GetRefreshTokenByToken(token string) (RefreshToken, error)
-	GetValidRefreshTokensByUserID(userID string) ([]RefreshToken, error)
+	CountValidRefreshTokensForUser(userID string) (int, error)
 	CleanExpiredTokens(userID string) error
 	DeleteRefreshToken(token string) error
+	DeleteRefreshTokenByDeviceFingerprint(userID, deviceFingerprint string) error
 }
 
 func GenerateDeviceFingerprint(deviceID string) (string, error) {

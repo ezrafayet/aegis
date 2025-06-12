@@ -37,9 +37,9 @@ func GenerateTokensForUser(user User, deviceID string, config Config, refreshTok
 	}
 
 	accessToken, atExpiresAt, err = NewAccessToken(CustomClaims{
-		UserID:   user.ID,
+		UserID:       user.ID,
 		EarlyAdopter: user.EarlyAdopter,
-		Metadata: user.Metadata,
+		Metadata:     user.Metadata,
 	}, config, time.Now())
 	if err != nil {
 		return "", -1, "", -1, err

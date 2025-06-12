@@ -13,11 +13,11 @@ import (
 )
 
 type RefreshToken struct {
-	UserID    string    `json:"id" gorm:"type:uuid"`
-	CreatedAt time.Time `json:"created_at" gorm:"index;not null"`
-	ExpiresAt time.Time `json:"expires_at" gorm:"index;not null"`
-	Token     string    `json:"token" gorm:"primaryKey;type:char(32);not null"`
-	DeviceFingerprint  string    `json:"device_fingerprint" gorm:"type:char(32);index;not null"`
+	UserID            string    `json:"id" gorm:"type:uuid"`
+	CreatedAt         time.Time `json:"created_at" gorm:"index;not null"`
+	ExpiresAt         time.Time `json:"expires_at" gorm:"index;not null"`
+	Token             string    `json:"token" gorm:"primaryKey;type:char(32);not null"`
+	DeviceFingerprint string    `json:"device_fingerprint" gorm:"type:char(32);index;not null"`
 }
 
 func (r RefreshToken) IsExpired() bool {
@@ -36,10 +36,10 @@ func NewRefreshToken(user User, deviceID string, config Config) (RefreshToken, i
 		return RefreshToken{}, -1, err
 	}
 	return RefreshToken{
-		UserID:    user.ID,
-		CreatedAt: createdAt,
-		ExpiresAt: expiresAt,
-		Token:     token,
+		UserID:            user.ID,
+		CreatedAt:         createdAt,
+		ExpiresAt:         expiresAt,
+		Token:             token,
 		DeviceFingerprint: deviceFingerprint,
 	}, expiresAt.Unix(), nil
 }

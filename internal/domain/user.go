@@ -15,16 +15,16 @@ import (
 )
 
 type User struct {
-	ID           string     `json:"id" gorm:"primaryKey;type:uuid"`
-	CreatedAt    time.Time  `json:"created_at" gorm:"index;not null"`
-	DeletedAt    *time.Time `json:"deleted_at" gorm:"index"`
-	BlockedAt    *time.Time `json:"blocked_at" gorm:"index"`
-	EarlyAdopter bool       `json:"early_adopter" gorm:"index"`
-	Name         string     `json:"name" gorm:"type:varchar(100);not null"`
-	NameFingerprint string `json:"name_fingerprint" gorm:"type:char(32);uniqueIndex;not null"`
-	AvatarURL string `json:"avatar_url" gorm:"type:varchar(1024)"`
-	Email     string `json:"email" gorm:"type:varchar(100);uniqueIndex;not null"`
-	Metadata  string `json:"metadata" gorm:"type:varchar(1024);not null"`
+	ID              string     `json:"id" gorm:"primaryKey;type:uuid"`
+	CreatedAt       time.Time  `json:"created_at" gorm:"index;not null"`
+	DeletedAt       *time.Time `json:"deleted_at" gorm:"index"`
+	BlockedAt       *time.Time `json:"blocked_at" gorm:"index"`
+	EarlyAdopter    bool       `json:"early_adopter" gorm:"index"`
+	Name            string     `json:"name" gorm:"type:varchar(100);not null"`
+	NameFingerprint string     `json:"name_fingerprint" gorm:"type:char(32);uniqueIndex;not null"`
+	AvatarURL       string     `json:"avatar_url" gorm:"type:varchar(1024)"`
+	Email           string     `json:"email" gorm:"type:varchar(100);uniqueIndex;not null"`
+	Metadata        string     `json:"metadata" gorm:"type:varchar(1024);not null"`
 	// Roles      postgres.StringArray   `json:"roles" gorm:"type:text[]"`
 	AuthMethod string `json:"auth_method" gorm:"type:varchar(16);not null"`
 }
@@ -47,16 +47,16 @@ func NewUser(name, avatar, email string, authMethod string) (User, error) {
 		return User{}, err
 	}
 	return User{
-		ID:           uuid.New().String(),
-		CreatedAt:    time.Now(),
-		DeletedAt:    nil,
-		BlockedAt:    nil,
-		EarlyAdopter: false,
-		Name:         name,
+		ID:              uuid.New().String(),
+		CreatedAt:       time.Now(),
+		DeletedAt:       nil,
+		BlockedAt:       nil,
+		EarlyAdopter:    false,
+		Name:            name,
 		NameFingerprint: nameFingerprint,
-		AvatarURL: avatar,
-		Email:     email,
-		Metadata:  "{}",
+		AvatarURL:       avatar,
+		Email:           email,
+		Metadata:        "{}",
 		// Roles:      roles,
 		AuthMethod: authMethod,
 	}, nil

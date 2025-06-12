@@ -7,10 +7,10 @@ import (
 )
 
 type CustomClaims struct {
-	UserID   string   `json:"user_id"`
-	EarlyAdopter bool `json:"early_adopter"`
-	Roles    []string `json:"roles"`
-	Metadata string   `json:"metadata"`
+	UserID       string   `json:"user_id"`
+	EarlyAdopter bool     `json:"early_adopter"`
+	Roles        []string `json:"roles"`
+	Metadata     string   `json:"metadata"`
 }
 
 func NewAccessToken(cClaims CustomClaims, config Config, issuedAt time.Time) (accessToken string, expiresAt int64, err error) {

@@ -7,7 +7,11 @@ import (
 
 func TestRefreshToken(t *testing.T) {
 	t.Run("should create a new refresh token", func(t *testing.T) {
-		token, _, _ := NewRefreshToken(User{ID: "123"}, "device-id", Config{
+		deviceFingerprint, err := GenerateDeviceFingerprint("device-id")
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		token, _, _ := NewRefreshToken(User{ID: "123"}, deviceFingerprint, Config{
 			JWT: JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
@@ -28,9 +32,16 @@ func TestRefreshToken(t *testing.T) {
 		if token.ExpiresAt.Before(time.Now()) {
 			t.Fatal("expected expires_at to be in the future", token.ExpiresAt)
 		}
+		if len(token.DeviceFingerprint) != 32 {
+			t.Fatal("expected device_fingerprint to be 32 characters", token.DeviceFingerprint)
+		}
 	})
 	t.Run("isExpired true", func(t *testing.T) {
-		token, _, _ := NewRefreshToken(User{ID: "123"}, "device-id", Config{
+		deviceFingerprint, err := GenerateDeviceFingerprint("device-id")
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		token, _, _ := NewRefreshToken(User{ID: "123"}, deviceFingerprint, Config{
 			JWT: JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,

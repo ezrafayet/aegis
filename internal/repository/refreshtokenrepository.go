@@ -34,7 +34,7 @@ func (r *RefreshTokenRepository) GetRefreshTokenByToken(token string) (domain.Re
 	if result.Error == gorm.ErrRecordNotFound {
 		return domain.RefreshToken{}, domain.ErrNoRefreshToken
 	}
-	return domain.RefreshToken{}, nil
+	return refreshToken, nil
 }
 
 func (r *RefreshTokenRepository) CountValidRefreshTokensForUser(userID string) (int, error) {

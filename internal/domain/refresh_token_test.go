@@ -54,3 +54,28 @@ func TestRefreshToken(t *testing.T) {
 		}
 	})
 }
+
+func TestGenerateDeviceFingerprint(t *testing.T) {
+	t.Run("should generate a device fingerprint", func(t *testing.T) {
+		deviceFingerprint, err := GenerateDeviceFingerprint("device-id")
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		if deviceFingerprint == "" {
+			t.Fatal("expected device fingerprint to not be empty", deviceFingerprint)
+		}
+	})
+	t.Run("should generate a unique device fingerprint", func(t *testing.T) {
+		deviceFingerprint1, err := GenerateDeviceFingerprint("device-id-1")
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		deviceFingerprint2, err := GenerateDeviceFingerprint("device-id-2")
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		if deviceFingerprint1 == deviceFingerprint2 {
+			t.Fatal("expected device fingerprint to be unique", deviceFingerprint1, deviceFingerprint2)
+		}
+	})
+}

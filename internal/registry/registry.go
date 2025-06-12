@@ -23,7 +23,7 @@ func NewRegistry(c domain.Config, db *gorm.DB) Registry {
 	authMiddlewares := auth.NewAuthMiddleware(c, authService)
 	authRouter := auth.NewAuthRouter(authHandlers, authMiddlewares)
 
-	githubProvider := github.NewOAuthGithubProvider(c)
+	githubProvider := github.NewOAuthGithubRepository(c)
 	githubServices := github.NewOAuthGithubService(c, githubProvider, &userRepository, &refreshTokenRepository)
 	githubHandlers := github.NewOAuthGithubHandlers(c, githubServices)
 	githubMiddlewares := github.NewOAuthGithubMiddlewares(c)

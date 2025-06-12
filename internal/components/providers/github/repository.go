@@ -9,14 +9,14 @@ import (
 	"othnx/internal/domain"
 )
 
-type OAuthGithubProvider struct {
+type OAuthGithubRepository struct {
 	Config domain.Config
 }
 
-var _ providersports.OAuthProvider = OAuthGithubProvider{}
+var _ providersports.OAuthProviderRepository = OAuthGithubRepository{}
 
-func NewOAuthGithubProvider(c domain.Config) OAuthGithubProvider {
-	return OAuthGithubProvider{
+func NewOAuthGithubRepository(c domain.Config) OAuthGithubRepository {
+	return OAuthGithubRepository{
 		Config: c,
 	}
 }
@@ -40,7 +40,7 @@ type gitHubEmail struct {
 	Verified bool   `json:"verified"`
 }
 
-func (p OAuthGithubProvider) GetUserInfos(code, state, redirectUri string) (*domain.UserInfos, error) {
+func (p OAuthGithubRepository) GetUserInfos(code, state, redirectUri string) (*domain.UserInfos, error) {
 	// Step 1: get access token
 	data := map[string]string{
 		"client_id":     p.Config.Auth.Providers.GitHub.ClientID,

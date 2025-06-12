@@ -10,14 +10,14 @@ import (
 
 type OAuthGithubService struct {
 	Config                 domain.Config
-	Provider               providersports.OAuthProvider
+	Provider               providersports.OAuthProviderRepository
 	UserRepository         domain.UserRepository
 	RefreshTokenRepository domain.RefreshTokenRepository
 }
 
 var _ providersports.OAuthProviderService = OAuthGithubService{}
 
-func NewOAuthGithubService(c domain.Config, p providersports.OAuthProvider, userRepository domain.UserRepository, refreshTokenRepository domain.RefreshTokenRepository) OAuthGithubService {
+func NewOAuthGithubService(c domain.Config, p providersports.OAuthProviderRepository, userRepository domain.UserRepository, refreshTokenRepository domain.RefreshTokenRepository) OAuthGithubService {
 	return OAuthGithubService{
 		Config:                 c,
 		Provider:               p,

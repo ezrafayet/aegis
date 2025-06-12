@@ -51,7 +51,8 @@ func (s OAuthGithubService) ExchangeCode(code, state string) (http.Cookie, http.
 		return http.Cookie{}, http.Cookie{}, domain.ErrWrongAuthMethod
 	}
 
-	accessToken, atExpiresAt, newRefreshToken, rtExpiresAt, err := domain.GenerateTokensForUser(user, s.Config, s.RefreshTokenRepository)
+	// todo device-id: pass one
+	accessToken, atExpiresAt, newRefreshToken, rtExpiresAt, err := domain.GenerateTokensForUser(user, "device-id", s.Config, s.RefreshTokenRepository)
 	if err != nil {
 		return http.Cookie{}, http.Cookie{}, err
 	}

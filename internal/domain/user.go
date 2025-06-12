@@ -42,7 +42,7 @@ func (u User) IsDeleted() bool {
 }
 
 func NewUser(name, avatar, email string, authMethod string) (User, error) {
-	nameFingerprint, err := ComputeNameFingerprint(name)
+	nameFingerprint, err := GenerateNameFingerprint(name)
 	if err != nil {
 		return User{}, err
 	}
@@ -62,7 +62,7 @@ func NewUser(name, avatar, email string, authMethod string) (User, error) {
 	}, nil
 }
 
-func ComputeNameFingerprint(name string) (string, error) {
+func GenerateNameFingerprint(name string) (string, error) {
 	trimmed := strings.TrimSpace(name)
 	if trimmed == "" {
 		return "", errors.New("empty_name")

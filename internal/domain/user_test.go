@@ -5,7 +5,7 @@ import "testing"
 func TestComputeNameFingerprint(t *testing.T) {
 	t.Run("should compute name fingerprint", func(t *testing.T) {
 		name := "John Doe"
-		fingerprint, err := ComputeNameFingerprint(name)
+		fingerprint, err := GenerateNameFingerprint(name)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -15,12 +15,12 @@ func TestComputeNameFingerprint(t *testing.T) {
 	})
 	t.Run("prevent naming collisions", func(t *testing.T) {
 		name1 := "John Doe"
-		fp1, err := ComputeNameFingerprint(name1)
+		fp1, err := GenerateNameFingerprint(name1)
 		if err != nil {
 			t.Fatal(err)
 		}
 		name2 := "John doé"
-		fp2, err := ComputeNameFingerprint(name2)
+		fp2, err := GenerateNameFingerprint(name2)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -30,12 +30,12 @@ func TestComputeNameFingerprint(t *testing.T) {
 	})
 	t.Run("2 different names should have different fingerprints", func(t *testing.T) {
 		name1 := "John Doe"
-		fp1, err := ComputeNameFingerprint(name1)
+		fp1, err := GenerateNameFingerprint(name1)
 		if err != nil {
 			t.Fatal(err)
 		}
 		name2 := "Jane Doe"
-		fp2, err := ComputeNameFingerprint(name2)
+		fp2, err := GenerateNameFingerprint(name2)
 		if err != nil {
 			t.Fatal(err)
 		}

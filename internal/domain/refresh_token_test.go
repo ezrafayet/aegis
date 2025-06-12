@@ -7,13 +7,12 @@ import (
 
 func TestRefreshToken(t *testing.T) {
 	t.Run("should create a new refresh token", func(t *testing.T) {
-		token, _, _ := NewRefreshToken(User{ID: "123"}, Config{
+		token, _, _ := NewRefreshToken(User{ID: "123"}, "device-id", Config{
 			JWT: JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
 				RefreshTokenExpirationDays: 30,
-			},
-		})
+			}})
 		if token.UserID != "123" {
 			t.Fatal("expected user_id to be 123", token.UserID)
 		}
@@ -31,7 +30,7 @@ func TestRefreshToken(t *testing.T) {
 		}
 	})
 	t.Run("isExpired true", func(t *testing.T) {
-		token, _, _ := NewRefreshToken(User{ID: "123"}, Config{
+		token, _, _ := NewRefreshToken(User{ID: "123"}, "device-id", Config{
 			JWT: JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
@@ -44,13 +43,12 @@ func TestRefreshToken(t *testing.T) {
 		}
 	})
 	t.Run("isExpired false", func(t *testing.T) {
-		token, _, _ := NewRefreshToken(User{ID: "123"}, Config{
+		token, _, _ := NewRefreshToken(User{ID: "123"}, "device-id", Config{
 			JWT: JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
 				RefreshTokenExpirationDays: 30,
-			},
-		})
+			}})
 		if token.IsExpired() {
 			t.Fatal("expected token to not be expired", token.ExpiresAt)
 		}

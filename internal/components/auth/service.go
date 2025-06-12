@@ -75,7 +75,7 @@ func (s AuthService) CheckAndRefreshToken(accessToken, refreshToken string) (htt
 	if err != nil {
 		return http.Cookie{}, http.Cookie{}, false, err
 	}
-	accessToken, atExpiresAt, newRefreshToken, rtExpiresAt, err := domain.GenerateTokensForUser(user, s.Config, &s.RefreshTokenRepository)
+	accessToken, atExpiresAt, newRefreshToken, rtExpiresAt, err := domain.GenerateTokensForUser(user, "device-id", s.Config, &s.RefreshTokenRepository)
 	if err != nil {
 		return http.Cookie{}, http.Cookie{}, false, err
 	}

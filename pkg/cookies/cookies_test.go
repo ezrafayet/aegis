@@ -1,7 +1,7 @@
 package cookies
 
 import (
-	"aegix/internal/domain"
+	"othnx/internal/domain"
 	"testing"
 )
 

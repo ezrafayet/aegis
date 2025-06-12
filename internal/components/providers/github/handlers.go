@@ -1,9 +1,9 @@
 package github
 
 import (
-	"aegix/internal/components/providers/providersports"
-	"aegix/internal/domain"
 	"net/http"
+	"othnx/internal/components/providers/providersports"
+	"othnx/internal/domain"
 
 	"github.com/labstack/echo/v4"
 )

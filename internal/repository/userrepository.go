@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"aegix/internal/domain"
+	"othnx/internal/domain"
 
 	"gorm.io/gorm"
 )

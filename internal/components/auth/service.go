@@ -1,10 +1,10 @@
 package auth
 
 import (
-	"aegix/internal/domain"
-	"aegix/internal/repository"
-	"aegix/pkg/cookies"
 	"net/http"
+	"othnx/internal/domain"
+	"othnx/internal/repository"
+	"othnx/pkg/cookies"
 )
 
 type AuthServiceInterface interface {

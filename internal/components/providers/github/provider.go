@@ -1,12 +1,12 @@
 package github
 
 import (
-	"aegix/internal/components/providers/providersports"
-	"aegix/internal/domain"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"othnx/internal/components/providers/providersports"
+	"othnx/internal/domain"
 )
 
 type OAuthGithubProvider struct {

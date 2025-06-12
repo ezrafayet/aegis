@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"aegix/internal/domain"
+	"othnx/internal/domain"
 	"testing"
 	"time"
 
@@ -22,7 +22,7 @@ func TestUserRepository(t *testing.T) {
 			CreatedAt:       time.Now(),
 			Name:            "Test User",
 			NameFingerprint: "test_fingerprint",
-			Email:           "test@test.com", 
+			Email:           "test@test.com",
 			Metadata:        "{}",
 			AuthMethod:      "test",
 		})
@@ -61,7 +61,7 @@ func TestUserRepository(t *testing.T) {
 			CreatedAt:       time.Now(),
 			Name:            "Test User1",
 			NameFingerprint: "test_fingerprint1",
-			Email:           "test@test.com", 
+			Email:           "test@test.com",
 			Metadata:        "{}",
 			AuthMethod:      "test",
 		})
@@ -73,7 +73,7 @@ func TestUserRepository(t *testing.T) {
 			CreatedAt:       time.Now(),
 			Name:            "Test User2",
 			NameFingerprint: "test_fingerprint2",
-			Email:           "test@test.com", 
+			Email:           "test@test.com",
 			Metadata:        "{}",
 			AuthMethod:      "test",
 		})
@@ -93,7 +93,7 @@ func TestUserRepository(t *testing.T) {
 			CreatedAt:       time.Now(),
 			Name:            "Test User1",
 			NameFingerprint: "test_fingerprint1",
-			Email:           "test1@test.com", 
+			Email:           "test1@test.com",
 			Metadata:        "{}",
 			AuthMethod:      "test",
 		})
@@ -105,7 +105,7 @@ func TestUserRepository(t *testing.T) {
 			CreatedAt:       time.Now(),
 			Name:            "Test User1",
 			NameFingerprint: "test_fingerprint1",
-			Email:           "test2@test.com", 
+			Email:           "test2@test.com",
 			Metadata:        "{}",
 			AuthMethod:      "test",
 		})

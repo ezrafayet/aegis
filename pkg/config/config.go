@@ -1,10 +1,10 @@
 package config
 
 import (
-	"aegix/internal/domain"
 	"encoding/json"
 	"errors"
 	"os"
+	"othnx/internal/domain"
 )
 
 func ReadConfig(configPath string) (domain.Config, error) {

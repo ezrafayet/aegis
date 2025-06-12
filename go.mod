@@ -1,4 +1,4 @@
-module aegix
+module othnx
 
 go 1.24.3
 

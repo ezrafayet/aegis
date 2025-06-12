@@ -1,10 +1,10 @@
 package registry
 
 import (
-	"aegix/internal/components/auth"
-	"aegix/internal/components/providers/github"
-	"aegix/internal/domain"
-	"aegix/internal/repository"
+	"othnx/internal/components/auth"
+	"othnx/internal/components/providers/github"
+	"othnx/internal/domain"
+	"othnx/internal/repository"
 
 	"gorm.io/gorm"
 )

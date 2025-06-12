@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"aegix/internal/domain"
+	"othnx/internal/domain"
 )
 
 func NewAccessCookie(token string, expiresAt int64, config domain.Config) http.Cookie {

@@ -1,8 +1,8 @@
 package providersports
 
 import (
-	"aegix/internal/domain"
 	"net/http"
+	"othnx/internal/domain"
 
 	"github.com/labstack/echo/v4"
 )

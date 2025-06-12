@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"aegix/internal/domain"
-	"aegix/internal/registry"
-	"aegix/pkg/config"
+	"othnx/internal/domain"
+	"othnx/internal/registry"
+	"othnx/pkg/config"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"

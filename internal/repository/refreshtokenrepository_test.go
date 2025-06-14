@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"othnx/internal/domain"
 	"testing"
+	"time"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -111,3 +112,176 @@ func TestGetRefreshTokenByToken(t *testing.T) {
 		}
 	})
 }
+
+func TestCountValidRefreshTokensForUser(t *testing.T) {
+	t.Run("should count valid refresh tokens for user", func(t *testing.T) {
+		db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		db.AutoMigrate(&domain.User{}, &domain.RefreshToken{})
+		refreshTokenRepository := NewRefreshTokenRepository(db)
+		deviceFingerprint, err := domain.GenerateDeviceFingerprint("device-id")
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		refreshTokenExpired, _, err := domain.NewRefreshToken(domain.User{ID: "123"}, deviceFingerprint, domain.Config{
+			JWT: domain.JWTConfig{
+				Secret:                     "xxxsecret",
+				AccessTokenExpirationMin:   15,
+				RefreshTokenExpirationDays: 30,
+			},
+		})
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		refreshTokenExpired.ExpiresAt = time.Now().Add(-time.Hour * 24)
+		err = refreshTokenRepository.CreateRefreshToken(refreshTokenExpired)
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		refreshTokenActive, _, err := domain.NewRefreshToken(domain.User{ID: "123"}, deviceFingerprint, domain.Config{
+			JWT: domain.JWTConfig{
+				Secret:                     "xxxsecret",
+				AccessTokenExpirationMin:   15,
+				RefreshTokenExpirationDays: 30,
+			},
+		})
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		err = refreshTokenRepository.CreateRefreshToken(refreshTokenActive)
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		count, err := refreshTokenRepository.CountValidRefreshTokensForUser("123")
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		if count != 1 {
+			t.Fatal("expected count to be 0", count)
+		}
+	})
+}
+
+func TestCleanExpiredTokens(t *testing.T) {
+	t.Run("should clean expired tokens", func(t *testing.T) {
+		db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		db.AutoMigrate(&domain.User{}, &domain.RefreshToken{})
+		refreshTokenRepository := NewRefreshTokenRepository(db)
+		deviceFingerprint, err := domain.GenerateDeviceFingerprint("device-id")
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		refreshTokenExpired, _, err := domain.NewRefreshToken(domain.User{ID: "123"}, deviceFingerprint, domain.Config{
+			JWT: domain.JWTConfig{
+				Secret:                     "xxxsecret",
+				AccessTokenExpirationMin:   15,
+				RefreshTokenExpirationDays: 30,
+			},
+		})
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		refreshTokenExpired.ExpiresAt = time.Now().Add(-time.Hour * 24)
+		err = refreshTokenRepository.CreateRefreshToken(refreshTokenExpired)
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		refreshTokenActive, _, err := domain.NewRefreshToken(domain.User{ID: "123"}, deviceFingerprint, domain.Config{
+			JWT: domain.JWTConfig{
+				Secret:                     "xxxsecret",
+				AccessTokenExpirationMin:   15,
+				RefreshTokenExpirationDays: 30,
+			},
+		})
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		err = refreshTokenRepository.CreateRefreshToken(refreshTokenActive)
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		err = refreshTokenRepository.CleanExpiredTokens("123")
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		var countActive int64
+		result := db.Model(&domain.RefreshToken{}).Where("user_id = ? AND token = ?", "123", refreshTokenActive.Token).Count(&countActive)
+		if result.Error != nil {
+			t.Fatal("expected no error", result.Error)
+		}
+		if countActive != 1 {
+			t.Fatal("expected count to be 1", countActive)
+		}
+		var countExpired int64
+		result = db.Model(&domain.RefreshToken{}).Where("user_id = ? AND token = ?", "123", refreshTokenExpired.Token).Count(&countExpired)
+		if result.Error != nil {
+			t.Fatal("expected no error", result.Error)
+		}
+		if countExpired != 0 {
+			t.Fatal("expected count to be 0", countExpired)
+		}
+	})
+}
+
+func TestDeleteRefreshToken(t *testing.T) {
+	t.Run("should delete a refresh token", func(t *testing.T) {
+		db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		db.AutoMigrate(&domain.User{}, &domain.RefreshToken{})
+		refreshTokenRepository := NewRefreshTokenRepository(db)
+		deviceFingerprint, err := domain.GenerateDeviceFingerprint("device-id")
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		refreshTokenExpired, _, err := domain.NewRefreshToken(domain.User{ID: "123"}, deviceFingerprint, domain.Config{
+			JWT: domain.JWTConfig{
+				Secret:                     "xxxsecret",
+				AccessTokenExpirationMin:   15,
+				RefreshTokenExpirationDays: 30,
+			},
+		})
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		refreshTokenExpired.ExpiresAt = time.Now().Add(-time.Hour * 24)
+		err = refreshTokenRepository.CreateRefreshToken(refreshTokenExpired)
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		refreshTokenActive, _, err := domain.NewRefreshToken(domain.User{ID: "123"}, deviceFingerprint, domain.Config{
+			JWT: domain.JWTConfig{
+				Secret:                     "xxxsecret",
+				AccessTokenExpirationMin:   15,
+				RefreshTokenExpirationDays: 30,
+			},
+		})
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		err = refreshTokenRepository.CreateRefreshToken(refreshTokenActive)
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		err = refreshTokenRepository.DeleteRefreshToken(refreshTokenExpired.Token)
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		var count int64
+		result := db.Model(&domain.RefreshToken{}).Where("user_id = ? AND token = ?", "123", refreshTokenActive.Token).Count(&count)
+		if result.Error != nil {
+			t.Fatal("expected no error", result.Error)
+		}
+		if count != 1 {
+			t.Fatal("expected count to be 1", count)
+		}
+	})
+}
+
+

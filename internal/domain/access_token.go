@@ -46,7 +46,7 @@ func ReadAccessTokenClaims(accessToken string, config Config) (CustomClaims, err
 				return CustomClaims{}, ErrAccessTokenExpired
 			}
 		}
-		return CustomClaims{}, err
+		return CustomClaims{}, ErrInvalidAccessToken
 	}
 	if !parsedToken.Valid {
 		return CustomClaims{}, ErrInvalidAccessToken

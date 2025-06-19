@@ -1,7 +1,8 @@
-package providers
+package providersports
 
 import (
 	"net/http"
+	"othnx/internal/domain"
 
 	"github.com/labstack/echo/v4"
 )
@@ -21,15 +22,9 @@ type OAuthMiddlewares interface {
 
 type OAuthProviderService interface {
 	GetAuthURL(redirectUri string) (string, error)
-	ExchangeCode(code, state string) (http.Cookie, http.Cookie, error) // returns a cookie
+	ExchangeCode(code, state string) (http.Cookie, http.Cookie, error)
 }
 
-type OAuthProvider interface {
-	GetUserInfos(code, state, redirectUri string) (*OAuthUser, error)
-}
-
-type OAuthUser struct {
-	Name   string
-	Email  string
-	Avatar string
+type OAuthProviderRepository interface {
+	GetUserInfos(code, state, redirectUri string) (*domain.UserInfos, error)
 }

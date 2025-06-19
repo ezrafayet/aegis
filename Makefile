@@ -1,6 +1,9 @@
 start:
 	go run cmd/httpserver/main.go
 
+build:
+	go build -o main cmd/httpserver/main.go
+
 fmt:
 	go fmt ./...
 

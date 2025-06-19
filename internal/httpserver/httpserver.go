@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"aegix/internal/domain"
-	"aegix/internal/registry"
-	"aegix/pkg/config"
+	"othnx/internal/domain"
+	"othnx/internal/registry"
+	"othnx/pkg/config"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -16,14 +16,14 @@ import (
 
 func Start() error {
 	fmt.Println(`
- █████╗ ██╗   ██╗████████╗██╗  ██╗     █████╗ ███████╗ ██████╗ ██╗██╗  ██╗
-██╔══██╗██║   ██║╚══██╔══╝██║  ██║    ██╔══██╗██╔════╝██╔════╝ ██║╚██╗██╔╝
-███████║██║   ██║   ██║   ███████║    ███████║█████╗  ██║  ███╗██║ ╚███╔╝ 
-██╔══██║██║   ██║   ██║   ██╔══██║    ██╔══██║██╔══╝  ██║   ██║██║ ██╔██╗ 
-██║  ██║╚██████╔╝   ██║   ██║  ██║    ██║  ██║███████╗╚██████╔╝██║██╔╝ ██╗
-╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝    ╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═╝╚═╝  ╚═╝
+ ██████╗ ████████╗██╗  ██╗███╗   ██╗██╗  ██╗     █████╗ ██╗   ██╗████████╗██╗  ██╗
+██╔═══██╗╚══██╔══╝██║  ██║████╗  ██║╚██╗██╔╝    ██╔══██╗██║   ██║╚══██╔══╝██║  ██║
+██║   ██║   ██║   ███████║██╔██╗ ██║ ╚███╔╝     ███████║██║   ██║   ██║   ███████║
+██║   ██║   ██║   ██╔══██║██║╚██╗██║ ██╔██╗     ██╔══██║██║   ██║   ██║   ██╔══██║
+╚██████╔╝   ██║   ██║  ██║██║ ╚████║██╔╝ ██╗    ██║  ██║╚██████╔╝   ██║   ██║  ██║
+ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝    ╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝
 Drop-in auth service - no SaaS, no lock-in
-v0.1.0
+v0.x.x (needs to be injected)
 	`)
 	c, err := config.ReadConfig("config.json")
 	if err != nil {
@@ -33,19 +33,16 @@ v0.1.0
 	db, err := gorm.Open(postgres.Open(c.DB.PostgresURL))
 	if err != nil {
 		return fmt.Errorf("failed to connect to database: %w", err)
+	} else {
+		fmt.Println("Connected to database")
 	}
-
-	fmt.Println("Connected to database")
 
 	if err := db.AutoMigrate(&domain.User{}, &domain.RefreshToken{}); err != nil {
 		return fmt.Errorf("failed to run database migrations: %w", err)
 	}
 
-	fmt.Println("Database migrations completed successfully")
-
 	e := echo.New()
 	e.HideBanner = true
-
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.SecureWithConfig(middleware.SecureConfig{
@@ -56,32 +53,15 @@ v0.1.0
 	}))
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins:     c.Auth.AllowedOrigins,
+		AllowOrigins:     c.App.AllowedOrigins,
 		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
 		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
 		AllowCredentials: true,
 	}))
 
 	r := registry.NewRegistry(c, db)
-
 	r.GitHubRouter.AttachRoutes(e)
-
 	r.AuthRouter.AttachRoutes(e)
 
-	// r.PrivateAuthRouter.AttachRoutes(e)
-	// e.POST("/authorize", func(c echo.Context) error {
-	// 	// ask auth service if a jwt is valid, and get user's details from jwt
-	// 	return c.NoContent(http.StatusOK)
-	// })
-	// must also retrieve and set
-	// e.POST("/authorize-api-token", func(c echo.Context) error {
-	// 	return c.String(http.StatusOK, "Hello, World!")
-	// })
-	// get/set user metadata
-
-	if err := e.Start(":5666"); err != nil && err != http.ErrServerClosed {
-		return fmt.Errorf("failed to start server: %w", err)
-	}
-
-	return nil
+	return e.Start(fmt.Sprintf(":%d", c.App.Port))
 }

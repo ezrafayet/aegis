@@ -1,22 +1,21 @@
 package github
 
 import (
-	"aegix/internal/domain"
-	"aegix/internal/providers"
-	"fmt"
 	"net/http"
+	"othnx/internal/components/providers/providersports"
+	"othnx/internal/domain"
 
 	"github.com/labstack/echo/v4"
 )
 
 type OAuthGithubHandlers struct {
 	Config  domain.Config
-	Service providers.OAuthProviderService
+	Service providersports.OAuthProviderService
 }
 
-var _ providers.OAuthProviderHandlers = OAuthGithubHandlers{}
+var _ providersports.OAuthProviderHandlers = OAuthGithubHandlers{}
 
-func NewOAuthGithubHandlers(c domain.Config, s providers.OAuthProviderService) OAuthGithubHandlers {
+func NewOAuthGithubHandlers(c domain.Config, s providersports.OAuthProviderService) OAuthGithubHandlers {
 	return OAuthGithubHandlers{
 		Config:  c,
 		Service: s,
@@ -32,7 +31,6 @@ func (h OAuthGithubHandlers) GetAuthURL(c echo.Context) error {
 }
 
 func (h OAuthGithubHandlers) ExchangeCode(c echo.Context) error {
-	// get code and state fromn the json body NOT FORM
 	type ExchangeCodeRequest struct {
 		Code  string `json:"code"`
 		State string `json:"state"`
@@ -43,8 +41,16 @@ func (h OAuthGithubHandlers) ExchangeCode(c echo.Context) error {
 	}
 	accessCookie, refreshCookie, err := h.Service.ExchangeCode(body.Code, body.State)
 	if err != nil {
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> err", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "an error occurred"})
+		if err.Error() == domain.ErrEarlyAdoptersOnly.Error() {
+			return c.JSON(http.StatusUnauthorized, map[string]string{"error": domain.ErrEarlyAdoptersOnly.Error()})
+		}
+		if err.Error() == domain.ErrUserBlocked.Error() {
+			return c.JSON(http.StatusUnauthorized, map[string]string{"error": domain.ErrUserBlocked.Error()})
+		}
+		if err.Error() == domain.ErrUserDeleted.Error() {
+			return c.JSON(http.StatusUnauthorized, map[string]string{"error": domain.ErrUserDeleted.Error()})
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": domain.ErrGeneric.Error()})
 	}
 	c.SetCookie(&accessCookie)
 	c.SetCookie(&refreshCookie)

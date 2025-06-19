@@ -1,17 +1,17 @@
 package registry
 
 import (
-	"aegix/internal/components/auth"
-	"aegix/internal/domain"
-	"aegix/internal/providers/github"
-	"aegix/internal/repository"
+	"othnx/internal/components/auth"
+	"othnx/internal/components/providers/github"
+	"othnx/internal/domain"
+	"othnx/internal/repository"
 
 	"gorm.io/gorm"
 )
 
 type Registry struct {
 	GitHubRouter github.OAuthGithubRouter
-	AuthRouter auth.AuthRouter
+	AuthRouter   auth.AuthRouter
 }
 
 func NewRegistry(c domain.Config, db *gorm.DB) Registry {
@@ -23,7 +23,7 @@ func NewRegistry(c domain.Config, db *gorm.DB) Registry {
 	authMiddlewares := auth.NewAuthMiddleware(c, authService)
 	authRouter := auth.NewAuthRouter(authHandlers, authMiddlewares)
 
-	githubProvider := github.NewOAuthGithubProvider(c)
+	githubProvider := github.NewOAuthGithubRepository(c)
 	githubServices := github.NewOAuthGithubService(c, githubProvider, &userRepository, &refreshTokenRepository)
 	githubHandlers := github.NewOAuthGithubHandlers(c, githubServices)
 	githubMiddlewares := github.NewOAuthGithubMiddlewares(c)
@@ -31,6 +31,6 @@ func NewRegistry(c domain.Config, db *gorm.DB) Registry {
 
 	return Registry{
 		GitHubRouter: githubRouter,
-		AuthRouter: authRouter,
+		AuthRouter:   authRouter,
 	}
 }

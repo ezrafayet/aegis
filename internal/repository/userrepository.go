@@ -1,8 +1,7 @@
 package repository
 
 import (
-	"aegix/internal/domain"
-	"aegix/internal/providers"
+	"othnx/internal/domain"
 
 	"gorm.io/gorm"
 )
@@ -32,7 +31,7 @@ func (r *UserRepository) GetUserByEmail(email string) (domain.User, error) {
 		return domain.User{}, result.Error
 	}
 	if result.Error == gorm.ErrRecordNotFound {
-		return domain.User{}, providers.ErrNoUser
+		return domain.User{}, domain.ErrNoUser
 	}
 	return user, nil
 }
@@ -44,4 +43,13 @@ func (r *UserRepository) GetUserByID(userID string) (domain.User, error) {
 		return domain.User{}, result.Error
 	}
 	return user, nil
+}
+
+func (r *UserRepository) DoesNameExist(nameFingerprint string) (bool, error) {
+	var user domain.User
+	result := r.db.Where("name_fingerprint = ?", nameFingerprint).First(&user)
+	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
+		return false, result.Error
+	}
+	return result.Error == nil, nil
 }

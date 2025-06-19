@@ -2,8 +2,9 @@
     "app": {
         "name": "myAppName",
         "url": "https://myapp.com",
-        "log_level": "debug",
-        "api_keys": ["xxxxxxxxxxxx"]
+        "allowed_origins": ["https://myapp.com"],
+        "api_keys": ["xxxxxxxxxxxx"],
+        "port": 5666
     },
     "db": {
         "postgres_url": "xxxxx" 
@@ -17,34 +18,20 @@
         "providers": {
             "github": {
                 "enabled": true,
-                "app_name": "xxxxx",
+                "app_name": "myAppName",
                 "client_id": "xxxxxx",
                 "client_secret": "xxxxxx"
             }
-        },
-        "redirect_urls": {
-            "success": ["http://localhost:3000/dashboard"],
-            "failure": ["http://localhost:3000/login"]
-        },
-        "allowed_origins": [
-            "http://localhost:3000"
-        ]
+        }
     },
     "cookie": {
-        "domain": "localhost",
-        "secure": false,
+        "domain": "https://myapp.com",
+        "secure": true,
         "http_only": true,
-        "same_site": "Lax",
-        "max_age": 3600
+        "same_site": 1,
+        "path": "/"
     },
     "user": {
-        "roles": ["platform_admin", "user"],
-        "metadata": {
-            "foo": {
-                "type": "string",
-                "default": "bar",
-                "enum": ["bar", "baz"]
-            }
-        }
+        "roles": ["platform_admin", "user"]
     }
 }

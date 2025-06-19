@@ -11,7 +11,7 @@ type AuthRouterInterface interface {
 }
 
 type AuthRouter struct {
-	Handlers AuthHandlersInterface
+	Handlers    AuthHandlersInterface
 	Middlewares AuthMiddlewareInterface
 }
 
@@ -19,7 +19,7 @@ var _ AuthRouterInterface = &AuthRouter{}
 
 func NewAuthRouter(h AuthHandlersInterface, m AuthMiddlewareInterface) AuthRouter {
 	return AuthRouter{
-		Handlers: h,
+		Handlers:    h,
 		Middlewares: m,
 	}
 }
@@ -27,6 +27,6 @@ func NewAuthRouter(h AuthHandlersInterface, m AuthMiddlewareInterface) AuthRoute
 func (r AuthRouter) AttachRoutes(e *echo.Echo) {
 	group := e.Group("/auth", r.Middlewares.CheckAndRefreshToken)
 	group.GET("/me", r.Handlers.GetSession)
-	group.GET("/logout", r.Handlers.Logout)
-	group.POST("/refresh", func(c echo.Context) error {return c.NoContent(http.StatusOK)})
+	group.GET("/refresh", func(c echo.Context) error { return c.NoContent(http.StatusOK) })
+	e.GET("/logout", r.Handlers.Logout)
 }

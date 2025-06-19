@@ -1,8 +1,8 @@
 package main
 
 import (
-	"aegix/internal/httpserver"
 	"log"
+	"othnx/internal/httpserver"
 )
 
 func main() {

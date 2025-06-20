@@ -36,3 +36,7 @@ func newCookie(name, token string, expiresAt int64, config domain.Config) http.C
 	}
 	return cookie
 }
+
+func IsZeroCookie(cookie http.Cookie) bool {
+	return cookie.Expires.IsZero() || cookie.Value == ""
+}

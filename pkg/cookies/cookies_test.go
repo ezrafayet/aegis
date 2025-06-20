@@ -19,11 +19,17 @@ func TestNewCookie(t *testing.T) {
 		}
 	})
 
-	t.Run("with defaults 'true' ovverrides values", func(t *testing.T) {
-		// todo
+	t.Run("is zero cookie detects a zero cookie", func(t *testing.T) {
+		cookie := NewAccessCookieZero(domain.Config{})
+		if !IsZeroCookie(cookie) {
+			t.Errorf("expected cookie to be zero")
+		}
 	})
 
-	t.Run("with defaults 'false' does not ovverride values", func(t *testing.T) {
-		// todo
+	t.Run("is zero cookie detects a non-zero cookie", func(t *testing.T) {
+		cookie := NewAccessCookie("test_value", 1717795200, domain.Config{})
+		if IsZeroCookie(cookie) {
+			t.Errorf("expected cookie to be non-zero")
+		}
 	})
 }

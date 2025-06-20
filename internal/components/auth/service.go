@@ -10,7 +10,7 @@ import (
 type AuthServiceInterface interface {
 	GetSession(accessToken string) (domain.Session, error)
 	Logout(refreshToken string) (http.Cookie, http.Cookie, error)
-	CheckAndRefreshToken(accessToken, refreshToken string) (http.Cookie, http.Cookie, bool, error)
+	CheckAndRefreshToken(accessToken, refreshToken string) (*http.Cookie, *http.Cookie, error)
 }
 
 type AuthService struct {
@@ -46,40 +46,45 @@ func (s AuthService) Logout(refreshToken string) (http.Cookie, http.Cookie, erro
 	return cookies.NewAccessCookieZero(s.Config), cookies.NewRefreshCookieZero(s.Config), nil
 }
 
-func (s AuthService) CheckAndRefreshToken(accessToken, refreshToken string) (http.Cookie, http.Cookie, bool, error) {
+func (s AuthService) resetCookies(err error) (*http.Cookie, *http.Cookie, error) {
+	ac, rc := cookies.NewAccessCookieZero(s.Config), cookies.NewRefreshCookieZero(s.Config)
+	return &ac, &rc, err
+}
+
+func (s AuthService) CheckAndRefreshToken(accessToken, refreshToken string) (*http.Cookie, *http.Cookie, error) {
 	_, err := domain.ReadAccessTokenClaims(accessToken, s.Config)
 	if err == nil {
-		return http.Cookie{}, http.Cookie{}, false, nil
+		return nil, nil, nil
 	}
 	if err.Error() != domain.ErrAccessTokenExpired.Error() {
-		return http.Cookie{}, http.Cookie{}, false, err
+		return s.resetCookies(err)
 	}
 	refreshTokenObject, err := s.RefreshTokenRepository.GetRefreshTokenByToken(refreshToken)
 	if err != nil {
-		return http.Cookie{}, http.Cookie{}, false, err
+		return s.resetCookies(err)
 	}
 	if refreshTokenObject.IsExpired() {
-		return cookies.NewAccessCookieZero(s.Config), cookies.NewRefreshCookieZero(s.Config), true, domain.ErrRefreshTokenExpired
+		return s.resetCookies(domain.ErrRefreshTokenExpired)
 	}
 	user, err := s.UserRepository.GetUserByID(refreshTokenObject.UserID)
 	if err != nil {
-		return http.Cookie{}, http.Cookie{}, false, err
+		return s.resetCookies(err)
 	}
 	if user.IsDeleted() {
-		return cookies.NewAccessCookieZero(s.Config), cookies.NewRefreshCookieZero(s.Config), true, domain.ErrUserDeleted
+		return s.resetCookies(domain.ErrUserDeleted)
 	}
 	if user.IsBlocked() {
-		return cookies.NewAccessCookieZero(s.Config), cookies.NewRefreshCookieZero(s.Config), true, domain.ErrUserBlocked
+		return s.resetCookies(domain.ErrUserBlocked)
 	}
 	err = s.RefreshTokenRepository.DeleteRefreshToken(refreshToken)
 	if err != nil {
-		return http.Cookie{}, http.Cookie{}, false, err
+		return s.resetCookies(err)
 	}
 	accessToken, atExpiresAt, newRefreshToken, rtExpiresAt, err := domain.GenerateTokensForUser(user, "device-id", s.Config, &s.RefreshTokenRepository)
 	if err != nil {
-		return http.Cookie{}, http.Cookie{}, false, err
+		return s.resetCookies(err)
 	}
 	accessCookie := cookies.NewAccessCookie(accessToken, atExpiresAt, s.Config)
 	refreshCookie := cookies.NewRefreshCookie(newRefreshToken, rtExpiresAt, s.Config)
-	return accessCookie, refreshCookie, true, nil
+	return &accessCookie, &refreshCookie, nil
 }

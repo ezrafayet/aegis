@@ -13,30 +13,46 @@ type OAuthGithubService struct {
 	Provider               providersports.OAuthProviderRepository
 	UserRepository         domain.UserRepository
 	RefreshTokenRepository domain.RefreshTokenRepository
+	StateRepository        domain.StateRepository
 }
 
 var _ providersports.OAuthProviderService = OAuthGithubService{}
 
-func NewOAuthGithubService(c domain.Config, p providersports.OAuthProviderRepository, userRepository domain.UserRepository, refreshTokenRepository domain.RefreshTokenRepository) OAuthGithubService {
+func NewOAuthGithubService(c domain.Config, p providersports.OAuthProviderRepository, userRepository domain.UserRepository, refreshTokenRepository domain.RefreshTokenRepository, stateRepository domain.StateRepository) OAuthGithubService {
 	return OAuthGithubService{
 		Config:                 c,
 		Provider:               p,
 		UserRepository:         userRepository,
 		RefreshTokenRepository: refreshTokenRepository,
+		StateRepository:        stateRepository,
 	}
 }
 
+// /!\ Can be abused to generate a lot of states - todo: fix
 func (s OAuthGithubService) GetAuthURL(redirectUri string) (string, error) {
+	state, err := domain.GenerateRandomToken("state_", 13)
+	if err != nil {
+		return "", err
+	}
+	if err := s.StateRepository.CreateState(domain.NewState(state)); err != nil {
+		return "", err
+	}
 	redirectURL := fmt.Sprintf(
 		"https://github.com/login/oauth/authorize?client_id=%s&scope=user:email&state=%s",
 		s.Config.Auth.Providers.GitHub.ClientID,
-		"random_state_here", // todo: generate proper state token and return it
+		state,
 	)
 	return redirectURL, nil
 }
 
 func (s OAuthGithubService) ExchangeCode(code, state string) (*http.Cookie, *http.Cookie, error) {
-	// todo: verify state, pass original state
+	serverState, err := s.StateRepository.GetAndDeleteState(state)
+	if err != nil {
+		return nil, nil, domain.ErrInvalidState
+	}
+	if serverState.IsExpired() {
+		return nil, nil, domain.ErrInvalidState
+	}
 	userInfos, err := s.Provider.GetUserInfos(code, state, "")
 	if err != nil {
 		return nil, nil, err

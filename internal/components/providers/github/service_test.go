@@ -34,15 +34,17 @@ func TestOAuthGithubService_ExchangeCode(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		db.AutoMigrate(&domain.User{}, &domain.RefreshToken{})
+		db.AutoMigrate(&domain.User{}, &domain.RefreshToken{}, &domain.State{})
 		refreshTokenRepository := repository.NewRefreshTokenRepository(db)
 		oauthProviderRepository := MockRepository{}
 		userRepository := repository.NewUserRepository(db)
-		authService := NewOAuthGithubService(baseConfig, oauthProviderRepository, &userRepository, &refreshTokenRepository)
+		stateRepository := repository.NewStateRepository(db)
+		authService := NewOAuthGithubService(baseConfig, oauthProviderRepository, &userRepository, &refreshTokenRepository, &stateRepository)
 		return authService, userRepository, refreshTokenRepository, db
 	}
 	t.Run("should create a user if no user exists", func(t *testing.T) {
 		ghService, _, _, db := prepare(t)
+		db.Create(&domain.State{Value: "some-state", ExpiresAt: time.Now().Add(3 * time.Minute)})
 		_, _, err := ghService.ExchangeCode("some-code", "some-state")
 		if err != nil {
 			t.Fatal("expected no error", err)
@@ -55,6 +57,7 @@ func TestOAuthGithubService_ExchangeCode(t *testing.T) {
 	})
 	t.Run("should not create a user if user already exists", func(t *testing.T) {
 		ghService, _, _, db := prepare(t)
+		db.Create(&domain.State{Value: "some-state", ExpiresAt: time.Now().Add(3 * time.Minute)})
 		newUser, err := domain.NewUser("some-name", "some-avatar", "some-email", "github")
 		if err != nil {
 			t.Fatal("expected no error", err)
@@ -72,6 +75,7 @@ func TestOAuthGithubService_ExchangeCode(t *testing.T) {
 	})
 	t.Run("should not return tokens if user is blocked", func(t *testing.T) {
 		ghService, _, _, db := prepare(t)
+		db.Create(&domain.State{Value: "some-state", ExpiresAt: time.Now().Add(3 * time.Minute)})
 		newUser, err := domain.NewUser("some-name", "some-avatar", "some-email", "github")
 		if err != nil {
 			t.Fatal("expected no error", err)
@@ -86,6 +90,7 @@ func TestOAuthGithubService_ExchangeCode(t *testing.T) {
 	})
 	t.Run("should not return tokens if user is deleted", func(t *testing.T) {
 		ghService, _, _, db := prepare(t)
+		db.Create(&domain.State{Value: "some-state", ExpiresAt: time.Now().Add(3 * time.Minute)})
 		newUser, err := domain.NewUser("some-name", "some-avatar", "some-email", "github")
 		if err != nil {
 			t.Fatal("expected no error", err)
@@ -100,6 +105,7 @@ func TestOAuthGithubService_ExchangeCode(t *testing.T) {
 	})
 	t.Run("should issue tokens if user does not have a valid refresh token", func(t *testing.T) {
 		ghService, _, _, db := prepare(t)
+		db.Create(&domain.State{Value: "some-state", ExpiresAt: time.Now().Add(3 * time.Minute)})
 		at, rt, err := ghService.ExchangeCode("some-code", "some-state")
 		if err != nil {
 			t.Fatal("expected no error", err)
@@ -123,6 +129,7 @@ func TestOAuthGithubService_ExchangeCode(t *testing.T) {
 	})
 	t.Run("should issue new tokens if user already has a valid refresh token, and delete the previous one", func(t *testing.T) {
 		ghService, _, _, db := prepare(t)
+		db.Create(&domain.State{Value: "some-state", ExpiresAt: time.Now().Add(3 * time.Minute)})
 		_, rt1, err := ghService.ExchangeCode("some-code", "some-state")
 		if err != nil {
 			t.Fatal("expected no error", err)
@@ -135,6 +142,7 @@ func TestOAuthGithubService_ExchangeCode(t *testing.T) {
 		if rt1 == nil || rt1.Value == "" {
 			t.Fatal("expected refresh token to be nil", rt1)
 		}
+		db.Create(&domain.State{Value: "some-state", ExpiresAt: time.Now().Add(3 * time.Minute)})
 		_, rt2, err := ghService.ExchangeCode("some-code", "some-state")
 		if err != nil {
 			t.Fatal("expected no error", err)

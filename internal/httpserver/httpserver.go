@@ -37,7 +37,7 @@ v0.x.x (needs to be injected)
 		fmt.Println("Connected to database")
 	}
 
-	if err := db.AutoMigrate(&domain.User{}, &domain.RefreshToken{}); err != nil {
+	if err := db.AutoMigrate(&domain.User{}, &domain.RefreshToken{}, &domain.State{}); err != nil {
 		return fmt.Errorf("failed to run database migrations: %w", err)
 	}
 

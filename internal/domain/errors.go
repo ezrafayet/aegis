@@ -25,4 +25,5 @@ var (
 var (
 	ErrWrongAuthMethod      = errors.New("wrong_auth_method")
 	ErrAuthMethodNotEnabled = errors.New("auth_method_not_enabled")
+	ErrInvalidState         = errors.New("invalid_state")
 )

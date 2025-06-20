@@ -66,6 +66,7 @@ func (s AuthService) CheckAndRefreshToken(accessToken, refreshToken string) (*ht
 	if refreshTokenObject.IsExpired() {
 		return s.resetCookies(domain.ErrRefreshTokenExpired)
 	}
+	// todo: check device id
 	user, err := s.UserRepository.GetUserByID(refreshTokenObject.UserID)
 	if err != nil {
 		return s.resetCookies(err)
@@ -80,6 +81,7 @@ func (s AuthService) CheckAndRefreshToken(accessToken, refreshToken string) (*ht
 	if err != nil {
 		return s.resetCookies(err)
 	}
+	// todo device-id: pass one, since one session per device is allowed
 	accessToken, atExpiresAt, newRefreshToken, rtExpiresAt, err := domain.GenerateTokensForUser(user, "device-id", s.Config, &s.RefreshTokenRepository)
 	if err != nil {
 		return s.resetCookies(err)

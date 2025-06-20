@@ -13,8 +13,8 @@ import (
 func TestCheckAndRefreshToken(t *testing.T) {
 	baseConfig := domain.Config{
 		JWT: domain.JWTConfig{
-			Secret: "some-secret",
-			AccessTokenExpirationMin: 1,
+			Secret:                     "some-secret",
+			AccessTokenExpirationMin:   1,
 			RefreshTokenExpirationDays: 1,
 		},
 	}
@@ -49,7 +49,7 @@ func TestCheckAndRefreshToken(t *testing.T) {
 		}
 		refreshToken.ExpiresAt = time.Now().Add(-time.Hour * 24)
 		db.Save(&refreshToken)
-		accessToken, _, err := domain.NewAccessToken(domain.CustomClaims{UserID: newUser.ID}, domain.Config{}, time.Now().Add(-time.Hour * 24))
+		accessToken, _, err := domain.NewAccessToken(domain.CustomClaims{UserID: newUser.ID}, domain.Config{}, time.Now().Add(-time.Hour*24))
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
@@ -70,7 +70,7 @@ func TestCheckAndRefreshToken(t *testing.T) {
 			t.Fatal("expected no error", err)
 		}
 		db.Save(&refreshToken)
-		accessToken, _, err := domain.NewAccessToken(domain.CustomClaims{UserID: newUser.ID}, baseConfig, time.Now().Add(-time.Hour * 24))
+		accessToken, _, err := domain.NewAccessToken(domain.CustomClaims{UserID: newUser.ID}, baseConfig, time.Now().Add(-time.Hour*24))
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}

@@ -22,7 +22,7 @@ type OAuthMiddlewares interface {
 
 type OAuthProviderService interface {
 	GetAuthURL(redirectUri string) (string, error)
-	ExchangeCode(code, state string) (http.Cookie, http.Cookie, error)
+	ExchangeCode(code, state string) (*http.Cookie, *http.Cookie, error)
 }
 
 type OAuthProviderRepository interface {

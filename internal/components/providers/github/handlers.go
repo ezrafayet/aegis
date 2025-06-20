@@ -52,7 +52,9 @@ func (h OAuthGithubHandlers) ExchangeCode(c echo.Context) error {
 		}
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": domain.ErrGeneric.Error()})
 	}
-	c.SetCookie(&accessCookie)
-	c.SetCookie(&refreshCookie)
+	if accessCookie != nil && refreshCookie != nil {
+		c.SetCookie(accessCookie)
+		c.SetCookie(refreshCookie)
+	}
 	return c.NoContent(http.StatusOK)
 }

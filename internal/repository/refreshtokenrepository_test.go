@@ -283,5 +283,3 @@ func TestDeleteRefreshToken(t *testing.T) {
 		}
 	})
 }
-
-

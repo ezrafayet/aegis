@@ -95,3 +95,75 @@ Also it won't support passwords since it is bad practise.
     }
 }
 ```
+
+# Security
+
+## Implemented
+
+### ✅ XSS (Cross-Site Scripting)
+
+**Description**: Attackers inject malicious scripts into web pages to steal authentication tokens or user data.
+
+**Prevention**: 
+- **HTTP-only cookies**: Authentication tokens are stored in `HttpOnly` cookies that JavaScript cannot access
+
+### ✅ CSRF (Cross-Site Request Forgery)
+
+**Description**: Attackers trick authenticated users into performing unwanted actions on your application.
+
+**Prevention**:
+- **OAuth state parameter**: Random, unguessable state tokens prevent unauthorized OAuth callbacks
+- **State expiration**: States expire after 3 minutes to limit attack window
+- **One-time use**: States are deleted after verification to prevent replay attacks
+
+### ✅ Session Fixation
+
+**Description**: Attackers force users to use a known session ID, then hijack the session after authentication.
+
+**Prevention**:
+- **New tokens per login**: Fresh access and refresh tokens are generated on every OAuth login
+- **Token rotation**: Existing refresh tokens are invalidated when new ones are issued
+- **Device fingerprinting**: Tokens are tied to specific device fingerprints (needs improvement)
+
+### ✅ Error Information Disclosure
+
+**Description**: Detailed error messages can reveal system information to attackers.
+
+**Prevention**:
+- **Generic error messages**: Use consistent, non-leaking error responses
+- **Logging separation**: Log detailed errors internally, return generic messages to users
+
+## Needs Implementation
+
+### ⚠️ Token Hijacking
+
+**Description**: Attackers steal refresh tokens and use them to impersonate users from different devices.
+
+**Current Risk**: 
+- Refresh tokens can be used from any device
+- No device validation during token refresh
+
+**Prevention Needed**:
+- **Device fingerprinting**: Generate unique device IDs from User-Agent, IP, and other headers
+- **Device validation**: Verify device fingerprint matches during token refresh
+- **Token binding**: Bind refresh tokens to specific device characteristics
+
+### ⚠️ DDoS Protection
+
+**Description**: Attackers overwhelm your service with requests to make it unavailable and inflate DB records.
+
+**Current Protection**:
+- **Basic rate limiting**: 20 requests per minute globally (too permissive)
+
+**Prevention Needed**:
+- **Per-endpoint rate limiting**: Different limits for different endpoints
+- **IP-based limiting**: Track requests per IP address
+- **Distributed rate limiting**: Use external storage or similar for persistent rate limiting
+
+### ⚠️ JWT Secret Strength
+
+**Description**: Weak JWT secrets can be brute-forced to forge tokens.
+
+**Prevention Needed**:
+- **Secret validation**: Ensure JWT secrets are at least 32 characters
+- **Entropy checking**: Validate secret randomness

@@ -1,10 +1,6 @@
 package auth
 
-import (
-	"net/http"
-
-	"github.com/labstack/echo/v4"
-)
+import "github.com/labstack/echo/v4"
 
 type AuthRouterInterface interface {
 	AttachRoutes(e *echo.Echo)
@@ -27,6 +23,6 @@ func NewAuthRouter(h AuthHandlersInterface, m AuthMiddlewareInterface) AuthRoute
 func (r AuthRouter) AttachRoutes(e *echo.Echo) {
 	group := e.Group("/auth", r.Middlewares.CheckAndRefreshToken)
 	group.GET("/me", r.Handlers.GetSession)
-	group.GET("/refresh", func(c echo.Context) error { return c.NoContent(http.StatusOK) })
+	group.GET("/refresh", r.Handlers.DoNothing)
 	e.GET("/logout", r.Handlers.Logout)
 }

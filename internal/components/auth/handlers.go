@@ -10,6 +10,7 @@ import (
 type AuthHandlersInterface interface {
 	GetSession(c echo.Context) error
 	Logout(c echo.Context) error
+	DoNothing(c echo.Context) error
 }
 
 type AuthHandlers struct {
@@ -61,5 +62,9 @@ func (h AuthHandlers) Logout(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": domain.ErrGeneric.Error()})
 	}
+	return c.NoContent(http.StatusOK)
+}
+
+func (h AuthHandlers) DoNothing(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }

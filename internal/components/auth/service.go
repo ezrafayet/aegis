@@ -9,7 +9,7 @@ import (
 
 type AuthServiceInterface interface {
 	GetSession(accessToken string) (domain.Session, error)
-	Logout(refreshToken string) (http.Cookie, http.Cookie, error)
+	Logout(refreshToken string) (*http.Cookie, *http.Cookie, error)
 	CheckAndRefreshToken(accessToken, refreshToken string) (*http.Cookie, *http.Cookie, error)
 }
 
@@ -39,16 +39,16 @@ func (s AuthService) GetSession(accessToken string) (domain.Session, error) {
 	}, nil
 }
 
-func (s AuthService) Logout(refreshToken string) (http.Cookie, http.Cookie, error) {
-	if refreshToken != "" {
-		_ = s.RefreshTokenRepository.DeleteRefreshToken(refreshToken)
-	}
-	return cookies.NewAccessCookieZero(s.Config), cookies.NewRefreshCookieZero(s.Config), nil
-}
-
 func (s AuthService) resetCookies(err error) (*http.Cookie, *http.Cookie, error) {
 	ac, rc := cookies.NewAccessCookieZero(s.Config), cookies.NewRefreshCookieZero(s.Config)
 	return &ac, &rc, err
+}
+
+func (s AuthService) Logout(refreshToken string) (*http.Cookie, *http.Cookie, error) {
+	if refreshToken != "" {
+		_ = s.RefreshTokenRepository.DeleteRefreshToken(refreshToken)
+	}
+	return s.resetCookies(nil)
 }
 
 func (s AuthService) CheckAndRefreshToken(accessToken, refreshToken string) (*http.Cookie, *http.Cookie, error) {

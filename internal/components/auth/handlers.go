@@ -54,8 +54,10 @@ func (h AuthHandlers) Logout(c echo.Context) error {
 		refreshToken = cookie.Value
 	}
 	accessCookie, refreshCookie, err := h.Service.Logout(refreshToken)
-	c.SetCookie(&refreshCookie)
-	c.SetCookie(&accessCookie)
+	if accessCookie != nil && refreshCookie != nil {
+		c.SetCookie(accessCookie)
+		c.SetCookie(refreshCookie)
+	}
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": domain.ErrGeneric.Error()})
 	}

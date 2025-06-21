@@ -2,10 +2,10 @@ package auth
 
 import (
 	"errors"
+	"github.com/labstack/echo/v4"
 	"net/http"
 	"othnx/internal/domain"
-
-	"github.com/labstack/echo/v4"
+	"othnx/pkg/apperrors"
 )
 
 type AuthMiddlewareInterface interface {
@@ -31,11 +31,11 @@ func (m AuthMiddleware) CheckAndRefreshToken(next echo.HandlerFunc) echo.Handler
 	return func(c echo.Context) error {
 		accessToken, err := c.Cookie("access_token")
 		if err != nil {
-			return c.JSON(http.StatusUnauthorized, map[string]string{"error": domain.ErrGeneric.Error()})
+			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrGeneric.Error()})
 		}
 		refreshToken, err := c.Cookie("refresh_token")
 		if err != nil {
-			return c.JSON(http.StatusUnauthorized, map[string]string{"error": domain.ErrGeneric.Error()})
+			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrGeneric.Error()})
 		}
 		c1, c2, err := m.Service.CheckAndRefreshToken(accessToken.Value, refreshToken.Value)
 		if c1 != nil && c2 != nil {
@@ -43,19 +43,19 @@ func (m AuthMiddleware) CheckAndRefreshToken(next echo.HandlerFunc) echo.Handler
 			c.SetCookie(c2)
 		}
 		if err != nil {
-			if err.Error() == domain.ErrInvalidAccessToken.Error() {
-				return c.JSON(http.StatusUnauthorized, map[string]string{"error": domain.ErrInvalidAccessToken.Error()})
+			if err.Error() == apperrors.ErrAccessTokenInvalid.Error() {
+				return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrAccessTokenInvalid.Error()})
 			}
-			if err.Error() == domain.ErrRefreshTokenExpired.Error() {
-				return c.JSON(http.StatusUnauthorized, map[string]string{"error": domain.ErrRefreshTokenExpired.Error()})
+			if err.Error() == apperrors.ErrRefreshTokenExpired.Error() {
+				return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrRefreshTokenExpired.Error()})
 			}
-			if err.Error() == domain.ErrUserDeleted.Error() {
-				return c.JSON(http.StatusUnauthorized, map[string]string{"error": domain.ErrUserDeleted.Error()})
+			if err.Error() == apperrors.ErrUserDeleted.Error() {
+				return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrUserDeleted.Error()})
 			}
-			if err.Error() == domain.ErrUserBlocked.Error() {
-				return c.JSON(http.StatusUnauthorized, map[string]string{"error": domain.ErrUserBlocked.Error()})
+			if err.Error() == apperrors.ErrUserBlocked.Error() {
+				return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrUserBlocked.Error()})
 			}
-			return c.JSON(http.StatusUnauthorized, map[string]string{"error": domain.ErrGeneric.Error()})
+			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrGeneric.Error()})
 		}
 		return next(c)
 	}

@@ -1,9 +1,9 @@
 package domain
 
 import (
-	"time"
-
 	"github.com/golang-jwt/jwt"
+	"othnx/pkg/apperrors"
+	"time"
 )
 
 type CustomClaims struct {
@@ -36,20 +36,20 @@ func NewAccessToken(cClaims CustomClaims, config Config, issuedAt time.Time) (ac
 func ReadAccessTokenClaims(accessToken string, config Config) (CustomClaims, error) {
 	parsedToken, err := jwt.Parse(accessToken, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, ErrInvalidAccessToken
+			return nil, apperrors.ErrAccessTokenInvalid
 		}
 		return []byte(config.JWT.Secret), nil
 	})
 	if err != nil {
 		if validationError, ok := err.(*jwt.ValidationError); ok {
 			if validationError.Errors&jwt.ValidationErrorExpired != 0 {
-				return CustomClaims{}, ErrAccessTokenExpired
+				return CustomClaims{}, apperrors.ErrAccessTokenExpired
 			}
 		}
-		return CustomClaims{}, ErrInvalidAccessToken
+		return CustomClaims{}, apperrors.ErrAccessTokenInvalid
 	}
 	if !parsedToken.Valid {
-		return CustomClaims{}, ErrInvalidAccessToken
+		return CustomClaims{}, apperrors.ErrAccessTokenInvalid
 	}
 
 	var customClaims CustomClaims

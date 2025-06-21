@@ -1,11 +1,11 @@
 package github
 
 import (
+	"github.com/labstack/echo/v4"
 	"net/http"
 	"othnx/internal/components/providers/providersports"
 	"othnx/internal/domain"
-
-	"github.com/labstack/echo/v4"
+	"othnx/pkg/apperrors"
 )
 
 type OAuthGithubHandlers struct {
@@ -41,16 +41,16 @@ func (h OAuthGithubHandlers) ExchangeCode(c echo.Context) error {
 	}
 	accessCookie, refreshCookie, err := h.Service.ExchangeCode(body.Code, body.State)
 	if err != nil {
-		if err.Error() == domain.ErrEarlyAdoptersOnly.Error() {
-			return c.JSON(http.StatusUnauthorized, map[string]string{"error": domain.ErrEarlyAdoptersOnly.Error()})
+		if err.Error() == apperrors.ErrEarlyAdoptersOnly.Error() {
+			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrEarlyAdoptersOnly.Error()})
 		}
-		if err.Error() == domain.ErrUserBlocked.Error() {
-			return c.JSON(http.StatusUnauthorized, map[string]string{"error": domain.ErrUserBlocked.Error()})
+		if err.Error() == apperrors.ErrUserBlocked.Error() {
+			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrUserBlocked.Error()})
 		}
-		if err.Error() == domain.ErrUserDeleted.Error() {
-			return c.JSON(http.StatusUnauthorized, map[string]string{"error": domain.ErrUserDeleted.Error()})
+		if err.Error() == apperrors.ErrUserDeleted.Error() {
+			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrUserDeleted.Error()})
 		}
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": domain.ErrGeneric.Error()})
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": apperrors.ErrGeneric.Error()})
 	}
 	if accessCookie != nil && refreshCookie != nil {
 		c.SetCookie(accessCookie)

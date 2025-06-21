@@ -3,6 +3,7 @@ package auth
 import (
 	"othnx/internal/domain"
 	"othnx/internal/repository"
+	"othnx/pkg/apperrors"
 	"testing"
 	"time"
 
@@ -32,7 +33,7 @@ func TestCheckAndRefreshToken(t *testing.T) {
 	t.Run("invalid access token gets rejected", func(t *testing.T) {
 		authService, _, _, _ := prepare(t)
 		_, _, err := authService.CheckAndRefreshToken("invalid", "invalid")
-		if err.Error() != domain.ErrInvalidAccessToken.Error() {
+		if err.Error() != apperrors.ErrAccessTokenInvalid.Error() {
 			t.Fatal("expected error ErrInvalidAccessToken", err)
 		}
 	})
@@ -54,7 +55,7 @@ func TestCheckAndRefreshToken(t *testing.T) {
 			t.Fatal("expected no error", err)
 		}
 		_, _, err = authService.CheckAndRefreshToken(accessToken, refreshToken.Token)
-		if err.Error() != domain.ErrRefreshTokenExpired.Error() {
+		if err.Error() != apperrors.ErrRefreshTokenExpired.Error() {
 			t.Fatal("expected error ErrRefreshTokenExpired", err)
 		}
 	})

@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"errors"
+	"othnx/pkg/apperrors"
 	"strings"
 	"time"
 	"unicode"
@@ -106,13 +107,13 @@ func GetOrCreateUserIfAllowed(userRepository UserRepository, userInfos *UserInfo
 		return User{}, err
 	}
 	if nameExists {
-		return User{}, ErrNameAlreadyExists
+		return User{}, apperrors.ErrNameAlreadyExists
 	}
 	user, err := userRepository.GetUserByEmail(userInfos.Email)
-	if err != nil && err.Error() != ErrNoUser.Error() {
+	if err != nil && err.Error() != apperrors.ErrNoUser.Error() {
 		return User{}, err
 	}
-	if err != nil && err.Error() == ErrNoUser.Error() {
+	if err != nil && err.Error() == apperrors.ErrNoUser.Error() {
 		user, err = NewUser(userInfos.Name, userInfos.Avatar, userInfos.Email, "github")
 		if err != nil {
 			return User{}, err
@@ -123,13 +124,13 @@ func GetOrCreateUserIfAllowed(userRepository UserRepository, userInfos *UserInfo
 		}
 	}
 	if user.IsDeleted() {
-		return User{}, ErrUserDeleted
+		return User{}, apperrors.ErrUserDeleted
 	}
 	if user.IsBlocked() {
-		return User{}, ErrUserBlocked
+		return User{}, apperrors.ErrUserBlocked
 	}
 	if config.App.EarlyAdoptersOnly && !user.IsEarlyAdopter() {
-		return User{}, ErrEarlyAdoptersOnly
+		return User{}, apperrors.ErrEarlyAdoptersOnly
 	}
 	return user, nil
 }

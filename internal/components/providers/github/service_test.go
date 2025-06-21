@@ -3,6 +3,7 @@ package github
 import (
 	"othnx/internal/domain"
 	"othnx/internal/repository"
+	"othnx/pkg/apperrors"
 	"testing"
 	"time"
 
@@ -84,7 +85,7 @@ func TestOAuthGithubService_ExchangeCode(t *testing.T) {
 		newUser.BlockedAt = &now
 		db.Create(&newUser)
 		_, _, err = ghService.ExchangeCode("some-code", "some-state")
-		if err.Error() != domain.ErrUserBlocked.Error() {
+		if err.Error() != apperrors.ErrUserBlocked.Error() {
 			t.Fatal("expected error ErrUserBlocked", err)
 		}
 	})
@@ -99,7 +100,7 @@ func TestOAuthGithubService_ExchangeCode(t *testing.T) {
 		newUser.DeletedAt = &now
 		db.Create(&newUser)
 		_, _, err = ghService.ExchangeCode("some-code", "some-state")
-		if err.Error() != domain.ErrUserDeleted.Error() {
+		if err.Error() != apperrors.ErrUserDeleted.Error() {
 			t.Fatal("expected error ErrUserDeleted", err)
 		}
 	})

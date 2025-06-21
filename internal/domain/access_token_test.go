@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"othnx/pkg/apperrors"
 	"testing"
 	"time"
 )
@@ -95,7 +96,7 @@ func TestAccessToken(t *testing.T) {
 				RefreshTokenExpirationDays: 30,
 			},
 		})
-		if err.Error() != "access_token_expired" {
+		if err.Error() != apperrors.ErrAccessTokenExpired.Error() {
 			t.Fatal("expected error to be 'access_token_expired'", err)
 		}
 	})

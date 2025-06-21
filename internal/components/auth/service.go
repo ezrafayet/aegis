@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"othnx/internal/domain"
 	"othnx/internal/repository"
+	"othnx/pkg/apperrors"
 	"othnx/pkg/cookies"
 )
 
@@ -56,7 +57,7 @@ func (s AuthService) CheckAndRefreshToken(accessToken, refreshToken string) (*ht
 	if err == nil {
 		return nil, nil, nil
 	}
-	if err.Error() != domain.ErrAccessTokenExpired.Error() {
+	if err.Error() != apperrors.ErrAccessTokenExpired.Error() {
 		return s.resetCookies(err)
 	}
 	refreshTokenObject, err := s.RefreshTokenRepository.GetRefreshTokenByToken(refreshToken)
@@ -64,7 +65,7 @@ func (s AuthService) CheckAndRefreshToken(accessToken, refreshToken string) (*ht
 		return s.resetCookies(err)
 	}
 	if refreshTokenObject.IsExpired() {
-		return s.resetCookies(domain.ErrRefreshTokenExpired)
+		return s.resetCookies(apperrors.ErrRefreshTokenExpired)
 	}
 	// todo: check device id
 	user, err := s.UserRepository.GetUserByID(refreshTokenObject.UserID)
@@ -72,13 +73,13 @@ func (s AuthService) CheckAndRefreshToken(accessToken, refreshToken string) (*ht
 		return s.resetCookies(err)
 	}
 	if user.IsDeleted() {
-		return s.resetCookies(domain.ErrUserDeleted)
+		return s.resetCookies(apperrors.ErrUserDeleted)
 	}
 	if user.IsBlocked() {
-		return s.resetCookies(domain.ErrUserBlocked)
+		return s.resetCookies(apperrors.ErrUserBlocked)
 	}
 	if s.Config.App.EarlyAdoptersOnly && !user.IsEarlyAdopter() {
-		return s.resetCookies(domain.ErrEarlyAdoptersOnly)
+		return s.resetCookies(apperrors.ErrEarlyAdoptersOnly)
 	}
 
 	err = s.RefreshTokenRepository.DeleteRefreshToken(refreshToken)

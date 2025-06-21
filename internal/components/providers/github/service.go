@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"othnx/internal/components/providers/providersports"
 	"othnx/internal/domain"
+	"othnx/pkg/apperrors"
 	"othnx/pkg/cookies"
 )
 
@@ -48,10 +49,10 @@ func (s OAuthGithubService) GetAuthURL(redirectUri string) (string, error) {
 func (s OAuthGithubService) ExchangeCode(code, state string) (*http.Cookie, *http.Cookie, error) {
 	serverState, err := s.StateRepository.GetAndDeleteState(state)
 	if err != nil {
-		return nil, nil, domain.ErrInvalidState
+		return nil, nil, apperrors.ErrInvalidState
 	}
 	if serverState.IsExpired() {
-		return nil, nil, domain.ErrInvalidState
+		return nil, nil, apperrors.ErrInvalidState
 	}
 	userInfos, err := s.Provider.GetUserInfos(code, state, "")
 	if err != nil {
@@ -64,7 +65,7 @@ func (s OAuthGithubService) ExchangeCode(code, state string) (*http.Cookie, *htt
 	}
 
 	if user.AuthMethod != "github" {
-		return nil, nil, domain.ErrWrongAuthMethod
+		return nil, nil, apperrors.ErrWrongAuthMethod
 	}
 
 	// todo device-id: pass one, since one session per device is allowed

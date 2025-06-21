@@ -1,9 +1,9 @@
 package repository
 
 import (
-	"othnx/internal/domain"
-
 	"gorm.io/gorm"
+	"othnx/internal/domain"
+	"othnx/pkg/apperrors"
 )
 
 type UserRepository struct {
@@ -31,7 +31,7 @@ func (r *UserRepository) GetUserByEmail(email string) (domain.User, error) {
 		return domain.User{}, result.Error
 	}
 	if result.Error == gorm.ErrRecordNotFound {
-		return domain.User{}, domain.ErrNoUser
+		return domain.User{}, apperrors.ErrNoUser
 	}
 	return user, nil
 }

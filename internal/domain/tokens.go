@@ -3,6 +3,7 @@ package domain
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"othnx/pkg/apperrors"
 	"time"
 )
 
@@ -32,7 +33,7 @@ func GenerateTokensForUser(user User, deviceID string, config Config, refreshTok
 	}
 
 	if validRefreshTokens >= 5 {
-		return "", -1, "", -1, ErrTooManyRefreshTokens
+		return "", -1, "", -1, apperrors.ErrTooManyRefreshTokens
 	}
 
 	_ = refreshTokenRepository.CleanExpiredTokens(user.ID)

@@ -1,10 +1,10 @@
 package auth
 
 import (
+	"github.com/labstack/echo/v4"
 	"net/http"
 	"othnx/internal/domain"
-
-	"github.com/labstack/echo/v4"
+	"othnx/pkg/apperrors"
 )
 
 type AuthHandlersInterface interface {
@@ -30,19 +30,19 @@ func NewAuthHandlers(c domain.Config, s AuthServiceInterface) AuthHandlers {
 func (h AuthHandlers) GetSession(c echo.Context) error {
 	var accessToken string
 	if cookie, err := c.Cookie("access_token"); err != nil {
-		return c.JSON(http.StatusUnauthorized, map[string]string{"error": domain.ErrGeneric.Error()})
+		return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrGeneric.Error()})
 	} else {
 		accessToken = cookie.Value
 	}
 	session, err := h.Service.GetSession(accessToken)
 	if err != nil {
-		if err.Error() == domain.ErrAccessTokenExpired.Error() {
-			return c.JSON(http.StatusUnauthorized, map[string]string{"error": domain.ErrAccessTokenExpired.Error()})
+		if err.Error() == apperrors.ErrAccessTokenExpired.Error() {
+			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrAccessTokenExpired.Error()})
 		}
-		if err.Error() == domain.ErrInvalidAccessToken.Error() {
-			return c.JSON(http.StatusUnauthorized, map[string]string{"error": domain.ErrInvalidAccessToken.Error()})
+		if err.Error() == apperrors.ErrAccessTokenInvalid.Error() {
+			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrAccessTokenInvalid.Error()})
 		}
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": domain.ErrGeneric.Error()})
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": apperrors.ErrGeneric.Error()})
 	}
 	return c.JSON(http.StatusOK, session)
 }
@@ -60,7 +60,7 @@ func (h AuthHandlers) Logout(c echo.Context) error {
 		c.SetCookie(refreshCookie)
 	}
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": domain.ErrGeneric.Error()})
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": apperrors.ErrGeneric.Error()})
 	}
 	return c.NoContent(http.StatusOK)
 }

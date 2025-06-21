@@ -57,7 +57,7 @@ func (s AuthService) CheckAndRefreshToken(accessToken, refreshToken string, forc
 	if err == nil && !forceRefresh {
 		return nil, nil, nil
 	}
-	if err != nil &&err.Error() != apperrors.ErrAccessTokenExpired.Error() {
+	if err != nil && err.Error() != apperrors.ErrAccessTokenExpired.Error() {
 		return s.resetCookies(err)
 	}
 	refreshTokenObject, err := s.RefreshTokenRepository.GetRefreshTokenByToken(refreshToken)

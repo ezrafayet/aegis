@@ -1,18 +1,18 @@
 package github
 
 import (
-	"github.com/labstack/echo/v4"
 	"net/http"
-	"othnx/internal/components/providers/providersports"
 	"othnx/internal/domain"
 	"othnx/pkg/apperrors"
+
+	"github.com/labstack/echo/v4"
 )
 
 type OAuthGithubMiddlewares struct {
 	Config domain.Config
 }
 
-var _ providersports.OAuthMiddlewares = OAuthGithubMiddlewares{}
+var _ domain.OAuthMiddlewares = OAuthGithubMiddlewares{}
 
 func NewOAuthGithubMiddlewares(c domain.Config) OAuthGithubMiddlewares {
 	return OAuthGithubMiddlewares{

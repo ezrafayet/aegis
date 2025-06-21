@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"othnx/internal/components/providers/providersports"
 	"othnx/internal/domain"
 )
 
@@ -13,7 +12,7 @@ type OAuthGithubRepository struct {
 	Config domain.Config
 }
 
-var _ providersports.OAuthProviderRepository = OAuthGithubRepository{}
+var _ domain.OAuthProviderRepository = OAuthGithubRepository{}
 
 func NewOAuthGithubRepository(c domain.Config) OAuthGithubRepository {
 	return OAuthGithubRepository{

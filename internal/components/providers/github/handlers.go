@@ -1,21 +1,21 @@
 package github
 
 import (
-	"github.com/labstack/echo/v4"
 	"net/http"
-	"othnx/internal/components/providers/providersports"
 	"othnx/internal/domain"
 	"othnx/pkg/apperrors"
+
+	"github.com/labstack/echo/v4"
 )
 
 type OAuthGithubHandlers struct {
 	Config  domain.Config
-	Service providersports.OAuthProviderService
+	Service domain.OAuthProviderService
 }
 
-var _ providersports.OAuthProviderHandlers = OAuthGithubHandlers{}
+var _ domain.OAuthProviderHandlers = OAuthGithubHandlers{}
 
-func NewOAuthGithubHandlers(c domain.Config, s providersports.OAuthProviderService) OAuthGithubHandlers {
+func NewOAuthGithubHandlers(c domain.Config, s domain.OAuthProviderService) OAuthGithubHandlers {
 	return OAuthGithubHandlers{
 		Config:  c,
 		Service: s,

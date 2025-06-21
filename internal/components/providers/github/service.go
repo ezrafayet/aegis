@@ -3,7 +3,6 @@ package github
 import (
 	"fmt"
 	"net/http"
-	"othnx/internal/components/providers/providersports"
 	"othnx/internal/domain"
 	"othnx/pkg/apperrors"
 	"othnx/pkg/cookies"
@@ -12,15 +11,15 @@ import (
 
 type OAuthGithubService struct {
 	Config                 domain.Config
-	Provider               providersports.OAuthProviderRepository
+	Provider               domain.OAuthProviderRepository
 	UserRepository         domain.UserRepository
 	RefreshTokenRepository domain.RefreshTokenRepository
 	StateRepository        domain.StateRepository
 }
 
-var _ providersports.OAuthProviderService = OAuthGithubService{}
+var _ domain.OAuthProviderService = OAuthGithubService{}
 
-func NewOAuthGithubService(c domain.Config, p providersports.OAuthProviderRepository, userRepository domain.UserRepository, refreshTokenRepository domain.RefreshTokenRepository, stateRepository domain.StateRepository) OAuthGithubService {
+func NewOAuthGithubService(c domain.Config, p domain.OAuthProviderRepository, userRepository domain.UserRepository, refreshTokenRepository domain.RefreshTokenRepository, stateRepository domain.StateRepository) OAuthGithubService {
 	return OAuthGithubService{
 		Config:                 c,
 		Provider:               p,

@@ -1,8 +1,7 @@
-package providersports
+package domain
 
 import (
 	"net/http"
-	"othnx/internal/domain"
 
 	"github.com/labstack/echo/v4"
 )
@@ -26,5 +25,5 @@ type OAuthProviderService interface {
 }
 
 type OAuthProviderRepository interface {
-	GetUserInfos(code, state, redirectUri string) (*domain.UserInfos, error)
+	GetUserInfos(code, state, redirectUri string) (*UserInfos, error)
 }

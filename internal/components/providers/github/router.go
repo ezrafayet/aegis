@@ -1,19 +1,19 @@
 package github
 
 import (
-	"othnx/internal/components/providers/providersports"
+	"othnx/internal/domain"
 
 	"github.com/labstack/echo/v4"
 )
 
 type OAuthGithubRouter struct {
-	Handlers       providersports.OAuthProviderHandlers
-	AuthMiddleware providersports.OAuthMiddlewares
+	Handlers       domain.OAuthProviderHandlers
+	AuthMiddleware domain.OAuthMiddlewares
 }
 
-var _ providersports.OAuthRouter = OAuthGithubRouter{}
+var _ domain.OAuthRouter = OAuthGithubRouter{}
 
-func NewOAuthGithubRouter(h providersports.OAuthProviderHandlers, m providersports.OAuthMiddlewares) OAuthGithubRouter {
+func NewOAuthGithubRouter(h domain.OAuthProviderHandlers, m domain.OAuthMiddlewares) OAuthGithubRouter {
 	return OAuthGithubRouter{
 		Handlers:       h,
 		AuthMiddleware: m,

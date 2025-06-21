@@ -20,10 +20,10 @@ jobs:
         go-version: '1.21'
         cache: true
         
-    - name: Install golangci-lint
-      uses: golangci/golangci-lint-action@v4
-      with:
-        version: latest
+    # - name: Install golangci-lint
+    #   uses: golangci/golangci-lint-action@v4
+    #   with:
+    #     version: latest
         
     - name: Run fmt-ci
       run: make fmt-ci

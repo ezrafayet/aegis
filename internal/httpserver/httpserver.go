@@ -6,7 +6,7 @@ import (
 
 	"othnx/internal/domain"
 	"othnx/internal/registry"
-	"othnx/pkg/config"
+	"othnx/internal/infra/config"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -25,7 +25,7 @@ func Start() error {
 Drop-in auth service - no SaaS, no lock-in
 v0.x.x (needs to be injected)
 	`)
-	c, err := config.ReadConfig("config.json")
+	c, err := config.Read("config.json")
 	if err != nil {
 		return err
 	}

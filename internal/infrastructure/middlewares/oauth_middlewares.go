@@ -1,12 +1,5 @@
-package github
+// some factory
 
-import (
-	"net/http"
-	"othnx/internal/domain"
-	"othnx/pkg/apperrors"
-
-	"github.com/labstack/echo/v4"
-)
 
 type OAuthGithubMiddlewares struct {
 	Config domain.Config

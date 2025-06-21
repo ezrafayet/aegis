@@ -16,5 +16,3 @@ func NewRole(userID, role string) Role {
 		Value:  role,
 	}
 }
-
-// This is handled by User repository

@@ -1,19 +1,4 @@
-package domain
-
-import (
-	"othnx/pkg/apperrors"
-	"strings"
-	"time"
-
-	"github.com/golang-jwt/jwt"
-)
-
-type CustomClaims struct {
-	UserID       string   `json:"user_id"`
-	EarlyAdopter bool     `json:"early_adopter"`
-	RolesValues  []string `json:"roles"`
-	Metadata     string   `json:"metadata"`
-}
+package jwt
 
 func NewAccessToken(cClaims CustomClaims, config Config, issuedAt time.Time) (accessToken string, expiresAt int64, err error) {
 	token := jwt.New(jwt.SigningMethodHS256)

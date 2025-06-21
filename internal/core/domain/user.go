@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"errors"
+	"othnx/internal/core/repositories"
 	"othnx/pkg/apperrors"
 	"othnx/pkg/uidgen"
 	"strings"
@@ -92,17 +93,6 @@ func GenerateNameFingerprint(name string) (string, error) {
 	return hex.EncodeToString(hash[:]), nil
 }
 
-type UserRepository interface {
-	CreateUser(user User, roles []Role) error
-	GetUserByID(userID string) (User, error)
-	GetUserByEmail(email string) (User, error)
-	DoesNameExist(nameFingerprint string) (bool, error)
-	// SoftDeleteUser(userID string) error
-	// HardDeleteUser(userID string) error
-	// BlockUser(userID string) error
-	// UnblockUser(userID string) error
-}
-
 // UserInfos is what is returned by the providers (GitHub, Google, etc.)
 type UserInfos struct {
 	Name   string
@@ -111,7 +101,7 @@ type UserInfos struct {
 }
 
 // todo: move this business logic somewhere
-func GetOrCreateUserIfAllowed(userRepository UserRepository, userInfos *UserInfos, config Config) (User, error) {
+func GetOrCreateUserIfAllowed(userRepository repositories.UserRepository, userInfos *UserInfos, config Config) (User, error) {
 	nameExists, err := userRepository.DoesNameExist(userInfos.Name)
 	if err != nil {
 		return User{}, err

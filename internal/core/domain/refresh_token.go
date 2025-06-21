@@ -41,15 +41,6 @@ func NewRefreshToken(user User, deviceFingerprint string, config Config) (Refres
 	}, expiresAt.Unix(), nil
 }
 
-type RefreshTokenRepository interface {
-	CreateRefreshToken(refreshToken RefreshToken) error
-	GetRefreshTokenByToken(token string) (RefreshToken, error)
-	CountValidRefreshTokensForUser(userID string) (int, error)
-	CleanExpiredTokens(userID string) error
-	DeleteRefreshToken(token string) error
-	DeleteRefreshTokenByDeviceFingerprint(userID, deviceFingerprint string) error
-}
-
 func GenerateDeviceFingerprint(deviceID string) (string, error) {
 	trimmed := strings.TrimSpace(deviceID)
 	if trimmed == "" {

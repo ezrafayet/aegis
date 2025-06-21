@@ -23,7 +23,3 @@ type OAuthProviderService interface {
 	GetAuthURL(redirectUri string) (string, error)
 	ExchangeCode(code, state string) (*http.Cookie, *http.Cookie, error)
 }
-
-type OAuthProviderRepository interface {
-	GetUserInfos(code, state, redirectUri string) (*UserInfos, error)
-}

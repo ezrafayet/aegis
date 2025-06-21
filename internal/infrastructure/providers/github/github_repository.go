@@ -1,13 +1,5 @@
 package github
 
-import (
-	"bytes"
-	"encoding/json"
-	"fmt"
-	"net/http"
-	"othnx/internal/domain"
-)
-
 type OAuthGithubRepository struct {
 	Config domain.Config
 }

@@ -1,5 +1,7 @@
 package github
 
+// make it somehow generic and reusable
+
 import (
 	"fmt"
 	"net/http"

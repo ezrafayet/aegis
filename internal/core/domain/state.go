@@ -17,8 +17,3 @@ func NewState(value string) State {
 		ExpiresAt: time.Now().Add(3 * time.Minute),
 	}
 }
-
-type StateRepository interface {
-	CreateState(state State) error
-	GetAndDeleteState(value string) (State, error)
-}

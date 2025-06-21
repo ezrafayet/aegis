@@ -1,6 +1,16 @@
 package jwt
 
-func NewAccessToken(cClaims CustomClaims, config Config, issuedAt time.Time) (accessToken string, expiresAt int64, err error) {
+import (
+	"othnx/internal/core/domain"
+	"othnx/internal/infrastructure/config"
+	"othnx/pkg/apperrors"
+	"strings"
+	"time"
+
+	"github.com/golang-jwt/jwt"
+)
+
+func Generate(cClaims domain.CustomClaims, config config.Config, issuedAt time.Time) (accessToken string, expiresAt int64, err error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	secondsOfValidity := config.JWT.AccessTokenExpirationMin * 60
 	expiresAt = issuedAt.Add(time.Second * time.Duration(secondsOfValidity)).Unix()
@@ -20,7 +30,7 @@ func NewAccessToken(cClaims CustomClaims, config Config, issuedAt time.Time) (ac
 	return tokenString, expiresAt, nil
 }
 
-func ReadAccessTokenClaims(accessToken string, config Config) (CustomClaims, error) {
+func ReadClaims(accessToken string, config config.Config) (domain.CustomClaims, error) {
 	parsedToken, err := jwt.Parse(accessToken, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, apperrors.ErrAccessTokenInvalid
@@ -30,16 +40,16 @@ func ReadAccessTokenClaims(accessToken string, config Config) (CustomClaims, err
 	if err != nil {
 		if validationError, ok := err.(*jwt.ValidationError); ok {
 			if validationError.Errors&jwt.ValidationErrorExpired != 0 {
-				return CustomClaims{}, apperrors.ErrAccessTokenExpired
+				return domain.CustomClaims{}, apperrors.ErrAccessTokenExpired
 			}
 		}
-		return CustomClaims{}, apperrors.ErrAccessTokenInvalid
+		return domain.CustomClaims{}, apperrors.ErrAccessTokenInvalid
 	}
 	if !parsedToken.Valid {
-		return CustomClaims{}, apperrors.ErrAccessTokenInvalid
+		return domain.CustomClaims{}, apperrors.ErrAccessTokenInvalid
 	}
 
-	var customClaims CustomClaims
+	var customClaims domain.CustomClaims
 
 	if claims, ok := parsedToken.Claims.(jwt.MapClaims); ok {
 		// /!\ This code can fail if the claims are not in the expected format

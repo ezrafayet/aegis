@@ -1,6 +1,8 @@
 package jwt
 
 import (
+	"othnx/internal/core/domain"
+	"othnx/internal/infrastructure/config"
 	"othnx/pkg/apperrors"
 	"testing"
 	"time"
@@ -8,12 +10,12 @@ import (
 
 func TestAccessToken(t *testing.T) {
 	t.Run("should create a new access token", func(t *testing.T) {
-		token, expires_at, err := NewAccessToken(CustomClaims{
+		token, expires_at, err := Generate(domain.CustomClaims{
 			UserID:      "123",
 			RolesValues: []string{""},
 			Metadata:    "{foo:bar}",
-		}, Config{
-			JWT: JWTConfig{
+		}, config.Config{
+			JWT: config.JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
 				RefreshTokenExpirationDays: 30,
@@ -31,12 +33,12 @@ func TestAccessToken(t *testing.T) {
 		}
 	})
 	t.Run("should read claims from a valid access token", func(t *testing.T) {
-		token, _, err := NewAccessToken(CustomClaims{
+		token, _, err := Generate(domain.CustomClaims{
 			UserID:      "123",
 			RolesValues: []string{"some-role"},
 			Metadata:    "{foo:bar}",
-		}, Config{
-			JWT: JWTConfig{
+		}, config.Config{
+			JWT: config.JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
 				RefreshTokenExpirationDays: 30,
@@ -45,8 +47,8 @@ func TestAccessToken(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		claims, err := ReadAccessTokenClaims(token, Config{
-			JWT: JWTConfig{
+		claims, err := ReadClaims(token, config.Config{
+			JWT: config.JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
 				RefreshTokenExpirationDays: 30,
@@ -66,8 +68,8 @@ func TestAccessToken(t *testing.T) {
 		}
 	})
 	t.Run("should return an error if the token is invalid", func(t *testing.T) {
-		_, err := ReadAccessTokenClaims("token", Config{
-			JWT: JWTConfig{
+		_, err := ReadClaims("token", config.Config{
+			JWT: config.JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
 				RefreshTokenExpirationDays: 30,
@@ -78,12 +80,12 @@ func TestAccessToken(t *testing.T) {
 		}
 	})
 	t.Run("should return an error if the token is expired", func(t *testing.T) {
-		token, _, err := NewAccessToken(CustomClaims{
+		token, _, err := Generate(domain.CustomClaims{
 			UserID:      "123",
 			RolesValues: []string{""},
 			Metadata:    "{foo:bar}",
-		}, Config{
-			JWT: JWTConfig{
+		}, config.Config{
+			JWT: config.JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
 				RefreshTokenExpirationDays: 30,
@@ -92,8 +94,8 @@ func TestAccessToken(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		_, err = ReadAccessTokenClaims(token, Config{
-			JWT: JWTConfig{
+		_, err = ReadClaims(token, config.Config{
+			JWT: config.JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
 				RefreshTokenExpirationDays: 30,
@@ -104,12 +106,12 @@ func TestAccessToken(t *testing.T) {
 		}
 	})
 	t.Run("should return an error if the JWT secret is wrong", func(t *testing.T) {
-		token, _, err := NewAccessToken(CustomClaims{
+		token, _, err := Generate(domain.CustomClaims{
 			UserID:      "123",
 			RolesValues: []string{""},
 			Metadata:    "{foo:bar}",
-		}, Config{
-			JWT: JWTConfig{
+		}, config.Config{
+			JWT: config.JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
 				RefreshTokenExpirationDays: 30,
@@ -118,8 +120,8 @@ func TestAccessToken(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		_, err = ReadAccessTokenClaims(token, Config{
-			JWT: JWTConfig{
+		_, err = ReadClaims(token, config.Config{
+			JWT: config.JWTConfig{
 				Secret:                     "xxxsecret2",
 				AccessTokenExpirationMin:   15,
 				RefreshTokenExpirationDays: 30,

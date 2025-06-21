@@ -24,5 +24,6 @@ func (r AuthRouter) AttachRoutes(e *echo.Echo) {
 	group := e.Group("/auth", r.Middlewares.CheckAndRefreshToken)
 	group.GET("/me", r.Handlers.GetSession)
 	group.GET("/refresh", r.Handlers.DoNothing)
-	e.GET("/logout", r.Handlers.Logout)
+	e.GET("/auth/logout", r.Handlers.Logout)
+	e.GET("/auth/health", r.Handlers.DoNothing)
 }

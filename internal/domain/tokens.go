@@ -41,6 +41,7 @@ func GenerateTokensForUser(user User, deviceID string, config Config, refreshTok
 		UserID:       user.ID,
 		EarlyAdopter: user.EarlyAdopter,
 		Metadata:     user.Metadata,
+		RolesValues:  user.RolesValues(),
 	}, config, time.Now())
 	if err != nil {
 		return "", -1, "", -1, err

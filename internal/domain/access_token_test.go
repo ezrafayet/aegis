@@ -9,9 +9,9 @@ import (
 func TestAccessToken(t *testing.T) {
 	t.Run("should create a new access token", func(t *testing.T) {
 		token, expires_at, err := NewAccessToken(CustomClaims{
-			UserID:   "123",
-			Roles:    []string{""},
-			Metadata: "{foo:bar}",
+			UserID:      "123",
+			RolesValues: []string{""},
+			Metadata:    "{foo:bar}",
 		}, Config{
 			JWT: JWTConfig{
 				Secret:                     "xxxsecret",
@@ -22,7 +22,7 @@ func TestAccessToken(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		expected := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIiLCJlYXJseV9hZG9wdGVyIjpmYWxzZSwiZXhwIjoxNjcyNTMyMTAwLCJpc3MiOiIiLCJpc3N1ZWRfYXQiOjE2NzI1MzEyMDAsIm1ldGFkYXRhIjoie2ZvbzpiYXJ9IiwidXNlcl9pZCI6IjEyMyJ9.lFosZlZyLUl3X4Vx1cXY2BV_BS6KrzYfzN79l7_mxcM"
+		expected := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIiLCJlYXJseV9hZG9wdGVyIjpmYWxzZSwiZXhwIjoxNjcyNTMyMTAwLCJpc3MiOiIiLCJpc3N1ZWRfYXQiOjE2NzI1MzEyMDAsIm1ldGFkYXRhIjoie2ZvbzpiYXJ9Iiwicm9sZXMiOiIiLCJ1c2VyX2lkIjoiMTIzIn0.kL101I2ojpEvHEENfOUiREkiYNYUMP6x9xeAoeqgzhY"
 		if token != expected {
 			t.Fatal("expected token to not be empty", token)
 		}
@@ -32,9 +32,9 @@ func TestAccessToken(t *testing.T) {
 	})
 	t.Run("should read claims from a valid access token", func(t *testing.T) {
 		token, _, err := NewAccessToken(CustomClaims{
-			UserID:   "123",
-			Roles:    []string{""},
-			Metadata: "{foo:bar}",
+			UserID:      "123",
+			RolesValues: []string{"some-role"},
+			Metadata:    "{foo:bar}",
 		}, Config{
 			JWT: JWTConfig{
 				Secret:                     "xxxsecret",
@@ -61,6 +61,9 @@ func TestAccessToken(t *testing.T) {
 		if claims.Metadata != "{foo:bar}" {
 			t.Fatal("expected metadata to be {foo:bar}", claims.Metadata)
 		}
+		if claims.RolesValues[0] != "some-role" {
+			t.Fatal("expected roles_values to be some-role", claims.RolesValues)
+		}
 	})
 	t.Run("should return an error if the token is invalid", func(t *testing.T) {
 		_, err := ReadAccessTokenClaims("token", Config{
@@ -76,9 +79,9 @@ func TestAccessToken(t *testing.T) {
 	})
 	t.Run("should return an error if the token is expired", func(t *testing.T) {
 		token, _, err := NewAccessToken(CustomClaims{
-			UserID:   "123",
-			Roles:    []string{""},
-			Metadata: "{foo:bar}",
+			UserID:      "123",
+			RolesValues: []string{""},
+			Metadata:    "{foo:bar}",
 		}, Config{
 			JWT: JWTConfig{
 				Secret:                     "xxxsecret",
@@ -102,9 +105,9 @@ func TestAccessToken(t *testing.T) {
 	})
 	t.Run("should return an error if the JWT secret is wrong", func(t *testing.T) {
 		token, _, err := NewAccessToken(CustomClaims{
-			UserID:   "123",
-			Roles:    []string{""},
-			Metadata: "{foo:bar}",
+			UserID:      "123",
+			RolesValues: []string{""},
+			Metadata:    "{foo:bar}",
 		}, Config{
 			JWT: JWTConfig{
 				Secret:                     "xxxsecret",

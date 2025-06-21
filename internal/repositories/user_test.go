@@ -15,7 +15,7 @@ func TestUserRepository(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		db.AutoMigrate(&domain.User{})
+		db.AutoMigrate(&domain.User{}, &domain.Role{})
 		userRepository := NewUserRepository(db)
 		err = userRepository.CreateUser(domain.User{
 			ID:              "123",
@@ -25,7 +25,7 @@ func TestUserRepository(t *testing.T) {
 			Email:           "test@test.com",
 			Metadata:        "{}",
 			AuthMethod:      "test",
-		})
+		}, []domain.Role{domain.NewRole("123", "user")})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -48,13 +48,19 @@ func TestUserRepository(t *testing.T) {
 		if user.AuthMethod != "test" {
 			t.Fatal("expected user auth method to be test", user.AuthMethod)
 		}
+		if len(user.Roles) != 1 {
+			t.Fatal("expected user to have 1 role", len(user.Roles))
+		}
+		if user.Roles[0].Value != "user" {
+			t.Fatal("expected user to have role user", user.Roles[0].Value)
+		}
 	})
 	t.Run("Forbid email collision", func(t *testing.T) {
 		db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
 		if err != nil {
 			t.Fatal(err)
 		}
-		db.AutoMigrate(&domain.User{})
+		db.AutoMigrate(&domain.User{}, &domain.Role{})
 		userRepository := NewUserRepository(db)
 		err = userRepository.CreateUser(domain.User{
 			ID:              "123",
@@ -64,7 +70,7 @@ func TestUserRepository(t *testing.T) {
 			Email:           "test@test.com",
 			Metadata:        "{}",
 			AuthMethod:      "test",
-		})
+		}, []domain.Role{domain.NewRole("123", "user")})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -76,7 +82,7 @@ func TestUserRepository(t *testing.T) {
 			Email:           "test@test.com",
 			Metadata:        "{}",
 			AuthMethod:      "test",
-		})
+		}, []domain.Role{domain.NewRole("456", "user")})
 		if err == nil {
 			t.Fatal(err)
 		}
@@ -86,7 +92,7 @@ func TestUserRepository(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		db.AutoMigrate(&domain.User{})
+		db.AutoMigrate(&domain.User{}, &domain.Role{})
 		userRepository := NewUserRepository(db)
 		err = userRepository.CreateUser(domain.User{
 			ID:              "123",
@@ -96,7 +102,7 @@ func TestUserRepository(t *testing.T) {
 			Email:           "test1@test.com",
 			Metadata:        "{}",
 			AuthMethod:      "test",
-		})
+		}, []domain.Role{domain.NewRole("123", "user")})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -108,9 +114,46 @@ func TestUserRepository(t *testing.T) {
 			Email:           "test2@test.com",
 			Metadata:        "{}",
 			AuthMethod:      "test",
-		})
+		}, []domain.Role{domain.NewRole("456", "user")})
 		if err == nil {
 			t.Fatal(err)
+		}
+	})
+}
+
+func TestUserRepository_Roles(t *testing.T) {
+	t.Run("should return roles for a user", func(t *testing.T) {
+		db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		db.AutoMigrate(&domain.User{}, &domain.Role{})
+		userRepository := NewUserRepository(db)
+		err = userRepository.CreateUser(domain.User{
+			ID:              "123",
+			CreatedAt:       time.Now(),
+			Name:            "Test User",
+			NameFingerprint: "test_fingerprint",
+			Email:           "test@test.com",
+			Metadata:        "{}",
+			AuthMethod:      "test",
+		}, []domain.Role{domain.NewRole("123", "user")})
+		if err != nil {
+			t.Fatal(err)
+		}
+		db.Create(domain.NewRole("123", "admin"))
+		user, err := userRepository.GetUserByEmail("test@test.com")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(user.Roles) != 2 {
+			t.Fatal("expected user to have 1 role", len(user.Roles))
+		}
+		if user.Roles[0].Value != "admin" {
+			t.Fatal("expected user to have role user", user.Roles[0].Value)
+		}
+		if user.Roles[1].Value != "user" {
+			t.Fatal("expected user to have role admin", user.Roles[1].Value)
 		}
 	})
 }

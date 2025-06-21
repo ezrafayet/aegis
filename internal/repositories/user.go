@@ -1,9 +1,10 @@
 package repositories
 
 import (
-	"gorm.io/gorm"
 	"othnx/internal/domain"
 	"othnx/pkg/apperrors"
+
+	"gorm.io/gorm"
 )
 
 type UserRepository struct {
@@ -16,17 +17,24 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 	return UserRepository{db: db}
 }
 
-func (r *UserRepository) CreateUser(user domain.User) error {
-	result := r.db.Model(&domain.User{}).Create(&user)
-	if result.Error != nil {
-		return result.Error
-	}
-	return nil
+func (r *UserRepository) CreateUser(user domain.User, roles []domain.Role) error {
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Model(&domain.User{}).Create(&user).Error; err != nil {
+			return err
+		}
+		for _, role := range roles {
+			if err := tx.Model(&domain.Role{}).Create(&role).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	return err
 }
 
 func (r *UserRepository) GetUserByEmail(email string) (domain.User, error) {
 	var user domain.User
-	result := r.db.Where("email = ?", email).First(&user)
+	result := r.db.Where("email = ?", email).Preload("Roles").First(&user)
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
 		return domain.User{}, result.Error
 	}

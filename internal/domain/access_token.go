@@ -1,15 +1,17 @@
 package domain
 
 import (
-	"github.com/golang-jwt/jwt"
 	"othnx/pkg/apperrors"
+	"strings"
 	"time"
+
+	"github.com/golang-jwt/jwt"
 )
 
 type CustomClaims struct {
 	UserID       string   `json:"user_id"`
 	EarlyAdopter bool     `json:"early_adopter"`
-	Roles        []string `json:"roles"`
+	RolesValues  []string `json:"roles"`
 	Metadata     string   `json:"metadata"`
 }
 
@@ -24,7 +26,7 @@ func NewAccessToken(cClaims CustomClaims, config Config, issuedAt time.Time) (ac
 	claims["iss"] = config.App.Name
 	claims["user_id"] = cClaims.UserID
 	claims["early_adopter"] = cClaims.EarlyAdopter
-	// claims["roles"] = strings.Join(customClaims.Roles, ",") // todo
+	claims["roles"] = strings.Join(cClaims.RolesValues, ",")
 	claims["metadata"] = cClaims.Metadata
 	tokenString, err := token.SignedString([]byte(config.JWT.Secret))
 	if err != nil {
@@ -58,7 +60,7 @@ func ReadAccessTokenClaims(accessToken string, config Config) (CustomClaims, err
 		// /!\ This code can fail if the claims are not in the expected format
 		customClaims.UserID = claims["user_id"].(string)
 		customClaims.EarlyAdopter = claims["early_adopter"].(bool)
-		// customClaims.Roles = strings.Split(claims["roles"].(string), " ")
+		customClaims.RolesValues = strings.Split(claims["roles"].(string), ",")
 		customClaims.Metadata = claims["metadata"].(string)
 	}
 

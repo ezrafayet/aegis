@@ -35,7 +35,7 @@ func TestOAuthGithubService_ExchangeCode(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		db.AutoMigrate(&domain.User{}, &domain.RefreshToken{}, &domain.State{})
+		db.AutoMigrate(&domain.User{}, &domain.RefreshToken{}, &domain.State{}, &domain.Role{})
 		refreshTokenRepository := repositories.NewRefreshTokenRepository(db)
 		oauthProviderRepository := MockRepository{}
 		userRepository := repositories.NewUserRepository(db)

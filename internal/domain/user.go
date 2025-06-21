@@ -27,6 +27,9 @@ type User struct {
 	Email           string     `json:"email" gorm:"type:varchar(100);uniqueIndex;not null"`
 	Metadata        string     `json:"metadata" gorm:"type:varchar(1024);not null"`
 	AuthMethod      string     `json:"auth_method" gorm:"type:varchar(16);not null"`
+
+	// relations
+	Roles []Role `json:"roles" gorm:"foreignKey:UserID;references:ID"`
 }
 
 func (u User) IsEarlyAdopter() bool {
@@ -39,6 +42,14 @@ func (u User) IsBlocked() bool {
 
 func (u User) IsDeleted() bool {
 	return u.DeletedAt != nil
+}
+
+func (u User) RolesValues() []string {
+	values := make([]string, len(u.Roles))
+	for i, role := range u.Roles {
+		values[i] = role.Value
+	}
+	return values
 }
 
 func NewUser(name, avatar, email string, authMethod string) (User, error) {
@@ -57,8 +68,7 @@ func NewUser(name, avatar, email string, authMethod string) (User, error) {
 		AvatarURL:       avatar,
 		Email:           email,
 		Metadata:        "{}",
-		// Roles:      roles,
-		AuthMethod: authMethod,
+		AuthMethod:      authMethod,
 	}, nil
 }
 
@@ -83,7 +93,7 @@ func GenerateNameFingerprint(name string) (string, error) {
 }
 
 type UserRepository interface {
-	CreateUser(user User) error
+	CreateUser(user User, roles []Role) error
 	GetUserByID(userID string) (User, error)
 	GetUserByEmail(email string) (User, error)
 	DoesNameExist(nameFingerprint string) (bool, error)
@@ -118,7 +128,7 @@ func GetOrCreateUserIfAllowed(userRepository UserRepository, userInfos *UserInfo
 		if err != nil {
 			return User{}, err
 		}
-		err = userRepository.CreateUser(user)
+		err = userRepository.CreateUser(user, []Role{NewRole(user.ID, "user")})
 		if err != nil {
 			return User{}, err
 		}

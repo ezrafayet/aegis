@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"othnx/internal/domain"
-	"othnx/internal/registry"
 	"othnx/internal/infra/config"
+	"othnx/internal/registry"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"

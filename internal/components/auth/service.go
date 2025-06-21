@@ -11,7 +11,7 @@ import (
 type AuthServiceInterface interface {
 	GetSession(accessToken string) (domain.Session, error)
 	Logout(refreshToken string) (*http.Cookie, *http.Cookie, error)
-	CheckAndRefreshToken(accessToken, refreshToken string) (*http.Cookie, *http.Cookie, error)
+	CheckAndRefreshToken(accessToken, refreshToken string, forceRefresh bool) (*http.Cookie, *http.Cookie, error)
 }
 
 type AuthService struct {
@@ -52,12 +52,12 @@ func (s AuthService) Logout(refreshToken string) (*http.Cookie, *http.Cookie, er
 	return s.resetCookies(nil)
 }
 
-func (s AuthService) CheckAndRefreshToken(accessToken, refreshToken string) (*http.Cookie, *http.Cookie, error) {
+func (s AuthService) CheckAndRefreshToken(accessToken, refreshToken string, forceRefresh bool) (*http.Cookie, *http.Cookie, error) {
 	_, err := domain.ReadAccessTokenClaims(accessToken, s.Config)
-	if err == nil {
+	if err == nil && !forceRefresh {
 		return nil, nil, nil
 	}
-	if err.Error() != apperrors.ErrAccessTokenExpired.Error() {
+	if err != nil &&err.Error() != apperrors.ErrAccessTokenExpired.Error() {
 		return s.resetCookies(err)
 	}
 	refreshTokenObject, err := s.RefreshTokenRepository.GetRefreshTokenByToken(refreshToken)

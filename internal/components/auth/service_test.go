@@ -32,7 +32,7 @@ func TestCheckAndRefreshToken(t *testing.T) {
 	}
 	t.Run("invalid access token gets rejected", func(t *testing.T) {
 		authService, _, _, _ := prepare(t)
-		_, _, err := authService.CheckAndRefreshToken("invalid", "invalid")
+		_, _, err := authService.CheckAndRefreshToken("invalid", "invalid", false)
 		if err.Error() != apperrors.ErrAccessTokenInvalid.Error() {
 			t.Fatal("expected error ErrInvalidAccessToken", err)
 		}
@@ -54,7 +54,7 @@ func TestCheckAndRefreshToken(t *testing.T) {
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
-		_, _, err = authService.CheckAndRefreshToken(accessToken, refreshToken.Token)
+		_, _, err = authService.CheckAndRefreshToken(accessToken, refreshToken.Token, false)
 		if err.Error() != apperrors.ErrRefreshTokenExpired.Error() {
 			t.Fatal("expected error ErrRefreshTokenExpired", err)
 		}
@@ -75,7 +75,7 @@ func TestCheckAndRefreshToken(t *testing.T) {
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
-		at, _, err := authService.CheckAndRefreshToken(accessToken, refreshToken.Token)
+		at, _, err := authService.CheckAndRefreshToken(accessToken, refreshToken.Token, false)
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
@@ -104,7 +104,7 @@ func TestCheckAndRefreshToken(t *testing.T) {
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
-		_, _, err = authService.CheckAndRefreshToken(accessToken, refreshToken.Token)
+		_, _, err = authService.CheckAndRefreshToken(accessToken, refreshToken.Token, false)
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
@@ -112,6 +112,33 @@ func TestCheckAndRefreshToken(t *testing.T) {
 		db.First(&retrievedRefreshToken, "user_id = ?", newUser.ID)
 		if retrievedRefreshToken.Token != refreshToken.Token {
 			t.Fatal("expected refresh token to be the same")
+		}
+	})
+
+	t.Run("valid access token does trigger refresh if forceRefresh is true", func(t *testing.T) {
+		authService, _, _, db := prepare(t)
+		newUser, err := domain.NewUser("some-name", "some-avatar", "some-email", "github")
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		db.Create(&newUser)
+		refreshToken, _, err := domain.NewRefreshToken(newUser, "some-device-id", baseConfig)
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		db.Save(&refreshToken)
+		accessToken, _, err := domain.NewAccessToken(domain.CustomClaims{UserID: newUser.ID}, baseConfig, time.Now())
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		_, _, err = authService.CheckAndRefreshToken(accessToken, refreshToken.Token, true)
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		var retrievedRefreshToken domain.RefreshToken
+		db.First(&retrievedRefreshToken, "user_id = ?", newUser.ID)
+		if retrievedRefreshToken.Token == refreshToken.Token {
+			t.Fatal("expected refresh token to be different")
 		}
 	})
 }

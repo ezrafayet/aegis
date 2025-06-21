@@ -4,14 +4,12 @@ import (
 	"fmt"
 	"net/http"
 
-	"othnx/internal/domain"
-	"othnx/internal/infra/config"
+	"othnx/internal/infrastructure/config"
+	"othnx/internal/infrastructure/database"
 	"othnx/internal/registry"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 func Start() error {
@@ -30,15 +28,13 @@ v0.x.x (needs to be injected)
 		return err
 	}
 
-	db, err := gorm.Open(postgres.Open(c.DB.PostgresURL))
+	db, err := database.Connect(c)
 	if err != nil {
-		return fmt.Errorf("failed to connect to database: %w", err)
-	} else {
-		fmt.Println("Connected to database")
+		return err
 	}
 
-	if err := db.AutoMigrate(&domain.User{}, &domain.RefreshToken{}, &domain.State{}); err != nil {
-		return fmt.Errorf("failed to run database migrations: %w", err)
+	if err := database.Migrate(db); err != nil {
+		return err
 	}
 
 	e := echo.New()

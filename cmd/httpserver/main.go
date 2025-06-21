@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	"othnx/internal/httpserver"
+	"othnx/internal/infrastructure/httpserver"
 )
 
 func main() {

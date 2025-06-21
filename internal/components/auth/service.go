@@ -77,6 +77,10 @@ func (s AuthService) CheckAndRefreshToken(accessToken, refreshToken string) (*ht
 	if user.IsBlocked() {
 		return s.resetCookies(domain.ErrUserBlocked)
 	}
+	if s.Config.App.EarlyAdoptersOnly && !user.IsEarlyAdopter() {
+		return s.resetCookies(domain.ErrEarlyAdoptersOnly)
+	}
+
 	err = s.RefreshTokenRepository.DeleteRefreshToken(refreshToken)
 	if err != nil {
 		return s.resetCookies(err)

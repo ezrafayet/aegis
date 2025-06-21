@@ -3,7 +3,7 @@ package auth
 import (
 	"net/http"
 	"othnx/internal/domain"
-	"othnx/internal/repository"
+	"othnx/internal/repositories"
 	"othnx/pkg/apperrors"
 	"othnx/pkg/cookies"
 )
@@ -16,13 +16,13 @@ type AuthServiceInterface interface {
 
 type AuthService struct {
 	Config                 domain.Config
-	RefreshTokenRepository repository.RefreshTokenRepository
-	UserRepository         repository.UserRepository
+	RefreshTokenRepository repositories.RefreshTokenRepository
+	UserRepository         repositories.UserRepository
 }
 
 var _ AuthServiceInterface = &AuthService{}
 
-func NewAuthService(c domain.Config, r repository.RefreshTokenRepository, u repository.UserRepository) AuthService {
+func NewAuthService(c domain.Config, r repositories.RefreshTokenRepository, u repositories.UserRepository) AuthService {
 	return AuthService{
 		Config:                 c,
 		RefreshTokenRepository: r,

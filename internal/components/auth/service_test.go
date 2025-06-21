@@ -2,7 +2,7 @@ package auth
 
 import (
 	"othnx/internal/domain"
-	"othnx/internal/repository"
+	"othnx/internal/repositories"
 	"othnx/pkg/apperrors"
 	"testing"
 	"time"
@@ -19,14 +19,14 @@ func TestCheckAndRefreshToken(t *testing.T) {
 			RefreshTokenExpirationDays: 1,
 		},
 	}
-	prepare := func(t *testing.T) (AuthService, repository.UserRepository, repository.RefreshTokenRepository, *gorm.DB) {
+	prepare := func(t *testing.T) (AuthService, repositories.UserRepository, repositories.RefreshTokenRepository, *gorm.DB) {
 		db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
 		if err != nil {
 			t.Fatal(err)
 		}
 		db.AutoMigrate(&domain.User{}, &domain.RefreshToken{})
-		refreshTokenRepository := repository.NewRefreshTokenRepository(db)
-		userRepository := repository.NewUserRepository(db)
+		refreshTokenRepository := repositories.NewRefreshTokenRepository(db)
+		userRepository := repositories.NewUserRepository(db)
 		authService := NewAuthService(baseConfig, refreshTokenRepository, userRepository)
 		return authService, userRepository, refreshTokenRepository, db
 	}

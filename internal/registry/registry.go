@@ -4,7 +4,7 @@ import (
 	"othnx/internal/components/auth"
 	"othnx/internal/components/providers/github"
 	"othnx/internal/domain"
-	"othnx/internal/repository"
+	"othnx/internal/repositories"
 
 	"gorm.io/gorm"
 )
@@ -15,9 +15,9 @@ type Registry struct {
 }
 
 func NewRegistry(c domain.Config, db *gorm.DB) Registry {
-	userRepository := repository.NewUserRepository(db)
-	refreshTokenRepository := repository.NewRefreshTokenRepository(db)
-	stateRepository := repository.NewStateRepository(db)
+	userRepository := repositories.NewUserRepository(db)
+	refreshTokenRepository := repositories.NewRefreshTokenRepository(db)
+	stateRepository := repositories.NewStateRepository(db)
 
 	authService := auth.NewAuthService(c, refreshTokenRepository, userRepository)
 	authHandlers := auth.NewAuthHandlers(c, authService)

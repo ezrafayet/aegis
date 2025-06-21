@@ -2,7 +2,7 @@ package github
 
 import (
 	"othnx/internal/domain"
-	"othnx/internal/repository"
+	"othnx/internal/repositories"
 	"othnx/pkg/apperrors"
 	"testing"
 	"time"
@@ -30,16 +30,16 @@ func TestOAuthGithubService_ExchangeCode(t *testing.T) {
 			RefreshTokenExpirationDays: 1,
 		},
 	}
-	prepare := func(t *testing.T) (OAuthGithubService, repository.UserRepository, repository.RefreshTokenRepository, *gorm.DB) {
+	prepare := func(t *testing.T) (OAuthGithubService, repositories.UserRepository, repositories.RefreshTokenRepository, *gorm.DB) {
 		db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
 		if err != nil {
 			t.Fatal(err)
 		}
 		db.AutoMigrate(&domain.User{}, &domain.RefreshToken{}, &domain.State{})
-		refreshTokenRepository := repository.NewRefreshTokenRepository(db)
+		refreshTokenRepository := repositories.NewRefreshTokenRepository(db)
 		oauthProviderRepository := MockRepository{}
-		userRepository := repository.NewUserRepository(db)
-		stateRepository := repository.NewStateRepository(db)
+		userRepository := repositories.NewUserRepository(db)
+		stateRepository := repositories.NewStateRepository(db)
 		authService := NewOAuthGithubService(baseConfig, oauthProviderRepository, &userRepository, &refreshTokenRepository, &stateRepository)
 		return authService, userRepository, refreshTokenRepository, db
 	}

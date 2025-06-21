@@ -24,5 +24,5 @@ func Connect(c domain.Config) (*gorm.DB, error) {
 }
 
 func Migrate(db *gorm.DB) error {
-	return db.AutoMigrate(&domain.User{}, &domain.RefreshToken{}, &domain.State{});
+	return db.AutoMigrate(&domain.User{}, &domain.RefreshToken{}, &domain.State{})
 }

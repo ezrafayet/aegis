@@ -1,13 +1,13 @@
-package domain
+package tokengen
 
 import (
 	"strings"
 	"testing"
 )
 
-func TestGenerateRandomToken(t *testing.T) {
+func TestGenerate(t *testing.T) {
 	t.Run("should generate a random token with a prefix", func(t *testing.T) {
-		token, err := GenerateRandomToken("test_", 8)
+		token, err := Generate("test_", 8)
 		if err != nil {
 			t.Fatal(err)
 		}

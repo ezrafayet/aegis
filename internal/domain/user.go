@@ -5,11 +5,11 @@ import (
 	"encoding/hex"
 	"errors"
 	"othnx/pkg/apperrors"
+	"othnx/pkg/uidgen"
 	"strings"
 	"time"
 	"unicode"
 
-	"github.com/google/uuid"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
@@ -47,7 +47,7 @@ func NewUser(name, avatar, email string, authMethod string) (User, error) {
 		return User{}, err
 	}
 	return User{
-		ID:              uuid.New().String(),
+		ID:              uidgen.Generate(),
 		CreatedAt:       time.Now(),
 		DeletedAt:       nil,
 		BlockedAt:       nil,

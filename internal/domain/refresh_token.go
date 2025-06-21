@@ -3,6 +3,7 @@ package domain
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"othnx/pkg/tokengen"
 	"strings"
 	"time"
 	"unicode"
@@ -25,7 +26,7 @@ func (r RefreshToken) IsExpired() bool {
 }
 
 func NewRefreshToken(user User, deviceFingerprint string, config Config) (RefreshToken, int64, error) {
-	token, err := GenerateRandomToken("refresh_", 12)
+	token, err := tokengen.Generate("refresh_", 12)
 	if err != nil {
 		return RefreshToken{}, -1, err
 	}

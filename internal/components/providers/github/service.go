@@ -7,6 +7,7 @@ import (
 	"othnx/internal/domain"
 	"othnx/pkg/apperrors"
 	"othnx/pkg/cookies"
+	"othnx/pkg/tokengen"
 )
 
 type OAuthGithubService struct {
@@ -31,7 +32,7 @@ func NewOAuthGithubService(c domain.Config, p providersports.OAuthProviderReposi
 
 // /!\ Can be abused to generate a lot of states - todo: fix
 func (s OAuthGithubService) GetAuthURL(redirectUri string) (string, error) {
-	state, err := domain.GenerateRandomToken("state_", 13)
+	state, err := tokengen.Generate("state_", 13)
 	if err != nil {
 		return "", err
 	}

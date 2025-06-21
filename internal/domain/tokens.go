@@ -1,19 +1,9 @@
 package domain
 
 import (
-	"crypto/rand"
-	"encoding/hex"
 	"othnx/pkg/apperrors"
 	"time"
 )
-
-func GenerateRandomToken(prefix string, nPairs int) (string, error) {
-	bytes := make([]byte, nPairs)
-	if _, err := rand.Read(bytes); err != nil {
-		return "", err
-	}
-	return prefix + hex.EncodeToString(bytes), nil
-}
 
 // todo: move this business logic somewhere
 func GenerateTokensForUser(user User, deviceID string, config Config, refreshTokenRepository RefreshTokenRepository) (accessToken string, atExpiresAt int64, refreshToken string, rtExpiresAt int64, err error) {

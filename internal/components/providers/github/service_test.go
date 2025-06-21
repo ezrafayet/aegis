@@ -55,6 +55,14 @@ func TestOAuthGithubService_ExchangeCode(t *testing.T) {
 		if user.Email != "some-email" {
 			t.Fatal("expected user to be created", user.Email)
 		}
+		var roles []domain.Role
+		db.Model(&domain.Role{}).Where("user_id = ?", user.ID).Find(&roles)
+		if len(roles) != 1 {
+			t.Fatal("expected user to have 1 role", len(roles))
+		}
+		if roles[0].Value != "user" {
+			t.Fatal("expected user to have role user", roles[0].Value)
+		}
 	})
 	t.Run("should not create a user if user already exists", func(t *testing.T) {
 		ghService, _, _, db := prepare(t)

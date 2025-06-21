@@ -147,13 +147,40 @@ func TestUserRepository_Roles(t *testing.T) {
 			t.Fatal(err)
 		}
 		if len(user.Roles) != 2 {
-			t.Fatal("expected user to have 1 role", len(user.Roles))
+			t.Fatal("expected user to have 2 roles", len(user.Roles))
 		}
 		if user.Roles[0].Value != "admin" {
 			t.Fatal("expected user to have role user", user.Roles[0].Value)
 		}
 		if user.Roles[1].Value != "user" {
 			t.Fatal("expected user to have role admin", user.Roles[1].Value)
+		}
+	})
+	t.Run("should not break if user has no roles", func(t *testing.T) {
+		db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		db.AutoMigrate(&domain.User{}, &domain.Role{})
+		userRepository := NewUserRepository(db)
+		err = userRepository.CreateUser(domain.User{
+			ID:              "123",
+			CreatedAt:       time.Now(),
+			Name:            "Test User",
+			NameFingerprint: "test_fingerprint",
+			Email:           "test@test.com",
+			Metadata:        "{}",
+			AuthMethod:      "test",
+		}, []domain.Role{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		user, err := userRepository.GetUserByEmail("test@test.com")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(user.Roles) != 0 {
+			t.Fatal("expected user to have 0 roles", len(user.Roles))
 		}
 	})
 }

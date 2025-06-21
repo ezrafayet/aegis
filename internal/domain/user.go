@@ -25,8 +25,7 @@ type User struct {
 	AvatarURL       string     `json:"avatar_url" gorm:"type:varchar(1024)"`
 	Email           string     `json:"email" gorm:"type:varchar(100);uniqueIndex;not null"`
 	Metadata        string     `json:"metadata" gorm:"type:varchar(1024);not null"`
-	// Roles      postgres.StringArray   `json:"roles" gorm:"type:text[]"`
-	AuthMethod string `json:"auth_method" gorm:"type:varchar(16);not null"`
+	AuthMethod      string     `json:"auth_method" gorm:"type:varchar(16);not null"`
 }
 
 func (u User) IsEarlyAdopter() bool {

@@ -1,7 +1,7 @@
 package jwt
 
 import (
-	"othnx/internal/core/domain"
+	"othnx/internal/domain/entities"
 	"othnx/internal/infrastructure/config"
 	"othnx/pkg/apperrors"
 	"testing"
@@ -10,7 +10,7 @@ import (
 
 func TestAccessToken(t *testing.T) {
 	t.Run("should create a new access token", func(t *testing.T) {
-		token, expires_at, err := Generate(domain.CustomClaims{
+		token, expires_at, err := Generate(entities.CustomClaims{
 			UserID:      "123",
 			RolesValues: []string{""},
 			Metadata:    "{foo:bar}",
@@ -33,7 +33,7 @@ func TestAccessToken(t *testing.T) {
 		}
 	})
 	t.Run("should read claims from a valid access token", func(t *testing.T) {
-		token, _, err := Generate(domain.CustomClaims{
+		token, _, err := Generate(entities.CustomClaims{
 			UserID:      "123",
 			RolesValues: []string{"some-role"},
 			Metadata:    "{foo:bar}",
@@ -80,7 +80,7 @@ func TestAccessToken(t *testing.T) {
 		}
 	})
 	t.Run("should return an error if the token is expired", func(t *testing.T) {
-		token, _, err := Generate(domain.CustomClaims{
+		token, _, err := Generate(entities.CustomClaims{
 			UserID:      "123",
 			RolesValues: []string{""},
 			Metadata:    "{foo:bar}",
@@ -106,7 +106,7 @@ func TestAccessToken(t *testing.T) {
 		}
 	})
 	t.Run("should return an error if the JWT secret is wrong", func(t *testing.T) {
-		token, _, err := Generate(domain.CustomClaims{
+		token, _, err := Generate(entities.CustomClaims{
 			UserID:      "123",
 			RolesValues: []string{""},
 			Metadata:    "{foo:bar}",

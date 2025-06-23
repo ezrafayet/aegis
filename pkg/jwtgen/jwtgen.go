@@ -1,7 +1,7 @@
 package jwt
 
 import (
-	"othnx/internal/core/domain"
+	"othnx/internal/domain/entities"
 	"othnx/internal/infrastructure/config"
 	"othnx/pkg/apperrors"
 	"strings"
@@ -10,7 +10,7 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-func Generate(cClaims domain.CustomClaims, config config.Config, issuedAt time.Time) (accessToken string, expiresAt int64, err error) {
+func Generate(cClaims entities.CustomClaims, config config.Config, issuedAt time.Time) (accessToken string, expiresAt int64, err error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	secondsOfValidity := config.JWT.AccessTokenExpirationMin * 60
 	expiresAt = issuedAt.Add(time.Second * time.Duration(secondsOfValidity)).Unix()
@@ -30,7 +30,7 @@ func Generate(cClaims domain.CustomClaims, config config.Config, issuedAt time.T
 	return tokenString, expiresAt, nil
 }
 
-func ReadClaims(accessToken string, config config.Config) (domain.CustomClaims, error) {
+func ReadClaims(accessToken string, config config.Config) (entities.CustomClaims, error) {
 	parsedToken, err := jwt.Parse(accessToken, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, apperrors.ErrAccessTokenInvalid
@@ -40,16 +40,16 @@ func ReadClaims(accessToken string, config config.Config) (domain.CustomClaims, 
 	if err != nil {
 		if validationError, ok := err.(*jwt.ValidationError); ok {
 			if validationError.Errors&jwt.ValidationErrorExpired != 0 {
-				return domain.CustomClaims{}, apperrors.ErrAccessTokenExpired
+				return entities.CustomClaims{}, apperrors.ErrAccessTokenExpired
 			}
 		}
-		return domain.CustomClaims{}, apperrors.ErrAccessTokenInvalid
+		return entities.CustomClaims{}, apperrors.ErrAccessTokenInvalid
 	}
 	if !parsedToken.Valid {
-		return domain.CustomClaims{}, apperrors.ErrAccessTokenInvalid
+		return entities.CustomClaims{}, apperrors.ErrAccessTokenInvalid
 	}
 
-	var customClaims domain.CustomClaims
+	var customClaims entities.CustomClaims
 
 	if claims, ok := parsedToken.Claims.(jwt.MapClaims); ok {
 		// /!\ This code can fail if the claims are not in the expected format

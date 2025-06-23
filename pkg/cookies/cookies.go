@@ -4,26 +4,26 @@ import (
 	"net/http"
 	"time"
 
-	"othnx/internal/domain"
+	"othnx/internal/infrastructure/config"
 )
 
-func NewAccessCookie(token string, expiresAt int64, config domain.Config) http.Cookie {
+func NewAccessCookie(token string, expiresAt int64, config config.Config) http.Cookie {
 	return newCookie("access_token", token, expiresAt, config)
 }
 
-func NewRefreshCookie(token string, expiresAt int64, config domain.Config) http.Cookie {
+func NewRefreshCookie(token string, expiresAt int64, config config.Config) http.Cookie {
 	return newCookie("refresh_token", token, expiresAt, config)
 }
 
-func NewAccessCookieZero(config domain.Config) http.Cookie {
+func NewAccessCookieZero(config config.Config) http.Cookie {
 	return newCookie("access_token", "", 0, config)
 }
 
-func NewRefreshCookieZero(config domain.Config) http.Cookie {
+func NewRefreshCookieZero(config config.Config) http.Cookie {
 	return newCookie("refresh_token", "", 0, config)
 }
 
-func newCookie(name, token string, expiresAt int64, config domain.Config) http.Cookie {
+func newCookie(name, token string, expiresAt int64, config config.Config) http.Cookie {
 	cookie := http.Cookie{
 		Name:     name,
 		Domain:   config.Cookies.Domain,

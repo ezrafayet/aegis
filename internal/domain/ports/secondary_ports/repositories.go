@@ -1,14 +1,14 @@
-package ports
+package secondary_ports
 
 import "othnx/internal/domain/entities"
 
 type OAuthProviderRepository interface {
-	GetUserInfos(code, state, redirectUri string) (*domain.UserInfos, error)
+	GetUserInfos(code, state, redirectUri string) (*entities.UserInfos, error)
 }
 
 type RefreshTokenRepository interface {
-	CreateRefreshToken(refreshToken domain.RefreshToken) error
-	GetRefreshTokenByToken(token string) (domain.RefreshToken, error)
+	CreateRefreshToken(refreshToken entities.RefreshToken) error
+	GetRefreshTokenByToken(token string) (entities.RefreshToken, error)
 	CountValidRefreshTokensForUser(userID string) (int, error)
 	CleanExpiredTokens(userID string) error
 	DeleteRefreshToken(token string) error
@@ -16,14 +16,14 @@ type RefreshTokenRepository interface {
 }
 
 type StateRepository interface {
-	CreateState(state domain.State) error
-	GetAndDeleteState(value string) (domain.State, error)
+	CreateState(state entities.State) error
+	GetAndDeleteState(value string) (entities.State, error)
 }
 
 type UserRepository interface {
-	CreateUser(user domain.User, roles []domain.Role) error
-	GetUserByID(userID string) (domain.User, error)
-	GetUserByEmail(email string) (domain.User, error)
+	CreateUser(user entities.User, roles []entities.Role) error
+	GetUserByID(userID string) (entities.User, error)
+	GetUserByEmail(email string) (entities.User, error)
 	DoesNameExist(nameFingerprint string) (bool, error)
 	// add role
 	// remove role

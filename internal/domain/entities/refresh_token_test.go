@@ -1,18 +1,20 @@
-package domain
+package entities
 
 import (
+	"othnx/internal/infrastructure/config"
+	"othnx/pkg/fingerprint"
 	"testing"
 	"time"
 )
 
 func TestRefreshToken(t *testing.T) {
 	t.Run("should create a new refresh token", func(t *testing.T) {
-		deviceFingerprint, err := GenerateDeviceFingerprint("device-id")
+		deviceFingerprint, err := fingerprint.GenerateDeviceFingerprint("device-id")
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
-		token, _, _ := NewRefreshToken(User{ID: "123"}, deviceFingerprint, Config{
-			JWT: JWTConfig{
+		token, _, _ := NewRefreshToken(User{ID: "123"}, deviceFingerprint, config.Config{
+			JWT: config.JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
 				RefreshTokenExpirationDays: 30,
@@ -37,12 +39,12 @@ func TestRefreshToken(t *testing.T) {
 		}
 	})
 	t.Run("isExpired true", func(t *testing.T) {
-		deviceFingerprint, err := GenerateDeviceFingerprint("device-id")
+		deviceFingerprint, err := fingerprint.GenerateDeviceFingerprint("device-id")
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
-		token, _, _ := NewRefreshToken(User{ID: "123"}, deviceFingerprint, Config{
-			JWT: JWTConfig{
+		token, _, _ := NewRefreshToken(User{ID: "123"}, deviceFingerprint, config.Config{
+			JWT: config.JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
 				RefreshTokenExpirationDays: 30,
@@ -54,8 +56,8 @@ func TestRefreshToken(t *testing.T) {
 		}
 	})
 	t.Run("isExpired false", func(t *testing.T) {
-		token, _, _ := NewRefreshToken(User{ID: "123"}, "device-id", Config{
-			JWT: JWTConfig{
+		token, _, _ := NewRefreshToken(User{ID: "123"}, "device-id", config.Config{
+			JWT: config.JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
 				RefreshTokenExpirationDays: 30,
@@ -68,7 +70,7 @@ func TestRefreshToken(t *testing.T) {
 
 func TestGenerateDeviceFingerprint(t *testing.T) {
 	t.Run("should generate a device fingerprint", func(t *testing.T) {
-		deviceFingerprint, err := GenerateDeviceFingerprint("device-id")
+		deviceFingerprint, err := fingerprint.GenerateDeviceFingerprint("device-id")
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
@@ -77,11 +79,11 @@ func TestGenerateDeviceFingerprint(t *testing.T) {
 		}
 	})
 	t.Run("should generate a unique device fingerprint", func(t *testing.T) {
-		deviceFingerprint1, err := GenerateDeviceFingerprint("device-id-1")
+		deviceFingerprint1, err := fingerprint.GenerateDeviceFingerprint("device-id-1")
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
-		deviceFingerprint2, err := GenerateDeviceFingerprint("device-id-2")
+		deviceFingerprint2, err := fingerprint.GenerateDeviceFingerprint("device-id-2")
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}

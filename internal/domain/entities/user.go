@@ -1,19 +1,9 @@
-package domain
+package entities
 
 import (
-	"crypto/md5"
-	"encoding/hex"
-	"errors"
-	"othnx/internal/core/repositories"
-	"othnx/pkg/apperrors"
+	"othnx/pkg/fingerprint"
 	"othnx/pkg/uidgen"
-	"strings"
 	"time"
-	"unicode"
-
-	"golang.org/x/text/runes"
-	"golang.org/x/text/transform"
-	"golang.org/x/text/unicode/norm"
 )
 
 type User struct {
@@ -54,7 +44,7 @@ func (u User) RolesValues() []string {
 }
 
 func NewUser(name, avatar, email string, authMethod string) (User, error) {
-	nameFingerprint, err := GenerateNameFingerprint(name)
+	nameFingerprint, err := fingerprint.GenerateNameFingerprint(name)
 	if err != nil {
 		return User{}, err
 	}
@@ -71,31 +61,4 @@ func NewUser(name, avatar, email string, authMethod string) (User, error) {
 		Metadata:        "{}",
 		AuthMethod:      authMethod,
 	}, nil
-}
-
-func GenerateNameFingerprint(name string) (string, error) {
-	trimmed := strings.TrimSpace(name)
-	if trimmed == "" {
-		return "", errors.New("empty_name")
-	}
-	normalized := strings.ToLower(trimmed)
-	transformer := transform.Chain(
-		norm.NFD,
-		runes.Remove(runes.In(unicode.Mn)),
-		norm.NFC,
-	)
-	result, _, err := transform.String(transformer, normalized)
-	if err != nil {
-		result = normalized
-	}
-	result = strings.Join(strings.Fields(result), " ")
-	hash := md5.Sum([]byte(result))
-	return hex.EncodeToString(hash[:]), nil
-}
-
-// UserInfos is what is returned by the providers (GitHub, Google, etc.)
-type UserInfos struct {
-	Name   string
-	Email  string
-	Avatar string
 }

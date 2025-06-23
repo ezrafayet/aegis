@@ -1,16 +1,9 @@
-package domain
+package entities
 
 import (
-	"crypto/md5"
-	"encoding/hex"
+	"othnx/internal/infrastructure/config"
 	"othnx/pkg/tokengen"
-	"strings"
 	"time"
-	"unicode"
-
-	"golang.org/x/text/runes"
-	"golang.org/x/text/transform"
-	"golang.org/x/text/unicode/norm"
 )
 
 type RefreshToken struct {
@@ -25,7 +18,7 @@ func (r RefreshToken) IsExpired() bool {
 	return r.ExpiresAt.Before(time.Now())
 }
 
-func NewRefreshToken(user User, deviceFingerprint string, config Config) (RefreshToken, int64, error) {
+func NewRefreshToken(user User, deviceFingerprint string, config config.Config) (RefreshToken, int64, error) {
 	token, err := tokengen.Generate("refresh_", 12)
 	if err != nil {
 		return RefreshToken{}, -1, err
@@ -39,24 +32,4 @@ func NewRefreshToken(user User, deviceFingerprint string, config Config) (Refres
 		Token:             token,
 		DeviceFingerprint: deviceFingerprint,
 	}, expiresAt.Unix(), nil
-}
-
-func GenerateDeviceFingerprint(deviceID string) (string, error) {
-	trimmed := strings.TrimSpace(deviceID)
-	if trimmed == "" {
-		trimmed = "default-device-id"
-	}
-	normalized := strings.ToLower(trimmed)
-	transformer := transform.Chain(
-		norm.NFD,
-		runes.Remove(runes.In(unicode.Mn)),
-		norm.NFC,
-	)
-	result, _, err := transform.String(transformer, normalized)
-	if err != nil {
-		result = normalized
-	}
-	result = strings.Join(strings.Fields(result), " ")
-	hash := md5.Sum([]byte(result))
-	return hex.EncodeToString(hash[:]), nil
 }

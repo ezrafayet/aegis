@@ -7,6 +7,12 @@ build:
 fmt:
 	go fmt ./...
 
+fmt-ci:
+	@if [ -n "$$(gofmt -l .)" ]; then \
+		echo "Code formatting check failed. Run 'make fmt' to fix formatting issues."; \
+		exit 1; \
+	fi
+
 vet:
 	go vet ./...
 

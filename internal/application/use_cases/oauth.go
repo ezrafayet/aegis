@@ -1,15 +1,4 @@
-package github
-
-// make it somehow generic and reusable
-
-import (
-	"fmt"
-	"net/http"
-	"othnx/internal/domain"
-	"othnx/pkg/apperrors"
-	"othnx/pkg/cookies"
-	"othnx/pkg/tokengen"
-)
+package use_cases
 
 type OAuthGithubService struct {
 	Config                 domain.Config

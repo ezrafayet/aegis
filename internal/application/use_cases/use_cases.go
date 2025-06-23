@@ -1,18 +1,4 @@
-package auth
-
-import (
-	"net/http"
-	"othnx/internal/domain"
-	"othnx/internal/repositories"
-	"othnx/pkg/apperrors"
-	"othnx/pkg/cookies"
-)
-
-type AuthServiceInterface interface {
-	GetSession(accessToken string) (domain.Session, error)
-	Logout(refreshToken string) (*http.Cookie, *http.Cookie, error)
-	CheckAndRefreshToken(accessToken, refreshToken string, forceRefresh bool) (*http.Cookie, *http.Cookie, error)
-}
+package use_cases
 
 type AuthService struct {
 	Config                 domain.Config

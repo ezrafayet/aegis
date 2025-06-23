@@ -1,11 +1,39 @@
-package domain
+package use_cases
 
-import (
-	"othnx/pkg/apperrors"
-	"time"
-)
+func GetOrCreateUserIfAllowed(userRepository repositories.UserRepository, userInfos *UserInfos, config Config) (User, error) {
+	nameExists, err := userRepository.DoesNameExist(userInfos.Name)
+	if err != nil {
+		return User{}, err
+	}
+	if nameExists {
+		return User{}, apperrors.ErrNameAlreadyExists
+	}
+	user, err := userRepository.GetUserByEmail(userInfos.Email)
+	if err != nil && err.Error() != apperrors.ErrNoUser.Error() {
+		return User{}, err
+	}
+	if err != nil && err.Error() == apperrors.ErrNoUser.Error() {
+		user, err = NewUser(userInfos.Name, userInfos.Avatar, userInfos.Email, "github")
+		if err != nil {
+			return User{}, err
+		}
+		err = userRepository.CreateUser(user, []Role{NewRole(user.ID, "user")})
+		if err != nil {
+			return User{}, err
+		}
+	}
+	if user.IsDeleted() {
+		return User{}, apperrors.ErrUserDeleted
+	}
+	if user.IsBlocked() {
+		return User{}, apperrors.ErrUserBlocked
+	}
+	if config.App.EarlyAdoptersOnly && !user.IsEarlyAdopter() {
+		return User{}, apperrors.ErrEarlyAdoptersOnly
+	}
+	return user, nil
+}
 
-// todo: move this business logic somewhere
 func GenerateTokensForUser(user User, deviceID string, config Config, refreshTokenRepository RefreshTokenRepository) (accessToken string, atExpiresAt int64, refreshToken string, rtExpiresAt int64, err error) {
 	deviceFingerprint, err := GenerateDeviceFingerprint(deviceID)
 	if err != nil {

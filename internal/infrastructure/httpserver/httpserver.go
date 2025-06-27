@@ -56,7 +56,16 @@ v0.x.x (needs to be injected)
 	}))
 
 	r := registry.NewRegistry(c, db)
-	r.GitHubRouter.AttachRoutes(e)
+
+	group := e.Group("/auth")
+
+	group.GET("/me", r.Handlers.GetSession, r.Middlewares.CheckAndRefreshToken)
+	group.GET("/refresh", r.Handlers.DoNothing, r.Middlewares.CheckAndForceRefreshToken)
+	group.GET("/logout", r.Handlers.Logout)
+	group.GET("/health", r.Handlers.DoNothing)
+
+	group.GET("/github", r.OAuthHandlers.GetAuthURL, r.OAuthMiddlewares.CheckAuthEnabled)
+	group.POST("/github/callback", r.OAuthHandlers.ExchangeCode, r.OAuthMiddlewares.CheckAuthEnabled)
 
 	// e.GET("/auth/me", r.Handlers.GetSession, r.Middlewares.CheckAndRefreshToken)
 	// e.GET("/auth/refresh", r.Handlers.DoNothing, r.Middlewares.CheckAndForceRefreshToken)

@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"net/http"
+	"othnx/internal/domain/entities"
 	"othnx/internal/domain/ports/primary_ports"
-	"othnx/internal/infrastructure/config"
 	"othnx/pkg/apperrors"
 	"othnx/pkg/cookies"
 
@@ -18,13 +18,13 @@ type OAuthHandlersInterface interface {
 }
 
 type OAuthGithubHandlers struct {
-	Config  config.Config
+	Config  entities.Config
 	Service primaryports.OAuthUseCasesInterface
 }
 
 var _ OAuthHandlersInterface = OAuthGithubHandlers{}
 
-func NewOAuthGithubHandlers(c config.Config, s primaryports.OAuthUseCasesInterface) OAuthGithubHandlers {
+func NewOAuthGithubHandlers(c entities.Config, s primaryports.OAuthUseCasesInterface) OAuthGithubHandlers {
 	return OAuthGithubHandlers{
 		Config:  c,
 		Service: s,

@@ -3,7 +3,6 @@ package repositories
 import (
 	"fmt"
 	"othnx/internal/domain/entities"
-	"othnx/internal/infrastructure/config"
 	"othnx/pkg/fingerprint"
 	"testing"
 	"time"
@@ -20,8 +19,8 @@ func TestCreateRefreshToken(t *testing.T) {
 		}
 		db.AutoMigrate(&entities.User{}, &entities.RefreshToken{})
 		refreshTokenRepository := NewRefreshTokenRepository(db)
-		refreshToken, _, err := entities.NewRefreshToken(entities.User{ID: "123"}, "device-id", config.Config{
-			JWT: config.JWTConfig{
+		refreshToken, _, err := entities.NewRefreshToken(entities.User{ID: "123"}, "device-id", entities.Config{
+			JWT: entities.JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
 				RefreshTokenExpirationDays: 30,
@@ -73,8 +72,8 @@ func TestGetRefreshTokenByToken(t *testing.T) {
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
-		refreshToken1, _, err := entities.NewRefreshToken(entities.User{ID: "123"}, deviceFingerprint1, config.Config{
-			JWT: config.JWTConfig{
+		refreshToken1, _, err := entities.NewRefreshToken(entities.User{ID: "123"}, deviceFingerprint1, entities.Config{
+			JWT: entities.JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
 				RefreshTokenExpirationDays: 30,
@@ -83,8 +82,8 @@ func TestGetRefreshTokenByToken(t *testing.T) {
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
-		refreshToken2, _, err := entities.NewRefreshToken(entities.User{ID: "123"}, deviceFingerprint2, config.Config{
-			JWT: config.JWTConfig{
+		refreshToken2, _, err := entities.NewRefreshToken(entities.User{ID: "123"}, deviceFingerprint2, entities.Config{
+			JWT: entities.JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
 				RefreshTokenExpirationDays: 30,
@@ -127,8 +126,8 @@ func TestCountValidRefreshTokensForUser(t *testing.T) {
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
-		refreshTokenExpired, _, err := entities.NewRefreshToken(entities.User{ID: "123"}, deviceFingerprint, config.Config{
-			JWT: config.JWTConfig{
+		refreshTokenExpired, _, err := entities.NewRefreshToken(entities.User{ID: "123"}, deviceFingerprint, entities.Config{
+			JWT: entities.JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
 				RefreshTokenExpirationDays: 30,
@@ -142,8 +141,8 @@ func TestCountValidRefreshTokensForUser(t *testing.T) {
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
-		refreshTokenActive, _, err := entities.NewRefreshToken(entities.User{ID: "123"}, deviceFingerprint, config.Config{
-			JWT: config.JWTConfig{
+		refreshTokenActive, _, err := entities.NewRefreshToken(entities.User{ID: "123"}, deviceFingerprint, entities.Config{
+			JWT: entities.JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
 				RefreshTokenExpirationDays: 30,
@@ -178,8 +177,8 @@ func TestCleanExpiredTokens(t *testing.T) {
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
-		refreshTokenExpired, _, err := entities.NewRefreshToken(entities.User{ID: "123"}, deviceFingerprint, config.Config{
-			JWT: config.JWTConfig{
+		refreshTokenExpired, _, err := entities.NewRefreshToken(entities.User{ID: "123"}, deviceFingerprint, entities.Config{
+			JWT: entities.JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
 				RefreshTokenExpirationDays: 30,
@@ -193,8 +192,8 @@ func TestCleanExpiredTokens(t *testing.T) {
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
-		refreshTokenActive, _, err := entities.NewRefreshToken(entities.User{ID: "123"}, deviceFingerprint, config.Config{
-			JWT: config.JWTConfig{
+		refreshTokenActive, _, err := entities.NewRefreshToken(entities.User{ID: "123"}, deviceFingerprint, entities.Config{
+			JWT: entities.JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
 				RefreshTokenExpirationDays: 30,
@@ -242,8 +241,8 @@ func TestDeleteRefreshToken(t *testing.T) {
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
-		refreshTokenExpired, _, err := entities.NewRefreshToken(entities.User{ID: "123"}, deviceFingerprint, config.Config{
-			JWT: config.JWTConfig{
+		refreshTokenExpired, _, err := entities.NewRefreshToken(entities.User{ID: "123"}, deviceFingerprint, entities.Config{
+			JWT: entities.JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
 				RefreshTokenExpirationDays: 30,
@@ -257,8 +256,8 @@ func TestDeleteRefreshToken(t *testing.T) {
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
-		refreshTokenActive, _, err := entities.NewRefreshToken(entities.User{ID: "123"}, deviceFingerprint, config.Config{
-			JWT: config.JWTConfig{
+		refreshTokenActive, _, err := entities.NewRefreshToken(entities.User{ID: "123"}, deviceFingerprint, entities.Config{
+			JWT: entities.JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
 				RefreshTokenExpirationDays: 30,

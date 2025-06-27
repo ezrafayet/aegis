@@ -3,7 +3,6 @@ package usecases
 import (
 	"othnx/internal/domain/entities"
 	"othnx/internal/domain/ports/secondary_ports"
-	"othnx/internal/infrastructure/config"
 	"othnx/internal/infrastructure/repositories"
 	"othnx/pkg/apperrors"
 	"othnx/pkg/jwtgen"
@@ -15,8 +14,8 @@ import (
 )
 
 func TestCheckAndRefreshToken(t *testing.T) {
-	baseConfig := config.Config{
-		JWT: config.JWTConfig{
+	baseConfig := entities.Config{
+		JWT: entities.JWTConfig{
 			Secret:                     "some-secret",
 			AccessTokenExpirationMin:   1,
 			RefreshTokenExpirationDays: 1,
@@ -53,7 +52,7 @@ func TestCheckAndRefreshToken(t *testing.T) {
 		}
 		refreshToken.ExpiresAt = time.Now().Add(-time.Hour * 24)
 		db.Save(&refreshToken)
-		accessToken, _, err := jwtgen.Generate(entities.CustomClaims{UserID: newUser.ID}, config.Config{}, time.Now().Add(-time.Hour*24))
+		accessToken, _, err := jwtgen.Generate(entities.CustomClaims{UserID: newUser.ID}, baseConfig, time.Now().Add(-time.Hour*24))
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
@@ -74,7 +73,7 @@ func TestCheckAndRefreshToken(t *testing.T) {
 			t.Fatal("expected no error", err)
 		}
 		db.Save(&refreshToken)
-		accessToken, _, err := jwtgen.Generate(entities.CustomClaims{UserID: newUser.ID}, config.Config{}, time.Now().Add(-time.Hour*24))
+		accessToken, _, err := jwtgen.Generate(entities.CustomClaims{UserID: newUser.ID}, baseConfig, time.Now().Add(-time.Hour*24))
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
@@ -103,7 +102,7 @@ func TestCheckAndRefreshToken(t *testing.T) {
 			t.Fatal("expected no error", err)
 		}
 		db.Save(&refreshToken)
-		accessToken, _, err := jwtgen.Generate(entities.CustomClaims{UserID: newUser.ID}, config.Config{}, time.Now())
+		accessToken, _, err := jwtgen.Generate(entities.CustomClaims{UserID: newUser.ID}, baseConfig, time.Now())
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
@@ -130,7 +129,7 @@ func TestCheckAndRefreshToken(t *testing.T) {
 			t.Fatal("expected no error", err)
 		}
 		db.Save(&refreshToken)
-		accessToken, _, err := jwtgen.Generate(entities.CustomClaims{UserID: newUser.ID}, config.Config{}, time.Now())
+		accessToken, _, err := jwtgen.Generate(entities.CustomClaims{UserID: newUser.ID}, baseConfig, time.Now())
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}

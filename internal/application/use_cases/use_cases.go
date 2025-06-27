@@ -4,21 +4,20 @@ import (
 	"othnx/internal/domain/entities"
 	"othnx/internal/domain/ports/primary_ports"
 	"othnx/internal/domain/ports/secondary_ports"
-	"othnx/internal/infrastructure/config"
 	"othnx/pkg/apperrors"
 	"othnx/pkg/jwtgen"
 	"time"
 )
 
 type AuthService struct {
-	Config                 config.Config
+	Config                 entities.Config
 	RefreshTokenRepository secondaryports.RefreshTokenRepository
 	UserRepository         secondaryports.UserRepository
 }
 
 var _ primaryports.UseCasesInterface = &AuthService{}
 
-func NewService(c config.Config, r secondaryports.RefreshTokenRepository, u secondaryports.UserRepository) AuthService {
+func NewService(c entities.Config, r secondaryports.RefreshTokenRepository, u secondaryports.UserRepository) AuthService {
 	return AuthService{
 		Config:                 c,
 		RefreshTokenRepository: r,

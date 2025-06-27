@@ -2,7 +2,7 @@ package registry
 
 import (
 	"othnx/internal/application/use_cases"
-	"othnx/internal/infrastructure/config"
+	"othnx/internal/domain/entities"
 	"othnx/internal/infrastructure/handlers"
 	"othnx/internal/infrastructure/middlewares"
 	"othnx/internal/infrastructure/providers/github"
@@ -18,7 +18,7 @@ type Registry struct {
 	OAuthMiddlewares middlewares.OAuthGithubMiddlewares
 }
 
-func NewRegistry(c config.Config, db *gorm.DB) Registry {
+func NewRegistry(c entities.Config, db *gorm.DB) Registry {
 	userRepository := repositories.NewUserRepository(db)
 	refreshTokenRepository := repositories.NewRefreshTokenRepository(db)
 	stateRepository := repositories.NewStateRepository(db)

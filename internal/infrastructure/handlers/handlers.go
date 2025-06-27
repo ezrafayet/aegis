@@ -1,12 +1,13 @@
 package handlers
 
 import (
-	"github.com/labstack/echo/v4"
 	"net/http"
+	"othnx/internal/domain/entities"
 	"othnx/internal/domain/ports/primary_ports"
-	"othnx/internal/infrastructure/config"
 	"othnx/pkg/apperrors"
 	"othnx/pkg/cookies"
+
+	"github.com/labstack/echo/v4"
 )
 
 type HandlersInterface interface {
@@ -16,13 +17,13 @@ type HandlersInterface interface {
 }
 
 type Handlers struct {
-	Config  config.Config
+	Config  entities.Config
 	Service primaryports.UseCasesInterface
 }
 
 var _ HandlersInterface = &Handlers{}
 
-func NewHandlers(c config.Config, s primaryports.UseCasesInterface) Handlers {
+func NewHandlers(c entities.Config, s primaryports.UseCasesInterface) Handlers {
 	return Handlers{
 		Config:  c,
 		Service: s,

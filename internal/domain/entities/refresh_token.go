@@ -1,7 +1,6 @@
 package entities
 
 import (
-	"othnx/internal/infrastructure/config"
 	"othnx/pkg/tokengen"
 	"time"
 )
@@ -23,7 +22,7 @@ func (r RefreshToken) IsExpired() bool {
 	return r.ExpiresAt.Before(time.Now())
 }
 
-func NewRefreshToken(user User, deviceFingerprint string, config config.Config) (RefreshToken, int64, error) {
+func NewRefreshToken(user User, deviceFingerprint string, config Config) (RefreshToken, int64, error) {
 	token, err := tokengen.Generate("refresh_", 12)
 	if err != nil {
 		return RefreshToken{}, -1, err

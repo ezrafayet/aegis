@@ -2,8 +2,8 @@ package middlewares
 
 import (
 	"net/http"
+	"othnx/internal/domain/entities"
 	"othnx/internal/domain/ports/primary_ports"
-	"othnx/internal/infrastructure/config"
 	"othnx/pkg/apperrors"
 
 	"github.com/labstack/echo/v4"
@@ -16,13 +16,13 @@ type OAuthMiddlewaresInterface interface {
 }
 
 type OAuthGithubMiddlewares struct {
-	Config  config.Config
+	Config  entities.Config
 	Service primaryports.OAuthUseCasesInterface
 }
 
 var _ OAuthMiddlewaresInterface = OAuthGithubMiddlewares{}
 
-func NewOAuthGithubMiddlewares(c config.Config) OAuthGithubMiddlewares {
+func NewOAuthGithubMiddlewares(c entities.Config) OAuthGithubMiddlewares {
 	return OAuthGithubMiddlewares{
 		Config: c,
 	}

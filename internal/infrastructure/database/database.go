@@ -3,13 +3,12 @@ package database
 import (
 	"fmt"
 	"othnx/internal/domain/entities"
-	"othnx/internal/infrastructure/config"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func Connect(c config.Config) (*gorm.DB, error) {
+func Connect(c entities.Config) (*gorm.DB, error) {
 	db, err := gorm.Open(postgres.Open(c.DB.PostgresURL))
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)

@@ -2,7 +2,6 @@ package jwtgen
 
 import (
 	"othnx/internal/domain/entities"
-	"othnx/internal/infrastructure/config"
 	"othnx/pkg/apperrors"
 	"strings"
 	"time"
@@ -10,7 +9,7 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-func Generate(cClaims entities.CustomClaims, config config.Config, issuedAt time.Time) (accessToken string, expiresAt int64, err error) {
+func Generate(cClaims entities.CustomClaims, config entities.Config, issuedAt time.Time) (accessToken string, expiresAt int64, err error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	secondsOfValidity := config.JWT.AccessTokenExpirationMin * 60
 	expiresAt = issuedAt.Add(time.Second * time.Duration(secondsOfValidity)).Unix()
@@ -30,7 +29,7 @@ func Generate(cClaims entities.CustomClaims, config config.Config, issuedAt time
 	return tokenString, expiresAt, nil
 }
 
-func ReadClaims(accessToken string, config config.Config) (entities.CustomClaims, error) {
+func ReadClaims(accessToken string, config entities.Config) (entities.CustomClaims, error) {
 	parsedToken, err := jwt.Parse(accessToken, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, apperrors.ErrAccessTokenInvalid

@@ -1,7 +1,6 @@
 package entities
 
 import (
-	"othnx/internal/infrastructure/config"
 	"othnx/pkg/fingerprint"
 	"testing"
 	"time"
@@ -13,8 +12,8 @@ func TestRefreshToken(t *testing.T) {
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
-		token, _, _ := NewRefreshToken(User{ID: "123"}, deviceFingerprint, config.Config{
-			JWT: config.JWTConfig{
+		token, _, _ := NewRefreshToken(User{ID: "123"}, deviceFingerprint, Config{
+			JWT: JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
 				RefreshTokenExpirationDays: 30,
@@ -43,8 +42,8 @@ func TestRefreshToken(t *testing.T) {
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
-		token, _, _ := NewRefreshToken(User{ID: "123"}, deviceFingerprint, config.Config{
-			JWT: config.JWTConfig{
+		token, _, _ := NewRefreshToken(User{ID: "123"}, deviceFingerprint, Config{
+			JWT: JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
 				RefreshTokenExpirationDays: 30,
@@ -56,8 +55,8 @@ func TestRefreshToken(t *testing.T) {
 		}
 	})
 	t.Run("isExpired false", func(t *testing.T) {
-		token, _, _ := NewRefreshToken(User{ID: "123"}, "device-id", config.Config{
-			JWT: config.JWTConfig{
+		token, _, _ := NewRefreshToken(User{ID: "123"}, "device-id", Config{
+			JWT: JWTConfig{
 				Secret:                     "xxxsecret",
 				AccessTokenExpirationMin:   15,
 				RefreshTokenExpirationDays: 30,

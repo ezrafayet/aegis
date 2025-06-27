@@ -3,8 +3,8 @@ package middlewares
 import (
 	"errors"
 	"net/http"
+	"othnx/internal/domain/entities"
 	"othnx/internal/domain/ports/primary_ports"
-	"othnx/internal/infrastructure/config"
 	"othnx/pkg/apperrors"
 	"othnx/pkg/cookies"
 
@@ -18,13 +18,13 @@ type AuthMiddlewareInterface interface {
 }
 
 type AuthMiddleware struct {
-	Config  config.Config
+	Config  entities.Config
 	Service primaryports.UseCasesInterface
 }
 
 var _ AuthMiddlewareInterface = &AuthMiddleware{}
 
-func NewAuthMiddleware(c config.Config, s primaryports.UseCasesInterface) AuthMiddleware {
+func NewAuthMiddleware(c entities.Config, s primaryports.UseCasesInterface) AuthMiddleware {
 	return AuthMiddleware{
 		Config:  c,
 		Service: s,

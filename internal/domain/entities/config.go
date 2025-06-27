@@ -1,4 +1,4 @@
-package config
+package entities
 
 type Config struct {
 	App struct {

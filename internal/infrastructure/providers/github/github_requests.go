@@ -7,16 +7,15 @@ import (
 	"net/http"
 	"othnx/internal/domain/entities"
 	"othnx/internal/domain/ports/secondary_ports"
-	"othnx/internal/infrastructure/config"
 )
 
 type OAuthGithubRepository struct {
-	Config config.Config
+	Config entities.Config
 }
 
 var _ secondaryports.OAuthProviderRequests = OAuthGithubRepository{}
 
-func NewOAuthGithubRepository(c config.Config) OAuthGithubRepository {
+func NewOAuthGithubRepository(c entities.Config) OAuthGithubRepository {
 	return OAuthGithubRepository{
 		Config: c,
 	}

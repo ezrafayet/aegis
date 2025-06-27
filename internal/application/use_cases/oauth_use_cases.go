@@ -5,7 +5,6 @@ import (
 	"othnx/internal/domain/entities"
 	"othnx/internal/domain/ports/primary_ports"
 	"othnx/internal/domain/ports/secondary_ports"
-	"othnx/internal/infrastructure/config"
 	"othnx/pkg/apperrors"
 	"othnx/pkg/tokengen"
 	"time"
@@ -14,7 +13,7 @@ import (
 // todo: make this package a generic package for all oauth providers and a factory
 
 type OAuthGithubService struct {
-	Config                 config.Config
+	Config                 entities.Config
 	Provider               secondaryports.OAuthProviderRequests
 	UserRepository         secondaryports.UserRepository
 	RefreshTokenRepository secondaryports.RefreshTokenRepository
@@ -23,7 +22,7 @@ type OAuthGithubService struct {
 
 var _ primaryports.OAuthUseCasesInterface = OAuthGithubService{}
 
-func NewOAuthGithubUseCases(c config.Config, p secondaryports.OAuthProviderRequests, userRepository secondaryports.UserRepository, refreshTokenRepository secondaryports.RefreshTokenRepository, stateRepository secondaryports.StateRepository) OAuthGithubService {
+func NewOAuthGithubUseCases(c entities.Config, p secondaryports.OAuthProviderRequests, userRepository secondaryports.UserRepository, refreshTokenRepository secondaryports.RefreshTokenRepository, stateRepository secondaryports.StateRepository) OAuthGithubService {
 	return OAuthGithubService{
 		Config:                 c,
 		Provider:               p,

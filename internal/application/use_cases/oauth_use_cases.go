@@ -12,7 +12,7 @@ import (
 
 // todo: make this package a generic package for all oauth providers and a factory
 
-type OAuthGithubService struct {
+type OAuthGithubUseCases struct {
 	Config                 entities.Config
 	Provider               secondaryports.OAuthProviderRequests
 	UserRepository         secondaryports.UserRepository
@@ -20,10 +20,10 @@ type OAuthGithubService struct {
 	StateRepository        secondaryports.StateRepository
 }
 
-var _ primaryports.OAuthUseCasesInterface = OAuthGithubService{}
+var _ primaryports.OAuthUseCasesInterface = OAuthGithubUseCases{}
 
-func NewOAuthGithubUseCases(c entities.Config, p secondaryports.OAuthProviderRequests, userRepository secondaryports.UserRepository, refreshTokenRepository secondaryports.RefreshTokenRepository, stateRepository secondaryports.StateRepository) OAuthGithubService {
-	return OAuthGithubService{
+func NewOAuthGithubUseCases(c entities.Config, p secondaryports.OAuthProviderRequests, userRepository secondaryports.UserRepository, refreshTokenRepository secondaryports.RefreshTokenRepository, stateRepository secondaryports.StateRepository) OAuthGithubUseCases {
+	return OAuthGithubUseCases{
 		Config:                 c,
 		Provider:               p,
 		UserRepository:         userRepository,
@@ -33,7 +33,7 @@ func NewOAuthGithubUseCases(c entities.Config, p secondaryports.OAuthProviderReq
 }
 
 // /!\ Can be abused to generate a lot of states - todo: fix
-func (s OAuthGithubService) GetAuthURL(redirectUri string) (string, error) {
+func (s OAuthGithubUseCases) GetAuthURL(redirectUri string) (string, error) {
 	state, err := tokengen.Generate("state_", 13)
 	if err != nil {
 		return "", err
@@ -49,7 +49,7 @@ func (s OAuthGithubService) GetAuthURL(redirectUri string) (string, error) {
 	return redirectURL, nil
 }
 
-func (s OAuthGithubService) ExchangeCode(code, state string) (*entities.TokenPair, error) {
+func (s OAuthGithubUseCases) ExchangeCode(code, state string) (*entities.TokenPair, error) {
 	serverState, err := s.StateRepository.GetAndDeleteState(state)
 	if err != nil {
 		return nil, apperrors.ErrInvalidState
@@ -85,7 +85,7 @@ func (s OAuthGithubService) ExchangeCode(code, state string) (*entities.TokenPai
 	}, nil
 }
 
-func (s OAuthGithubService) CheckAuthEnabled(provider string) bool {
+func (s OAuthGithubUseCases) CheckAuthEnabled(provider string) bool {
 	switch provider {
 	case "github":
 		return s.Config.Auth.Providers.GitHub.Enabled

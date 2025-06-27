@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"othnx/internal/domain/entities"
 	"othnx/internal/domain/ports/primary"
@@ -39,10 +40,10 @@ func (h Handlers) GetSession(c echo.Context) error {
 	}
 	session, err := h.Service.GetSession(accessToken)
 	if err != nil {
-		if err.Error() == apperrors.ErrAccessTokenExpired.Error() {
+		if errors.Is(err, apperrors.ErrAccessTokenExpired) {
 			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrAccessTokenExpired.Error()})
 		}
-		if err.Error() == apperrors.ErrAccessTokenInvalid.Error() {
+		if errors.Is(err, apperrors.ErrAccessTokenInvalid) {
 			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrAccessTokenInvalid.Error()})
 		}
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": apperrors.ErrGeneric.Error()})

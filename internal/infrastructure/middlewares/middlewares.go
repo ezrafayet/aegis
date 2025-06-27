@@ -47,16 +47,16 @@ func (m AuthMiddleware) CheckAndRefreshToken(next echo.HandlerFunc) echo.Handler
 			cookies.NewRefreshCookie(tokensPair.RefreshToken, tokensPair.RefreshTokenExpiresAt.Unix(), m.Config)
 		}
 		if err != nil {
-			if err.Error() == apperrors.ErrAccessTokenInvalid.Error() {
+			if errors.Is(err, apperrors.ErrAccessTokenInvalid) {
 				return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrAccessTokenInvalid.Error()})
 			}
-			if err.Error() == apperrors.ErrRefreshTokenExpired.Error() {
+			if errors.Is(err, apperrors.ErrRefreshTokenExpired) {
 				return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrRefreshTokenExpired.Error()})
 			}
-			if err.Error() == apperrors.ErrUserDeleted.Error() {
+			if errors.Is(err, apperrors.ErrUserDeleted) {
 				return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrUserDeleted.Error()})
 			}
-			if err.Error() == apperrors.ErrUserBlocked.Error() {
+			if errors.Is(err, apperrors.ErrUserBlocked) {
 				return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrUserBlocked.Error()})
 			}
 			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrGeneric.Error()})
@@ -81,16 +81,16 @@ func (m AuthMiddleware) CheckAndForceRefreshToken(next echo.HandlerFunc) echo.Ha
 			cookies.NewRefreshCookie(tokensPair.RefreshToken, tokensPair.RefreshTokenExpiresAt.Unix(), m.Config)
 		}
 		if err != nil {
-			if err.Error() == apperrors.ErrAccessTokenInvalid.Error() {
+			if errors.Is(err, apperrors.ErrAccessTokenInvalid) {
 				return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrAccessTokenInvalid.Error()})
 			}
-			if err.Error() == apperrors.ErrRefreshTokenExpired.Error() {
+			if errors.Is(err, apperrors.ErrRefreshTokenExpired) {
 				return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrRefreshTokenExpired.Error()})
 			}
-			if err.Error() == apperrors.ErrUserDeleted.Error() {
+			if errors.Is(err, apperrors.ErrUserDeleted) {
 				return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrUserDeleted.Error()})
 			}
-			if err.Error() == apperrors.ErrUserBlocked.Error() {
+			if errors.Is(err, apperrors.ErrUserBlocked) {
 				return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrUserBlocked.Error()})
 			}
 			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrGeneric.Error()})

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"othnx/internal/domain/entities"
 	"othnx/internal/domain/ports/primary"
@@ -50,13 +51,13 @@ func (h OAuthGithubHandlers) ExchangeCode(c echo.Context) error {
 	}
 	tokensPair, err := h.Service.ExchangeCode(body.Code, body.State)
 	if err != nil {
-		if err.Error() == apperrors.ErrEarlyAdoptersOnly.Error() {
+		if errors.Is(err, apperrors.ErrEarlyAdoptersOnly) {
 			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrEarlyAdoptersOnly.Error()})
 		}
-		if err.Error() == apperrors.ErrUserBlocked.Error() {
+		if errors.Is(err, apperrors.ErrUserBlocked) {
 			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrUserBlocked.Error()})
 		}
-		if err.Error() == apperrors.ErrUserDeleted.Error() {
+		if errors.Is(err, apperrors.ErrUserDeleted) {
 			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrUserDeleted.Error()})
 		}
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": apperrors.ErrGeneric.Error()})

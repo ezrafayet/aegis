@@ -20,7 +20,7 @@ type OAuthGithubMiddlewares struct {
 	Service primaryports.OAuthUseCasesInterface
 }
 
-var _ OAuthGithubMiddlewares = OAuthGithubMiddlewares{}
+var _ OAuthMiddlewaresInterface = OAuthGithubMiddlewares{}
 
 func NewOAuthGithubMiddlewares(c config.Config) OAuthGithubMiddlewares {
 	return OAuthGithubMiddlewares{

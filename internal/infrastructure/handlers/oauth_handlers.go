@@ -12,13 +12,17 @@ import (
 
 // some factory
 
+type OAuthHandlersInterface interface {
+	GetAuthURL(c echo.Context) error
+	ExchangeCode(c echo.Context) error
+}
 
 type OAuthGithubHandlers struct {
 	Config  config.Config
 	Service primaryports.OAuthUseCasesInterface
 }
 
-var _ OAuthGithubHandlers = OAuthGithubHandlers{}
+var _ OAuthHandlersInterface = OAuthGithubHandlers{}
 
 func NewOAuthGithubHandlers(c config.Config, s primaryports.OAuthUseCasesInterface) OAuthGithubHandlers {
 	return OAuthGithubHandlers{

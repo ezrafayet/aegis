@@ -16,7 +16,7 @@ type OAuthMiddlewaresInterface interface {
 }
 
 type OAuthGithubMiddlewares struct {
-	Config config.Config
+	Config  config.Config
 	Service primaryports.OAuthUseCasesInterface
 }
 

@@ -79,9 +79,9 @@ func (s OAuthGithubService) ExchangeCode(code, state string) (*entities.TokenPai
 	}
 
 	return &entities.TokenPair{
-		AccessToken: accessToken,
-		AccessTokenExpiresAt: time.Unix(atExpiresAt, 0),
-		RefreshToken: newRefreshToken,
+		AccessToken:           accessToken,
+		AccessTokenExpiresAt:  time.Unix(atExpiresAt, 0),
+		RefreshToken:          newRefreshToken,
 		RefreshTokenExpiresAt: time.Unix(rtExpiresAt, 0),
 	}, nil
 }

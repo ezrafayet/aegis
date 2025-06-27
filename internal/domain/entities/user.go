@@ -19,7 +19,7 @@ type User struct {
 	Metadata        string     `json:"metadata" gorm:"type:varchar(1024);not null"`
 	AuthMethod      string     `json:"auth_method" gorm:"type:varchar(16);not null"`
 	// relations
-	Roles []Role `json:"roles" gorm:"foreignKey:UserID;references:ID"`
+	Roles         []Role         `json:"roles" gorm:"foreignKey:UserID;references:ID"`
 	RefreshTokens []RefreshToken `json:"refresh_tokens" gorm:"foreignKey:UserID;references:ID"`
 }
 

@@ -13,7 +13,7 @@ type RefreshToken struct {
 	Token             string    `json:"token" gorm:"primaryKey;type:char(32);not null"`
 	DeviceFingerprint string    `json:"device_fingerprint" gorm:"type:char(32);index;not null"`
 	// relations
-	User   User   `json:"user" gorm:"foreignKey:UserID;references:ID"`
+	User User `json:"user" gorm:"foreignKey:UserID;references:ID"`
 }
 
 // todo: make tokens unique per deviceID

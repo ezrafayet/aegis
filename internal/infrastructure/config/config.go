@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
-
 )
 
 func Read(configPath string) (Config, error) {

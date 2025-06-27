@@ -1,9 +1,9 @@
 package repositories
 
 import (
+	"gorm.io/gorm"
 	"othnx/internal/domain/entities"
 	"othnx/internal/domain/ports/secondary_ports"
-	"gorm.io/gorm"
 )
 
 type StateRepository struct {

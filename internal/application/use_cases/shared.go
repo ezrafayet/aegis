@@ -79,7 +79,7 @@ func GenerateTokensForUser(user entities.User, deviceID string, config config.Co
 		UserID:       user.ID,
 		EarlyAdopter: user.EarlyAdopter,
 		Metadata:     user.Metadata,
-		Roles:  user.RolesValues(),
+		Roles:        user.RolesValues(),
 	}, config, time.Now())
 	if err != nil {
 		return "", -1, "", -1, err

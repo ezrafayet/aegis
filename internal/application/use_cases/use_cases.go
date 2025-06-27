@@ -38,9 +38,9 @@ func (s AuthService) GetSession(accessToken string) (entities.Session, error) {
 
 func (s AuthService) eraseTokens(err error) (*entities.TokenPair, error) {
 	return &entities.TokenPair{
-		AccessToken:  "",
-		AccessTokenExpiresAt: time.Now(),
-		RefreshToken: "",
+		AccessToken:           "",
+		AccessTokenExpiresAt:  time.Now(),
+		RefreshToken:          "",
 		RefreshTokenExpiresAt: time.Now(),
 	}, err
 }
@@ -92,9 +92,9 @@ func (s AuthService) CheckAndRefreshToken(accessToken, refreshToken string, forc
 		return s.eraseTokens(err)
 	}
 	return &entities.TokenPair{
-		AccessToken: accessToken,
-		AccessTokenExpiresAt: time.Unix(atExpiresAt, 0),
-		RefreshToken: newRefreshToken,
+		AccessToken:           accessToken,
+		AccessTokenExpiresAt:  time.Unix(atExpiresAt, 0),
+		RefreshToken:          newRefreshToken,
 		RefreshTokenExpiresAt: time.Unix(rtExpiresAt, 0),
 	}, nil
 }

@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"othnx/internal/domain/entities"
-	"othnx/internal/domain/ports/secondary_ports"
+	"othnx/internal/domain/ports/secondary"
 	"othnx/pkg/apperrors"
 
 	"gorm.io/gorm"
@@ -12,7 +12,7 @@ type UserRepository struct {
 	db *gorm.DB
 }
 
-var _ secondaryports.UserRepository = &UserRepository{}
+var _ secondary.UserRepository = &UserRepository{}
 
 func NewUserRepository(db *gorm.DB) UserRepository {
 	return UserRepository{db: db}

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"othnx/internal/domain/entities"
-	"othnx/internal/domain/ports/primary_ports"
+	"othnx/internal/domain/ports/primary"
 	"othnx/pkg/apperrors"
 	"othnx/pkg/cookies"
 
@@ -19,12 +19,12 @@ type AuthMiddlewareInterface interface {
 
 type AuthMiddleware struct {
 	Config  entities.Config
-	Service primaryports.UseCasesInterface
+	Service primary.UseCasesInterface
 }
 
 var _ AuthMiddlewareInterface = &AuthMiddleware{}
 
-func NewAuthMiddleware(c entities.Config, s primaryports.UseCasesInterface) AuthMiddleware {
+func NewAuthMiddleware(c entities.Config, s primary.UseCasesInterface) AuthMiddleware {
 	return AuthMiddleware{
 		Config:  c,
 		Service: s,

@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"othnx/internal/domain/entities"
-	"othnx/internal/domain/ports/secondary_ports"
+	"othnx/internal/domain/ports/secondary"
 	"othnx/pkg/apperrors"
 	"time"
 
@@ -13,7 +13,7 @@ type RefreshTokenRepository struct {
 	db *gorm.DB
 }
 
-var _ secondaryports.RefreshTokenRepository = &RefreshTokenRepository{}
+var _ secondary.RefreshTokenRepository = &RefreshTokenRepository{}
 
 func NewRefreshTokenRepository(db *gorm.DB) RefreshTokenRepository {
 	return RefreshTokenRepository{db: db}

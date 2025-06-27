@@ -1,16 +1,17 @@
 package repositories
 
 import (
-	"gorm.io/gorm"
 	"othnx/internal/domain/entities"
-	"othnx/internal/domain/ports/secondary_ports"
+	"othnx/internal/domain/ports/secondary"
+
+	"gorm.io/gorm"
 )
 
 type StateRepository struct {
 	db *gorm.DB
 }
 
-var _ secondaryports.StateRepository = &StateRepository{}
+var _ secondary.StateRepository = &StateRepository{}
 
 func NewStateRepository(db *gorm.DB) StateRepository {
 	return StateRepository{db: db}

@@ -2,14 +2,14 @@ package usecases
 
 import (
 	"othnx/internal/domain/entities"
-	"othnx/internal/domain/ports/secondary_ports"
+	"othnx/internal/domain/ports/secondary"
 	"othnx/pkg/apperrors"
 	"othnx/pkg/fingerprint"
 	"othnx/pkg/jwtgen"
 	"time"
 )
 
-func GetOrCreateUserIfAllowed(userRepository secondaryports.UserRepository, userInfos *entities.UserInfos, config entities.Config) (entities.User, error) {
+func GetOrCreateUserIfAllowed(userRepository secondary.UserRepository, userInfos *entities.UserInfos, config entities.Config) (entities.User, error) {
 	nameExists, err := userRepository.DoesNameExist(userInfos.Name)
 	if err != nil {
 		return entities.User{}, err
@@ -43,7 +43,7 @@ func GetOrCreateUserIfAllowed(userRepository secondaryports.UserRepository, user
 	return user, nil
 }
 
-func GenerateTokensForUser(user entities.User, deviceID string, config entities.Config, refreshTokenRepository secondaryports.RefreshTokenRepository) (accessToken string, atExpiresAt int64, refreshToken string, rtExpiresAt int64, err error) {
+func GenerateTokensForUser(user entities.User, deviceID string, config entities.Config, refreshTokenRepository secondary.RefreshTokenRepository) (accessToken string, atExpiresAt int64, refreshToken string, rtExpiresAt int64, err error) {
 	deviceFingerprint, err := fingerprint.GenerateDeviceFingerprint(deviceID)
 	if err != nil {
 		return "", -1, "", -1, err

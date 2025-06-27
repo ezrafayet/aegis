@@ -3,8 +3,8 @@ package usecases
 import (
 	"fmt"
 	"othnx/internal/domain/entities"
-	"othnx/internal/domain/ports/primary_ports"
-	"othnx/internal/domain/ports/secondary_ports"
+	"othnx/internal/domain/ports/primary"
+	"othnx/internal/domain/ports/secondary"
 	"othnx/pkg/apperrors"
 	"othnx/pkg/tokengen"
 	"time"
@@ -14,15 +14,15 @@ import (
 
 type OAuthGithubUseCases struct {
 	Config                 entities.Config
-	Provider               secondaryports.OAuthProviderRequests
-	UserRepository         secondaryports.UserRepository
-	RefreshTokenRepository secondaryports.RefreshTokenRepository
-	StateRepository        secondaryports.StateRepository
+	Provider               secondary.OAuthProviderRequests
+	UserRepository         secondary.UserRepository
+	RefreshTokenRepository secondary.RefreshTokenRepository
+	StateRepository        secondary.StateRepository
 }
 
-var _ primaryports.OAuthUseCasesInterface = OAuthGithubUseCases{}
+var _ primary.OAuthUseCasesInterface = OAuthGithubUseCases{}
 
-func NewOAuthGithubUseCases(c entities.Config, p secondaryports.OAuthProviderRequests, userRepository secondaryports.UserRepository, refreshTokenRepository secondaryports.RefreshTokenRepository, stateRepository secondaryports.StateRepository) OAuthGithubUseCases {
+func NewOAuthGithubUseCases(c entities.Config, p secondary.OAuthProviderRequests, userRepository secondary.UserRepository, refreshTokenRepository secondary.RefreshTokenRepository, stateRepository secondary.StateRepository) OAuthGithubUseCases {
 	return OAuthGithubUseCases{
 		Config:                 c,
 		Provider:               p,

@@ -2,8 +2,8 @@ package usecases
 
 import (
 	"othnx/internal/domain/entities"
-	"othnx/internal/domain/ports/primary_ports"
-	"othnx/internal/domain/ports/secondary_ports"
+	"othnx/internal/domain/ports/primary"
+	"othnx/internal/domain/ports/secondary"
 	"othnx/pkg/apperrors"
 	"othnx/pkg/jwtgen"
 	"time"
@@ -11,13 +11,13 @@ import (
 
 type UseCases struct {
 	Config                 entities.Config
-	RefreshTokenRepository secondaryports.RefreshTokenRepository
-	UserRepository         secondaryports.UserRepository
+	RefreshTokenRepository secondary.RefreshTokenRepository
+	UserRepository         secondary.UserRepository
 }
 
-var _ primaryports.UseCasesInterface = &UseCases{}
+var _ primary.UseCasesInterface = &UseCases{}
 
-func NewService(c entities.Config, r secondaryports.RefreshTokenRepository, u secondaryports.UserRepository) UseCases {
+func NewService(c entities.Config, r secondary.RefreshTokenRepository, u secondary.UserRepository) UseCases {
 	return UseCases{
 		Config:                 c,
 		RefreshTokenRepository: r,

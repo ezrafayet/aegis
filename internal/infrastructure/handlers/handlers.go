@@ -3,7 +3,7 @@ package handlers
 import (
 	"net/http"
 	"othnx/internal/domain/entities"
-	"othnx/internal/domain/ports/primary_ports"
+	"othnx/internal/domain/ports/primary"
 	"othnx/pkg/apperrors"
 	"othnx/pkg/cookies"
 
@@ -18,12 +18,12 @@ type HandlersInterface interface {
 
 type Handlers struct {
 	Config  entities.Config
-	Service primaryports.UseCasesInterface
+	Service primary.UseCasesInterface
 }
 
 var _ HandlersInterface = &Handlers{}
 
-func NewHandlers(c entities.Config, s primaryports.UseCasesInterface) Handlers {
+func NewHandlers(c entities.Config, s primary.UseCasesInterface) Handlers {
 	return Handlers{
 		Config:  c,
 		Service: s,

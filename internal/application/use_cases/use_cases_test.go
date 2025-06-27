@@ -2,7 +2,7 @@ package usecases
 
 import (
 	"othnx/internal/domain/entities"
-	"othnx/internal/domain/ports/secondary_ports"
+	"othnx/internal/domain/ports/secondary"
 	"othnx/internal/infrastructure/repositories"
 	"othnx/pkg/apperrors"
 	"othnx/pkg/jwtgen"
@@ -21,7 +21,7 @@ func TestCheckAndRefreshToken(t *testing.T) {
 			RefreshTokenExpirationDays: 1,
 		},
 	}
-	prepare := func(t *testing.T) (UseCases, secondaryports.UserRepository, secondaryports.RefreshTokenRepository, *gorm.DB) {
+	prepare := func(t *testing.T) (UseCases, secondary.UserRepository, secondary.RefreshTokenRepository, *gorm.DB) {
 		db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
 		if err != nil {
 			t.Fatal(err)

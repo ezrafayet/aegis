@@ -6,14 +6,14 @@ import (
 	"fmt"
 	"net/http"
 	"othnx/internal/domain/entities"
-	"othnx/internal/domain/ports/secondary_ports"
+	"othnx/internal/domain/ports/secondary"
 )
 
 type OAuthGithubRepository struct {
 	Config entities.Config
 }
 
-var _ secondaryports.OAuthProviderRequests = OAuthGithubRepository{}
+var _ secondary.OAuthProviderRequests = OAuthGithubRepository{}
 
 func NewOAuthGithubRepository(c entities.Config) OAuthGithubRepository {
 	return OAuthGithubRepository{

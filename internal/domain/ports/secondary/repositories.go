@@ -1,4 +1,4 @@
-package secondaryports
+package secondary
 
 import "othnx/internal/domain/entities"
 

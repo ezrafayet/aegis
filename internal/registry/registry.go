@@ -1,37 +1,41 @@
 package registry
 
 import (
-	"othnx/internal/components/auth"
-	"othnx/internal/components/providers/github"
-	"othnx/internal/domain"
-	"othnx/internal/repositories"
+	"othnx/internal/infrastructure/config"
+	"othnx/internal/infrastructure/handlers"
+	"othnx/internal/infrastructure/middlewares"
+	"othnx/internal/infrastructure/repositories"
+	"othnx/internal/application/use_cases"
+	"othnx/internal/infrastructure/providers/github"
 
 	"gorm.io/gorm"
 )
 
 type Registry struct {
-	GitHubRouter github.OAuthGithubRouter
-	AuthRouter   auth.AuthRouter
+	Handlers handlers.HandlersInterface
+	Middlewares middlewares.AuthMiddlewareInterface
+	OAuthHandlers handlers.OAuthGithubHandlers
+	OAuthMiddlewares middlewares.OAuthGithubMiddlewares
 }
 
-func NewRegistry(c domain.Config, db *gorm.DB) Registry {
+func NewRegistry(c config.Config, db *gorm.DB) Registry {
 	userRepository := repositories.NewUserRepository(db)
 	refreshTokenRepository := repositories.NewRefreshTokenRepository(db)
 	stateRepository := repositories.NewStateRepository(db)
 
-	authService := auth.NewAuthService(c, refreshTokenRepository, userRepository)
-	authHandlers := auth.NewAuthHandlers(c, authService)
-	authMiddlewares := auth.NewAuthMiddleware(c, authService)
-	authRouter := auth.NewAuthRouter(authHandlers, authMiddlewares)
+	usecases := usecases.NewService(c, &refreshTokenRepository, &userRepository)
+	handlers := handlers.NewHandlers(c, usecases)
+	middlewares := middlewares.NewAuthMiddleware(c, usecases)
 
 	githubProvider := github.NewOAuthGithubRepository(c)
-	githubServices := github.NewOAuthGithubService(c, githubProvider, &userRepository, &refreshTokenRepository, &stateRepository)
-	githubHandlers := github.NewOAuthGithubHandlers(c, githubServices)
-	githubMiddlewares := github.NewOAuthGithubMiddlewares(c)
-	githubRouter := github.NewOAuthGithubRouter(githubHandlers, githubMiddlewares)
+	githubUsecases := usecases.NewOAuthGithubUseCases(c, githubProvider, &userRepository, &refreshTokenRepository, &stateRepository)
+	githubHandlers := handlers.NewOAuthGithubHandlers(c, githubUsecases)
+	githubMiddlewares := middlewares.NewOAuthGithubMiddlewares(c)
 
 	return Registry{
-		GitHubRouter: githubRouter,
-		AuthRouter:   authRouter,
+		Handlers: handlers,
+		Middlewares: middlewares,
+		OAuthHandlers: githubHandlers,
+		OAuthMiddlewares: githubMiddlewares,
 	}
 }

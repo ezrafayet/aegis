@@ -1,14 +1,26 @@
+package handlers
+
+import (
+	"net/http"
+	"othnx/internal/domain/ports/primary_ports"
+	"othnx/internal/infrastructure/config"
+	"othnx/pkg/apperrors"
+	"othnx/pkg/cookies"
+
+	"github.com/labstack/echo/v4"
+)
+
 // some factory
 
 
 type OAuthGithubHandlers struct {
-	Config  domain.Config
-	Service domain.OAuthProviderService
+	Config  config.Config
+	Service primaryports.OAuthUseCasesInterface
 }
 
-var _ domain.OAuthProviderHandlers = OAuthGithubHandlers{}
+var _ OAuthGithubHandlers = OAuthGithubHandlers{}
 
-func NewOAuthGithubHandlers(c domain.Config, s domain.OAuthProviderService) OAuthGithubHandlers {
+func NewOAuthGithubHandlers(c config.Config, s primaryports.OAuthUseCasesInterface) OAuthGithubHandlers {
 	return OAuthGithubHandlers{
 		Config:  c,
 		Service: s,
@@ -32,7 +44,7 @@ func (h OAuthGithubHandlers) ExchangeCode(c echo.Context) error {
 	if err := c.Bind(&body); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid request"})
 	}
-	accessCookie, refreshCookie, err := h.Service.ExchangeCode(body.Code, body.State)
+	tokensPair, err := h.Service.ExchangeCode(body.Code, body.State)
 	if err != nil {
 		if err.Error() == apperrors.ErrEarlyAdoptersOnly.Error() {
 			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrEarlyAdoptersOnly.Error()})
@@ -45,9 +57,9 @@ func (h OAuthGithubHandlers) ExchangeCode(c echo.Context) error {
 		}
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": apperrors.ErrGeneric.Error()})
 	}
-	if accessCookie != nil && refreshCookie != nil {
-		c.SetCookie(accessCookie)
-		c.SetCookie(refreshCookie)
+	if tokensPair != nil {
+		cookies.NewAccessCookie(tokensPair.AccessToken, tokensPair.AccessTokenExpiresAt.Unix(), h.Config)
+		cookies.NewRefreshCookie(tokensPair.RefreshToken, tokensPair.RefreshTokenExpiresAt.Unix(), h.Config)
 	}
 	return c.NoContent(http.StatusOK)
 }

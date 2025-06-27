@@ -1,10 +1,6 @@
-package secondary_ports
+package secondaryports
 
 import "othnx/internal/domain/entities"
-
-type OAuthProviderRepository interface {
-	GetUserInfos(code, state, redirectUri string) (*entities.UserInfos, error)
-}
 
 type RefreshTokenRepository interface {
 	CreateRefreshToken(refreshToken entities.RefreshToken) error
@@ -25,6 +21,4 @@ type UserRepository interface {
 	GetUserByID(userID string) (entities.User, error)
 	GetUserByEmail(email string) (entities.User, error)
 	DoesNameExist(nameFingerprint string) (bool, error)
-	// add role
-	// remove role
 }

@@ -2,13 +2,14 @@ package database
 
 import (
 	"fmt"
-	"othnx/internal/domain"
+	"othnx/internal/domain/entities"
+	"othnx/internal/infrastructure/config"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func Connect(c domain.Config) (*gorm.DB, error) {
+func Connect(c config.Config) (*gorm.DB, error) {
 	db, err := gorm.Open(postgres.Open(c.DB.PostgresURL))
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
@@ -16,7 +17,7 @@ func Connect(c domain.Config) (*gorm.DB, error) {
 		fmt.Println("Connected to database")
 	}
 
-	if err := db.AutoMigrate(&domain.User{}, &domain.RefreshToken{}, &domain.State{}); err != nil {
+	if err := db.AutoMigrate(&entities.User{}, &entities.RefreshToken{}, &entities.State{}); err != nil {
 		return nil, fmt.Errorf("failed to run database migrations: %w", err)
 	}
 
@@ -24,5 +25,5 @@ func Connect(c domain.Config) (*gorm.DB, error) {
 }
 
 func Migrate(db *gorm.DB) error {
-	return db.AutoMigrate(&domain.User{}, &domain.RefreshToken{}, &domain.State{})
+	return db.AutoMigrate(&entities.User{}, &entities.RefreshToken{}, &entities.State{})
 }

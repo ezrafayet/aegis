@@ -1,14 +1,24 @@
-package use_cases
+package usecases
+
+import (
+	"othnx/internal/domain/entities"
+	"othnx/internal/domain/ports/primary_ports"
+	"othnx/internal/domain/ports/secondary_ports"
+	"othnx/internal/infrastructure/config"
+	"othnx/pkg/apperrors"
+	"othnx/pkg/jwtgen"
+	"time"
+)
 
 type AuthService struct {
-	Config                 domain.Config
-	RefreshTokenRepository repositories.RefreshTokenRepository
-	UserRepository         repositories.UserRepository
+	Config                 config.Config
+	RefreshTokenRepository secondaryports.RefreshTokenRepository
+	UserRepository         secondaryports.UserRepository
 }
 
-var _ AuthServiceInterface = &AuthService{}
+var _ primaryports.UseCasesInterface = &AuthService{}
 
-func NewAuthService(c domain.Config, r repositories.RefreshTokenRepository, u repositories.UserRepository) AuthService {
+func NewService(c config.Config, r secondaryports.RefreshTokenRepository, u secondaryports.UserRepository) AuthService {
 	return AuthService{
 		Config:                 c,
 		RefreshTokenRepository: r,
@@ -16,68 +26,75 @@ func NewAuthService(c domain.Config, r repositories.RefreshTokenRepository, u re
 	}
 }
 
-func (s AuthService) GetSession(accessToken string) (domain.Session, error) {
-	customClaims, err := domain.ReadAccessTokenClaims(accessToken, s.Config)
+func (s AuthService) GetSession(accessToken string) (entities.Session, error) {
+	customClaims, err := jwtgen.ReadClaims(accessToken, s.Config)
 	if err != nil {
-		return domain.Session{}, err
+		return entities.Session{}, err
 	}
-	return domain.Session{
+	return entities.Session{
 		CustomClaims: customClaims,
 	}, nil
 }
 
-func (s AuthService) resetCookies(err error) (*http.Cookie, *http.Cookie, error) {
-	ac, rc := cookies.NewAccessCookieZero(s.Config), cookies.NewRefreshCookieZero(s.Config)
-	return &ac, &rc, err
+func (s AuthService) eraseTokens(err error) (*entities.TokenPair, error) {
+	return &entities.TokenPair{
+		AccessToken:  "",
+		AccessTokenExpiresAt: time.Now(),
+		RefreshToken: "",
+		RefreshTokenExpiresAt: time.Now(),
+	}, err
 }
 
-func (s AuthService) Logout(refreshToken string) (*http.Cookie, *http.Cookie, error) {
+func (s AuthService) Logout(refreshToken string) (*entities.TokenPair, error) {
 	if refreshToken != "" {
 		_ = s.RefreshTokenRepository.DeleteRefreshToken(refreshToken)
 	}
-	return s.resetCookies(nil)
+	return s.eraseTokens(nil)
 }
 
-func (s AuthService) CheckAndRefreshToken(accessToken, refreshToken string, forceRefresh bool) (*http.Cookie, *http.Cookie, error) {
-	_, err := domain.ReadAccessTokenClaims(accessToken, s.Config)
+func (s AuthService) CheckAndRefreshToken(accessToken, refreshToken string, forceRefresh bool) (*entities.TokenPair, error) {
+	_, err := jwtgen.ReadClaims(accessToken, s.Config)
 	if err == nil && !forceRefresh {
-		return nil, nil, nil
+		return s.eraseTokens(nil)
 	}
 	if err != nil && err.Error() != apperrors.ErrAccessTokenExpired.Error() {
-		return s.resetCookies(err)
+		return s.eraseTokens(err)
 	}
 	refreshTokenObject, err := s.RefreshTokenRepository.GetRefreshTokenByToken(refreshToken)
 	if err != nil {
-		return s.resetCookies(err)
+		return s.eraseTokens(err)
 	}
 	if refreshTokenObject.IsExpired() {
-		return s.resetCookies(apperrors.ErrRefreshTokenExpired)
+		return s.eraseTokens(apperrors.ErrRefreshTokenExpired)
 	}
 	// todo: check device id
 	user, err := s.UserRepository.GetUserByID(refreshTokenObject.UserID)
 	if err != nil {
-		return s.resetCookies(err)
+		return s.eraseTokens(err)
 	}
 	if user.IsDeleted() {
-		return s.resetCookies(apperrors.ErrUserDeleted)
+		return s.eraseTokens(apperrors.ErrUserDeleted)
 	}
 	if user.IsBlocked() {
-		return s.resetCookies(apperrors.ErrUserBlocked)
+		return s.eraseTokens(apperrors.ErrUserBlocked)
 	}
 	if s.Config.App.EarlyAdoptersOnly && !user.IsEarlyAdopter() {
-		return s.resetCookies(apperrors.ErrEarlyAdoptersOnly)
+		return s.eraseTokens(apperrors.ErrEarlyAdoptersOnly)
 	}
 
 	err = s.RefreshTokenRepository.DeleteRefreshToken(refreshToken)
 	if err != nil {
-		return s.resetCookies(err)
+		return s.eraseTokens(err)
 	}
 	// todo device-id: pass one, since one session per device is allowed
-	accessToken, atExpiresAt, newRefreshToken, rtExpiresAt, err := domain.GenerateTokensForUser(user, "device-id", s.Config, &s.RefreshTokenRepository)
+	accessToken, atExpiresAt, newRefreshToken, rtExpiresAt, err := GenerateTokensForUser(user, "device-id", s.Config, s.RefreshTokenRepository)
 	if err != nil {
-		return s.resetCookies(err)
+		return s.eraseTokens(err)
 	}
-	accessCookie := cookies.NewAccessCookie(accessToken, atExpiresAt, s.Config)
-	refreshCookie := cookies.NewRefreshCookie(newRefreshToken, rtExpiresAt, s.Config)
-	return &accessCookie, &refreshCookie, nil
+	return &entities.TokenPair{
+		AccessToken: accessToken,
+		AccessTokenExpiresAt: time.Unix(atExpiresAt, 0),
+		RefreshToken: newRefreshToken,
+		RefreshTokenExpiresAt: time.Unix(rtExpiresAt, 0),
+	}, nil
 }

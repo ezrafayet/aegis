@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"othnx/internal/domain"
+	"othnx/internal/domain/entities"
 	"testing"
 
 	"gorm.io/driver/sqlite"
@@ -14,9 +14,9 @@ func TestStateRepository_GetAndDeleteState(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		db.AutoMigrate(&domain.State{})
+		db.AutoMigrate(&entities.State{})
 		repo := NewStateRepository(db)
-		state := domain.NewState("some-value")
+		state := entities.NewState("some-value")
 		if err := repo.CreateState(state); err != nil {
 			t.Fatal(err)
 		}
@@ -28,7 +28,7 @@ func TestStateRepository_GetAndDeleteState(t *testing.T) {
 			t.Fatal("expected state to be deleted", got.Value)
 		}
 		var count int64
-		db.Model(&domain.State{}).Where("value = ?", state.Value).Count(&count)
+		db.Model(&entities.State{}).Where("value = ?", state.Value).Count(&count)
 		if count != 0 {
 			t.Fatal("expected state to be deleted", count)
 		}

@@ -1,12 +1,22 @@
 package github
 
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"othnx/internal/domain/entities"
+	"othnx/internal/domain/ports/secondary_ports"
+	"othnx/internal/infrastructure/config"
+)
+
 type OAuthGithubRepository struct {
-	Config domain.Config
+	Config config.Config
 }
 
-var _ domain.OAuthProviderRepository = OAuthGithubRepository{}
+var _ secondaryports.OAuthProviderRequests = OAuthGithubRepository{}
 
-func NewOAuthGithubRepository(c domain.Config) OAuthGithubRepository {
+func NewOAuthGithubRepository(c config.Config) OAuthGithubRepository {
 	return OAuthGithubRepository{
 		Config: c,
 	}
@@ -31,7 +41,7 @@ type gitHubEmail struct {
 	Verified bool   `json:"verified"`
 }
 
-func (p OAuthGithubRepository) GetUserInfos(code, state, redirectUri string) (*domain.UserInfos, error) {
+func (p OAuthGithubRepository) GetUserInfos(code, state, redirectUri string) (*entities.UserInfos, error) {
 	// Step 1: get access token
 	data := map[string]string{
 		"client_id":     p.Config.Auth.Providers.GitHub.ClientID,
@@ -102,7 +112,7 @@ func (p OAuthGithubRepository) GetUserInfos(code, state, redirectUri string) (*d
 
 	userName := user.Name
 
-	return &domain.UserInfos{
+	return &entities.UserInfos{
 		Name:   userName,
 		Email:  em,
 		Avatar: user.AvatarURL,

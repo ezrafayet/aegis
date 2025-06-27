@@ -1,4 +1,4 @@
-package jwt
+package jwtgen
 
 import (
 	"othnx/internal/domain/entities"
@@ -12,7 +12,7 @@ func TestAccessToken(t *testing.T) {
 	t.Run("should create a new access token", func(t *testing.T) {
 		token, expires_at, err := Generate(entities.CustomClaims{
 			UserID:      "123",
-			RolesValues: []string{""},
+			Roles: []string{""},
 			Metadata:    "{foo:bar}",
 		}, config.Config{
 			JWT: config.JWTConfig{
@@ -35,7 +35,7 @@ func TestAccessToken(t *testing.T) {
 	t.Run("should read claims from a valid access token", func(t *testing.T) {
 		token, _, err := Generate(entities.CustomClaims{
 			UserID:      "123",
-			RolesValues: []string{"some-role"},
+			Roles: []string{"some-role"},
 			Metadata:    "{foo:bar}",
 		}, config.Config{
 			JWT: config.JWTConfig{
@@ -63,8 +63,8 @@ func TestAccessToken(t *testing.T) {
 		if claims.Metadata != "{foo:bar}" {
 			t.Fatal("expected metadata to be {foo:bar}", claims.Metadata)
 		}
-		if claims.RolesValues[0] != "some-role" {
-			t.Fatal("expected roles_values to be some-role", claims.RolesValues)
+		if claims.Roles[0] != "some-role" {
+			t.Fatal("expected roles_values to be some-role", claims.Roles)
 		}
 	})
 	t.Run("should return an error if the token is invalid", func(t *testing.T) {
@@ -82,7 +82,7 @@ func TestAccessToken(t *testing.T) {
 	t.Run("should return an error if the token is expired", func(t *testing.T) {
 		token, _, err := Generate(entities.CustomClaims{
 			UserID:      "123",
-			RolesValues: []string{""},
+			Roles: []string{""},
 			Metadata:    "{foo:bar}",
 		}, config.Config{
 			JWT: config.JWTConfig{
@@ -108,7 +108,7 @@ func TestAccessToken(t *testing.T) {
 	t.Run("should return an error if the JWT secret is wrong", func(t *testing.T) {
 		token, _, err := Generate(entities.CustomClaims{
 			UserID:      "123",
-			RolesValues: []string{""},
+			Roles: []string{""},
 			Metadata:    "{foo:bar}",
 		}, config.Config{
 			JWT: config.JWTConfig{

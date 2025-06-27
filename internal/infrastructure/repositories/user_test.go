@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"othnx/internal/domain"
+	"othnx/internal/domain/entities"
 	"testing"
 	"time"
 
@@ -15,9 +15,9 @@ func TestUserRepository(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		db.AutoMigrate(&domain.User{}, &domain.Role{})
+		db.AutoMigrate(&entities.User{}, &entities.Role{})
 		userRepository := NewUserRepository(db)
-		err = userRepository.CreateUser(domain.User{
+		err = userRepository.CreateUser(entities.User{
 			ID:              "123",
 			CreatedAt:       time.Now(),
 			Name:            "Test User",
@@ -25,7 +25,7 @@ func TestUserRepository(t *testing.T) {
 			Email:           "test@test.com",
 			Metadata:        "{}",
 			AuthMethod:      "test",
-		}, []domain.Role{domain.NewRole("123", "user")})
+		}, []entities.Role{entities.NewRole("123", "user")})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -60,9 +60,9 @@ func TestUserRepository(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		db.AutoMigrate(&domain.User{}, &domain.Role{})
+		db.AutoMigrate(&entities.User{}, &entities.Role{})
 		userRepository := NewUserRepository(db)
-		err = userRepository.CreateUser(domain.User{
+		err = userRepository.CreateUser(entities.User{
 			ID:              "123",
 			CreatedAt:       time.Now(),
 			Name:            "Test User1",
@@ -70,11 +70,11 @@ func TestUserRepository(t *testing.T) {
 			Email:           "test@test.com",
 			Metadata:        "{}",
 			AuthMethod:      "test",
-		}, []domain.Role{domain.NewRole("123", "user")})
+		}, []entities.Role{entities.NewRole("123", "user")})
 		if err != nil {
 			t.Fatal(err)
 		}
-		err = userRepository.CreateUser(domain.User{
+		err = userRepository.CreateUser(entities.User{
 			ID:              "456",
 			CreatedAt:       time.Now(),
 			Name:            "Test User2",
@@ -82,7 +82,7 @@ func TestUserRepository(t *testing.T) {
 			Email:           "test@test.com",
 			Metadata:        "{}",
 			AuthMethod:      "test",
-		}, []domain.Role{domain.NewRole("456", "user")})
+		}, []entities.Role{entities.NewRole("456", "user")})
 		if err == nil {
 			t.Fatal(err)
 		}
@@ -92,9 +92,9 @@ func TestUserRepository(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		db.AutoMigrate(&domain.User{}, &domain.Role{})
+		db.AutoMigrate(&entities.User{}, &entities.Role{})
 		userRepository := NewUserRepository(db)
-		err = userRepository.CreateUser(domain.User{
+		err = userRepository.CreateUser(entities.User{
 			ID:              "123",
 			CreatedAt:       time.Now(),
 			Name:            "Test User1",
@@ -102,11 +102,11 @@ func TestUserRepository(t *testing.T) {
 			Email:           "test1@test.com",
 			Metadata:        "{}",
 			AuthMethod:      "test",
-		}, []domain.Role{domain.NewRole("123", "user")})
+		}, []entities.Role{entities.NewRole("123", "user")})
 		if err != nil {
 			t.Fatal(err)
 		}
-		err = userRepository.CreateUser(domain.User{
+		err = userRepository.CreateUser(entities.User{
 			ID:              "456",
 			CreatedAt:       time.Now(),
 			Name:            "Test User1",
@@ -114,7 +114,7 @@ func TestUserRepository(t *testing.T) {
 			Email:           "test2@test.com",
 			Metadata:        "{}",
 			AuthMethod:      "test",
-		}, []domain.Role{domain.NewRole("456", "user")})
+		}, []entities.Role{entities.NewRole("456", "user")})
 		if err == nil {
 			t.Fatal(err)
 		}
@@ -127,9 +127,9 @@ func TestUserRepository_Roles(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		db.AutoMigrate(&domain.User{}, &domain.Role{})
+		db.AutoMigrate(&entities.User{}, &entities.Role{})
 		userRepository := NewUserRepository(db)
-		err = userRepository.CreateUser(domain.User{
+		err = userRepository.CreateUser(entities.User{
 			ID:              "123",
 			CreatedAt:       time.Now(),
 			Name:            "Test User",
@@ -137,11 +137,11 @@ func TestUserRepository_Roles(t *testing.T) {
 			Email:           "test@test.com",
 			Metadata:        "{}",
 			AuthMethod:      "test",
-		}, []domain.Role{domain.NewRole("123", "user")})
+		}, []entities.Role{entities.NewRole("123", "user")})
 		if err != nil {
 			t.Fatal(err)
 		}
-		db.Create(domain.NewRole("123", "admin"))
+		db.Create(entities.NewRole("123", "admin"))
 		user, err := userRepository.GetUserByEmail("test@test.com")
 		if err != nil {
 			t.Fatal(err)
@@ -161,9 +161,9 @@ func TestUserRepository_Roles(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		db.AutoMigrate(&domain.User{}, &domain.Role{})
+		db.AutoMigrate(&entities.User{}, &entities.Role{})
 		userRepository := NewUserRepository(db)
-		err = userRepository.CreateUser(domain.User{
+		err = userRepository.CreateUser(entities.User{
 			ID:              "123",
 			CreatedAt:       time.Now(),
 			Name:            "Test User",
@@ -171,7 +171,7 @@ func TestUserRepository_Roles(t *testing.T) {
 			Email:           "test@test.com",
 			Metadata:        "{}",
 			AuthMethod:      "test",
-		}, []domain.Role{})
+		}, []entities.Role{})
 		if err != nil {
 			t.Fatal(err)
 		}

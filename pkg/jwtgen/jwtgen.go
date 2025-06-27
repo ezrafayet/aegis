@@ -1,4 +1,4 @@
-package jwt
+package jwtgen
 
 import (
 	"othnx/internal/domain/entities"
@@ -21,7 +21,7 @@ func Generate(cClaims entities.CustomClaims, config config.Config, issuedAt time
 	claims["iss"] = config.App.Name
 	claims["user_id"] = cClaims.UserID
 	claims["early_adopter"] = cClaims.EarlyAdopter
-	claims["roles"] = strings.Join(cClaims.RolesValues, ",")
+	claims["roles"] = strings.Join(cClaims.Roles, ",")
 	claims["metadata"] = cClaims.Metadata
 	tokenString, err := token.SignedString([]byte(config.JWT.Secret))
 	if err != nil {
@@ -55,7 +55,7 @@ func ReadClaims(accessToken string, config config.Config) (entities.CustomClaims
 		// /!\ This code can fail if the claims are not in the expected format
 		customClaims.UserID = claims["user_id"].(string)
 		customClaims.EarlyAdopter = claims["early_adopter"].(bool)
-		customClaims.RolesValues = strings.Split(claims["roles"].(string), ",")
+		customClaims.Roles = strings.Split(claims["roles"].(string), ",")
 		customClaims.Metadata = claims["metadata"].(string)
 	}
 

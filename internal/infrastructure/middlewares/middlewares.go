@@ -1,11 +1,14 @@
-package auth
+package middlewares
 
 import (
 	"errors"
-	"github.com/labstack/echo/v4"
 	"net/http"
-	"othnx/internal/domain"
+	"othnx/internal/domain/ports/primary_ports"
+	"othnx/internal/infrastructure/config"
 	"othnx/pkg/apperrors"
+	"othnx/pkg/cookies"
+
+	"github.com/labstack/echo/v4"
 )
 
 type AuthMiddlewareInterface interface {
@@ -15,13 +18,13 @@ type AuthMiddlewareInterface interface {
 }
 
 type AuthMiddleware struct {
-	Config  domain.Config
-	Service AuthServiceInterface
+	Config  config.Config
+	Service primaryports.UseCasesInterface
 }
 
 var _ AuthMiddlewareInterface = &AuthMiddleware{}
 
-func NewAuthMiddleware(c domain.Config, s AuthServiceInterface) AuthMiddleware {
+func NewAuthMiddleware(c config.Config, s primaryports.UseCasesInterface) AuthMiddleware {
 	return AuthMiddleware{
 		Config:  c,
 		Service: s,
@@ -38,10 +41,10 @@ func (m AuthMiddleware) CheckAndRefreshToken(next echo.HandlerFunc) echo.Handler
 		if err != nil {
 			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrGeneric.Error()})
 		}
-		c1, c2, err := m.Service.CheckAndRefreshToken(accessToken.Value, refreshToken.Value, false)
-		if c1 != nil && c2 != nil {
-			c.SetCookie(c1)
-			c.SetCookie(c2)
+		tokensPair, err := m.Service.CheckAndRefreshToken(accessToken.Value, refreshToken.Value, false)
+		if tokensPair != nil {
+			cookies.NewAccessCookie(tokensPair.AccessToken, tokensPair.AccessTokenExpiresAt.Unix(), m.Config)
+			cookies.NewRefreshCookie(tokensPair.RefreshToken, tokensPair.RefreshTokenExpiresAt.Unix(), m.Config)
 		}
 		if err != nil {
 			if err.Error() == apperrors.ErrAccessTokenInvalid.Error() {
@@ -72,10 +75,10 @@ func (m AuthMiddleware) CheckAndForceRefreshToken(next echo.HandlerFunc) echo.Ha
 		if err != nil {
 			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrGeneric.Error()})
 		}
-		c1, c2, err := m.Service.CheckAndRefreshToken(accessToken.Value, refreshToken.Value, true)
-		if c1 != nil && c2 != nil {
-			c.SetCookie(c1)
-			c.SetCookie(c2)
+		tokensPair, err := m.Service.CheckAndRefreshToken(accessToken.Value, refreshToken.Value, true)
+		if tokensPair != nil {
+			cookies.NewAccessCookie(tokensPair.AccessToken, tokensPair.AccessTokenExpiresAt.Unix(), m.Config)
+			cookies.NewRefreshCookie(tokensPair.RefreshToken, tokensPair.RefreshTokenExpiresAt.Unix(), m.Config)
 		}
 		if err != nil {
 			if err.Error() == apperrors.ErrAccessTokenInvalid.Error() {

@@ -1,4 +1,4 @@
-package primary_ports
+package primaryports
 
 import "othnx/internal/domain/entities"
 

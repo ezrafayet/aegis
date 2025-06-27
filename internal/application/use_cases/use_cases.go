@@ -9,23 +9,23 @@ import (
 	"time"
 )
 
-type AuthService struct {
+type UseCases struct {
 	Config                 entities.Config
 	RefreshTokenRepository secondaryports.RefreshTokenRepository
 	UserRepository         secondaryports.UserRepository
 }
 
-var _ primaryports.UseCasesInterface = &AuthService{}
+var _ primaryports.UseCasesInterface = &UseCases{}
 
-func NewService(c entities.Config, r secondaryports.RefreshTokenRepository, u secondaryports.UserRepository) AuthService {
-	return AuthService{
+func NewService(c entities.Config, r secondaryports.RefreshTokenRepository, u secondaryports.UserRepository) UseCases {
+	return UseCases{
 		Config:                 c,
 		RefreshTokenRepository: r,
 		UserRepository:         u,
 	}
 }
 
-func (s AuthService) GetSession(accessToken string) (entities.Session, error) {
+func (s UseCases) GetSession(accessToken string) (entities.Session, error) {
 	customClaims, err := jwtgen.ReadClaims(accessToken, s.Config)
 	if err != nil {
 		return entities.Session{}, err
@@ -35,7 +35,7 @@ func (s AuthService) GetSession(accessToken string) (entities.Session, error) {
 	}, nil
 }
 
-func (s AuthService) eraseTokens(err error) (*entities.TokenPair, error) {
+func (s UseCases) eraseTokens(err error) (*entities.TokenPair, error) {
 	return &entities.TokenPair{
 		AccessToken:           "",
 		AccessTokenExpiresAt:  time.Now(),
@@ -44,14 +44,14 @@ func (s AuthService) eraseTokens(err error) (*entities.TokenPair, error) {
 	}, err
 }
 
-func (s AuthService) Logout(refreshToken string) (*entities.TokenPair, error) {
+func (s UseCases) Logout(refreshToken string) (*entities.TokenPair, error) {
 	if refreshToken != "" {
 		_ = s.RefreshTokenRepository.DeleteRefreshToken(refreshToken)
 	}
 	return s.eraseTokens(nil)
 }
 
-func (s AuthService) CheckAndRefreshToken(accessToken, refreshToken string, forceRefresh bool) (*entities.TokenPair, error) {
+func (s UseCases) CheckAndRefreshToken(accessToken, refreshToken string, forceRefresh bool) (*entities.TokenPair, error) {
 	_, err := jwtgen.ReadClaims(accessToken, s.Config)
 	if err == nil && !forceRefresh {
 		return s.eraseTokens(nil)

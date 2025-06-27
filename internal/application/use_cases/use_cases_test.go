@@ -21,7 +21,7 @@ func TestCheckAndRefreshToken(t *testing.T) {
 			RefreshTokenExpirationDays: 1,
 		},
 	}
-	prepare := func(t *testing.T) (AuthService, secondaryports.UserRepository, secondaryports.RefreshTokenRepository, *gorm.DB) {
+	prepare := func(t *testing.T) (UseCases, secondaryports.UserRepository, secondaryports.RefreshTokenRepository, *gorm.DB) {
 		db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
 		if err != nil {
 			t.Fatal(err)

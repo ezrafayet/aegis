@@ -1,7 +1,7 @@
 package registry
 
 import (
-	usecases "othnx/internal/application/use_cases"
+	"othnx/internal/application/use_cases"
 	"othnx/internal/infrastructure/config"
 	"othnx/internal/infrastructure/handlers"
 	"othnx/internal/infrastructure/middlewares"
@@ -24,8 +24,8 @@ func NewRegistry(c config.Config, db *gorm.DB) Registry {
 	stateRepository := repositories.NewStateRepository(db)
 
 	authService := usecases.NewService(c, &refreshTokenRepository, &userRepository)
-	handlers := handlers.NewHandlers(c, authService)
-	middlewares := middlewares.NewAuthMiddleware(c, authService)
+	authHandlers := handlers.NewHandlers(c, authService)
+	authMiddlewares := middlewares.NewAuthMiddleware(c, authService)
 
 	githubProvider := github.NewOAuthGithubRepository(c)
 	githubUsecases := usecases.NewOAuthGithubUseCases(c, githubProvider, &userRepository, &refreshTokenRepository, &stateRepository)
@@ -33,8 +33,8 @@ func NewRegistry(c config.Config, db *gorm.DB) Registry {
 	githubMiddlewares := middlewares.NewOAuthGithubMiddlewares(c)
 
 	return Registry{
-		Handlers:         handlers,
-		Middlewares:      middlewares,
+		Handlers:         authHandlers,
+		Middlewares:      authMiddlewares,
 		OAuthHandlers:    githubHandlers,
 		OAuthMiddlewares: githubMiddlewares,
 	}

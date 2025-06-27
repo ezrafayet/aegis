@@ -9,6 +9,8 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
+// todo: remove dependency on domain
+
 func Generate(cClaims entities.CustomClaims, config entities.Config, issuedAt time.Time) (accessToken string, expiresAt int64, err error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	secondsOfValidity := config.JWT.AccessTokenExpirationMin * 60

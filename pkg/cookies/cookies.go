@@ -7,6 +7,8 @@ import (
 	"othnx/internal/domain/entities"
 )
 
+// todo: remove dependency on domain
+
 func NewAccessCookie(token string, expiresAt int64, config entities.Config) http.Cookie {
 	return newCookie("access_token", token, expiresAt, config)
 }

@@ -14,12 +14,12 @@ import (
 
 func Start() error {
 	fmt.Println(`
- ██████╗ ████████╗██╗  ██╗███╗   ██╗██╗  ██╗     █████╗ ██╗   ██╗████████╗██╗  ██╗
-██╔═══██╗╚══██╔══╝██║  ██║████╗  ██║╚██╗██╔╝    ██╔══██╗██║   ██║╚══██╔══╝██║  ██║
-██║   ██║   ██║   ███████║██╔██╗ ██║ ╚███╔╝     ███████║██║   ██║   ██║   ███████║
-██║   ██║   ██║   ██╔══██║██║╚██╗██║ ██╔██╗     ██╔══██║██║   ██║   ██║   ██╔══██║
-╚██████╔╝   ██║   ██║  ██║██║ ╚████║██╔╝ ██╗    ██║  ██║╚██████╔╝   ██║   ██║  ██║
- ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝    ╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝
+ █████╗ ███████╗ ██████╗ ██╗███████╗     ██████╗ ████████╗██╗  ██╗
+██╔══██╗██╔════╝██╔════╝ ██║██╔════╝    ██╔═████╗╚══██╔══╝██║  ██║
+███████║█████╗  ██║  ███╗██║███████╗    ██║██╔██║   ██║   ███████║
+██╔══██║██╔══╝  ██║   ██║██║╚════██║    ████╔╝██║   ██║   ██╔══██║
+██║  ██║███████╗╚██████╔╝██║███████║    ╚██████╔╝   ██║   ██║  ██║
+╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═╝╚══════╝     ╚═════╝    ╚═╝   ╚═╝  ╚═╝
 Drop-in auth service - no SaaS, no lock-in
 v0.x.x (needs to be injected)
 	`)
@@ -56,8 +56,25 @@ v0.x.x (needs to be injected)
 	}))
 
 	r := registry.NewRegistry(c, db)
-	r.GitHubRouter.AttachRoutes(e)
-	r.AuthRouter.AttachRoutes(e)
+
+	group := e.Group("/auth")
+
+	group.GET("/me", r.Handlers.GetSession, r.Middlewares.CheckAndRefreshToken)
+	group.GET("/refresh", r.Handlers.DoNothing, r.Middlewares.CheckAndForceRefreshToken)
+	group.GET("/logout", r.Handlers.Logout)
+	group.GET("/health", r.Handlers.DoNothing)
+
+	group.GET("/github", r.OAuthHandlers.GetAuthURL, r.OAuthMiddlewares.CheckAuthEnabled)
+	group.POST("/github/callback", r.OAuthHandlers.ExchangeCode, r.OAuthMiddlewares.CheckAuthEnabled)
+
+	// e.GET("/auth/me", r.Handlers.GetSession, r.Middlewares.CheckAndRefreshToken)
+	// e.GET("/auth/refresh", r.Handlers.DoNothing, r.Middlewares.CheckAndForceRefreshToken)
+	// e.GET("/auth/logout", r.Handlers.Logout)
+	// e.GET("/auth/health", r.Handlers.DoNothing)
+
+	// group := e.Group("/auth/github", r.AuthMiddleware.CheckAuthEnabled)
+	// group.GET("", r.Handlers.GetAuthURL)
+	// group.POST("/callback", r.Handlers.ExchangeCode)
 
 	return e.Start(fmt.Sprintf(":%d", c.App.Port))
 }

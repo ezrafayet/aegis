@@ -1,13 +1,13 @@
 package cookies
 
 import (
-	"othnx/internal/domain"
+	"othnx/internal/domain/entities"
 	"testing"
 )
 
 func TestNewCookie(t *testing.T) {
 	t.Run("basic test", func(t *testing.T) {
-		cookie := newCookie("access_token", "test_value", 1717795200, domain.Config{})
+		cookie := newCookie("access_token", "test_value", 1717795200, entities.Config{})
 		if cookie.Name != "access_token" {
 			t.Errorf("expected cookie name to be 'access_token', got %s", cookie.Name)
 		}
@@ -20,14 +20,14 @@ func TestNewCookie(t *testing.T) {
 	})
 
 	t.Run("is zero cookie detects a zero cookie", func(t *testing.T) {
-		cookie := NewAccessCookieZero(domain.Config{})
+		cookie := NewAccessCookieZero(entities.Config{})
 		if !IsZeroCookie(cookie) {
 			t.Errorf("expected cookie to be zero")
 		}
 	})
 
 	t.Run("is zero cookie detects a non-zero cookie", func(t *testing.T) {
-		cookie := NewAccessCookie("test_value", 1717795200, domain.Config{})
+		cookie := NewAccessCookie("test_value", 1717795200, entities.Config{})
 		if IsZeroCookie(cookie) {
 			t.Errorf("expected cookie to be non-zero")
 		}

@@ -19,12 +19,12 @@ type AuthMiddlewareInterface interface {
 
 type AuthMiddleware struct {
 	Config  entities.Config
-	Service primary.UseCasesInterface
+	Service primary.UseCasesExecutor
 }
 
 var _ AuthMiddlewareInterface = &AuthMiddleware{}
 
-func NewAuthMiddleware(c entities.Config, s primary.UseCasesInterface) AuthMiddleware {
+func NewAuthMiddleware(c entities.Config, s primary.UseCasesExecutor) AuthMiddleware {
 	return AuthMiddleware{
 		Config:  c,
 		Service: s,

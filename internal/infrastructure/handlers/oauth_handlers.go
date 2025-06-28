@@ -20,12 +20,12 @@ type OAuthHandlersInterface interface {
 
 type OAuthGithubHandlers struct {
 	Config  entities.Config
-	Service primary.OAuthUseCasesInterface
+	Service primary.OAuthUseCasesExecutor
 }
 
 var _ OAuthHandlersInterface = OAuthGithubHandlers{}
 
-func NewOAuthGithubHandlers(c entities.Config, s primary.OAuthUseCasesInterface) OAuthGithubHandlers {
+func NewOAuthGithubHandlers(c entities.Config, s primary.OAuthUseCasesExecutor) OAuthGithubHandlers {
 	return OAuthGithubHandlers{
 		Config:  c,
 		Service: s,

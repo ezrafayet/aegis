@@ -20,7 +20,7 @@ type OAuthGithubUseCases struct {
 	StateRepository        secondary.StateRepository
 }
 
-var _ primary.OAuthUseCasesInterface = OAuthGithubUseCases{}
+var _ primary.OAuthUseCasesExecutor = OAuthGithubUseCases{}
 
 func NewOAuthGithubUseCases(c entities.Config, p secondary.OAuthProviderRequests, userRepository secondary.UserRepository, refreshTokenRepository secondary.RefreshTokenRepository, stateRepository secondary.StateRepository) OAuthGithubUseCases {
 	return OAuthGithubUseCases{

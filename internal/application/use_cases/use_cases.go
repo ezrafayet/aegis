@@ -15,7 +15,7 @@ type UseCases struct {
 	UserRepository         secondary.UserRepository
 }
 
-var _ primary.UseCasesInterface = &UseCases{}
+var _ primary.UseCasesExecutor = &UseCases{}
 
 func NewService(c entities.Config, r secondary.RefreshTokenRepository, u secondary.UserRepository) UseCases {
 	return UseCases{

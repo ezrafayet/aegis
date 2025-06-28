@@ -2,7 +2,7 @@ package primary
 
 import "othnx/internal/domain/entities"
 
-type OAuthUseCasesInterface interface {
+type OAuthUseCasesExecutor interface {
 	// For handlers
 	GetAuthURL(redirectUri string) (string, error)
 	ExchangeCode(code, state string) (*entities.TokenPair, error)

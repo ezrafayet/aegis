@@ -17,7 +17,7 @@ type OAuthMiddlewaresInterface interface {
 
 type OAuthGithubMiddlewares struct {
 	Config  entities.Config
-	Service primary.OAuthUseCasesInterface
+	Service primary.OAuthUseCasesExecutor
 }
 
 var _ OAuthMiddlewaresInterface = OAuthGithubMiddlewares{}

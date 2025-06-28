@@ -19,12 +19,12 @@ type HandlersInterface interface {
 
 type Handlers struct {
 	Config  entities.Config
-	Service primary.UseCasesInterface
+	Service primary.UseCasesExecutor
 }
 
 var _ HandlersInterface = &Handlers{}
 
-func NewHandlers(c entities.Config, s primary.UseCasesInterface) Handlers {
+func NewHandlers(c entities.Config, s primary.UseCasesExecutor) Handlers {
 	return Handlers{
 		Config:  c,
 		Service: s,

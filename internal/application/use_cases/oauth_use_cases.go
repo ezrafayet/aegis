@@ -57,7 +57,7 @@ func (s OAuthGithubUseCases) ExchangeCode(code, state string) (*entities.TokenPa
 	if serverState.IsExpired() {
 		return nil, apperrors.ErrInvalidState
 	}
-	userInfos, err := s.Provider.GetUserInfos(code, state, "")
+	userInfos, err := s.Provider.ExchangeCodeForUserInfos(code, state, "")
 	if err != nil {
 		return nil, err
 	}

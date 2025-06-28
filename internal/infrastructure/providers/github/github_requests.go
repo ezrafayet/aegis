@@ -40,7 +40,7 @@ type gitHubEmail struct {
 	Verified bool   `json:"verified"`
 }
 
-func (p OAuthGithubRepository) GetUserInfos(code, state, redirectUri string) (*entities.UserInfos, error) {
+func (p OAuthGithubRepository) ExchangeCodeForUserInfos(code, state, redirectUri string) (*entities.UserInfos, error) {
 	// Step 1: get access token
 	data := map[string]string{
 		"client_id":     p.Config.Auth.Providers.GitHub.ClientID,

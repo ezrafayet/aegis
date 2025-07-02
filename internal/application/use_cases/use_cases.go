@@ -4,6 +4,7 @@ import (
 	"othnx/internal/domain/entities"
 	"othnx/internal/domain/ports/primary"
 	"othnx/internal/domain/ports/secondary"
+	"othnx/internal/domain/services"
 	"othnx/pkg/apperrors"
 	"othnx/pkg/jwtgen"
 	"time"
@@ -13,15 +14,18 @@ type UseCases struct {
 	Config                 entities.Config
 	RefreshTokenRepository secondary.RefreshTokenRepository
 	UserRepository         secondary.UserRepository
+	TokenService           *services.TokenService
 }
 
 var _ primary.UseCasesExecutor = &UseCases{}
 
 func NewService(c entities.Config, r secondary.RefreshTokenRepository, u secondary.UserRepository) UseCases {
+	tokenService := services.NewTokenService(r, c)
 	return UseCases{
 		Config:                 c,
 		RefreshTokenRepository: r,
 		UserRepository:         u,
+		TokenService:           tokenService,
 	}
 }
 
@@ -86,7 +90,7 @@ func (s UseCases) CheckAndRefreshToken(accessToken, refreshToken string, forceRe
 		return s.eraseTokens(err)
 	}
 	// todo device-id: pass one, since one session per device is allowed
-	accessToken, atExpiresAt, newRefreshToken, rtExpiresAt, err := GenerateTokensForUser(user, "device-id", s.Config, s.RefreshTokenRepository)
+	accessToken, atExpiresAt, newRefreshToken, rtExpiresAt, err := s.TokenService.GenerateTokensForUser(user, "device-id")
 	if err != nil {
 		return s.eraseTokens(err)
 	}

@@ -5,6 +5,7 @@ import (
 	"othnx/internal/domain/entities"
 	"othnx/internal/domain/ports/primary"
 	"othnx/internal/domain/ports/secondary"
+	"othnx/internal/domain/services"
 	"othnx/pkg/apperrors"
 	"othnx/pkg/tokengen"
 	"time"
@@ -18,17 +19,23 @@ type OAuthGithubUseCases struct {
 	UserRepository         secondary.UserRepository
 	RefreshTokenRepository secondary.RefreshTokenRepository
 	StateRepository        secondary.StateRepository
+	UserService            *services.UserService
+	TokenService           *services.TokenService
 }
 
 var _ primary.OAuthUseCasesExecutor = OAuthGithubUseCases{}
 
 func NewOAuthGithubUseCases(c entities.Config, p secondary.OAuthProviderRequests, userRepository secondary.UserRepository, refreshTokenRepository secondary.RefreshTokenRepository, stateRepository secondary.StateRepository) OAuthGithubUseCases {
+	userService := services.NewUserService(userRepository, c)
+	tokenService := services.NewTokenService(refreshTokenRepository, c)
 	return OAuthGithubUseCases{
 		Config:                 c,
 		Provider:               p,
 		UserRepository:         userRepository,
 		RefreshTokenRepository: refreshTokenRepository,
 		StateRepository:        stateRepository,
+		UserService:            userService,
+		TokenService:           tokenService,
 	}
 }
 
@@ -62,7 +69,7 @@ func (s OAuthGithubUseCases) ExchangeCode(code, state string) (*entities.TokenPa
 		return nil, err
 	}
 
-	user, err := GetOrCreateUserIfAllowed(s.UserRepository, userInfos, s.Config)
+	user, err := s.UserService.GetOrCreateUserIfAllowed(userInfos, "github")
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +79,7 @@ func (s OAuthGithubUseCases) ExchangeCode(code, state string) (*entities.TokenPa
 	}
 
 	// todo device-id: pass one, since one session per device is allowed
-	accessToken, atExpiresAt, newRefreshToken, rtExpiresAt, err := GenerateTokensForUser(user, "device-id", s.Config, s.RefreshTokenRepository)
+	accessToken, atExpiresAt, newRefreshToken, rtExpiresAt, err := s.TokenService.GenerateTokensForUser(user, "device-id")
 	if err != nil {
 		return nil, err
 	}

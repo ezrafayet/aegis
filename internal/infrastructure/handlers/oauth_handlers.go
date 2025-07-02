@@ -11,28 +11,26 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// some factory
-
 type OAuthHandlersInterface interface {
 	GetAuthURL(c echo.Context) error
 	ExchangeCode(c echo.Context) error
 }
 
-type OAuthGithubHandlers struct {
+type OAuthHandlers struct {
 	Config  entities.Config
 	Service primary.OAuthUseCasesExecutor
 }
 
-var _ OAuthHandlersInterface = OAuthGithubHandlers{}
+var _ OAuthHandlersInterface = OAuthHandlers{}
 
-func NewOAuthGithubHandlers(c entities.Config, s primary.OAuthUseCasesExecutor) OAuthGithubHandlers {
-	return OAuthGithubHandlers{
+func NewOAuthHandlers(c entities.Config, s primary.OAuthUseCasesExecutor) OAuthHandlers {
+	return OAuthHandlers{
 		Config:  c,
 		Service: s,
 	}
 }
 
-func (h OAuthGithubHandlers) GetAuthURL(c echo.Context) error {
+func (h OAuthHandlers) GetAuthURL(c echo.Context) error {
 	redirectUrl, err := h.Service.GetAuthURL(c.QueryParam("redirect_uri"))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "an error occurred"})
@@ -40,7 +38,7 @@ func (h OAuthGithubHandlers) GetAuthURL(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{"redirect_url": redirectUrl})
 }
 
-func (h OAuthGithubHandlers) ExchangeCode(c echo.Context) error {
+func (h OAuthHandlers) ExchangeCode(c echo.Context) error {
 	type ExchangeCodeRequest struct {
 		Code  string `json:"code"`
 		State string `json:"state"`

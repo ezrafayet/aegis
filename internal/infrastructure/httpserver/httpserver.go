@@ -64,8 +64,10 @@ v0.x.x (needs to be injected)
 	group.GET("/logout", r.Handlers.Logout)
 	group.GET("/health", r.Handlers.DoNothing)
 
-	group.GET("/github", r.OAuthHandlers.GetAuthURL, r.OAuthMiddlewares.CheckAuthEnabled)
-	group.POST("/github/callback", r.OAuthHandlers.ExchangeCode, r.OAuthMiddlewares.CheckAuthEnabled)
+	for _, provider := range r.Providers {
+		group.GET(fmt.Sprintf("/%s", provider.Name), provider.Handlers.GetAuthURL, provider.Middlewares.CheckAuthEnabled)
+		group.POST(fmt.Sprintf("/%s/callback", provider.Name), provider.Handlers.ExchangeCode, provider.Middlewares.CheckAuthEnabled)
+	}
 
 	// e.GET("/auth/me", r.Handlers.GetSession, r.Middlewares.CheckAndRefreshToken)
 	// e.GET("/auth/refresh", r.Handlers.DoNothing, r.Middlewares.CheckAndForceRefreshToken)

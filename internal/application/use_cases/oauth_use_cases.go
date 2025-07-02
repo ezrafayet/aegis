@@ -13,7 +13,7 @@ import (
 
 // todo: make this package a generic package for all oauth providers and a factory
 
-type OAuthGithubUseCases struct {
+type OAuthUseCases struct {
 	Config                 entities.Config
 	Provider               secondary.OAuthProviderRequests
 	UserRepository         secondary.UserRepository
@@ -23,12 +23,12 @@ type OAuthGithubUseCases struct {
 	TokenService           *services.TokenService
 }
 
-var _ primary.OAuthUseCasesExecutor = OAuthGithubUseCases{}
+var _ primary.OAuthUseCasesExecutor = OAuthUseCases{}
 
-func NewOAuthGithubUseCases(c entities.Config, p secondary.OAuthProviderRequests, userRepository secondary.UserRepository, refreshTokenRepository secondary.RefreshTokenRepository, stateRepository secondary.StateRepository) OAuthGithubUseCases {
+func NewOAuthGithubUseCases(c entities.Config, p secondary.OAuthProviderRequests, userRepository secondary.UserRepository, refreshTokenRepository secondary.RefreshTokenRepository, stateRepository secondary.StateRepository) OAuthUseCases {
 	userService := services.NewUserService(userRepository, c)
 	tokenService := services.NewTokenService(refreshTokenRepository, c)
-	return OAuthGithubUseCases{
+	return OAuthUseCases{
 		Config:                 c,
 		Provider:               p,
 		UserRepository:         userRepository,
@@ -40,7 +40,7 @@ func NewOAuthGithubUseCases(c entities.Config, p secondary.OAuthProviderRequests
 }
 
 // /!\ Can be abused to generate a lot of states - todo: fix
-func (s OAuthGithubUseCases) GetAuthURL(redirectUri string) (string, error) {
+func (s OAuthUseCases) GetAuthURL(redirectUri string) (string, error) {
 	state, err := tokengen.Generate("state_", 13)
 	if err != nil {
 		return "", err
@@ -48,6 +48,7 @@ func (s OAuthGithubUseCases) GetAuthURL(redirectUri string) (string, error) {
 	if err := s.StateRepository.CreateState(entities.NewState(state)); err != nil {
 		return "", err
 	}
+	// todo: to support multiple providers, we need to use a map of providers and their config
 	redirectURL := fmt.Sprintf(
 		"https://github.com/login/oauth/authorize?client_id=%s&scope=user:email&state=%s",
 		s.Config.Auth.Providers.GitHub.ClientID,
@@ -56,7 +57,7 @@ func (s OAuthGithubUseCases) GetAuthURL(redirectUri string) (string, error) {
 	return redirectURL, nil
 }
 
-func (s OAuthGithubUseCases) ExchangeCode(code, state string) (*entities.TokenPair, error) {
+func (s OAuthUseCases) ExchangeCode(code, state string) (*entities.TokenPair, error) {
 	serverState, err := s.StateRepository.GetAndDeleteState(state)
 	if err != nil {
 		return nil, apperrors.ErrInvalidState
@@ -69,12 +70,12 @@ func (s OAuthGithubUseCases) ExchangeCode(code, state string) (*entities.TokenPa
 		return nil, err
 	}
 
-	user, err := s.UserService.GetOrCreateUserIfAllowed(userInfos, "github")
+	user, err := s.UserService.GetOrCreateUserIfAllowed(userInfos, s.Provider.GetName())
 	if err != nil {
 		return nil, err
 	}
 
-	if user.AuthMethod != "github" {
+	if user.AuthMethod != s.Provider.GetName() {
 		return nil, apperrors.ErrWrongAuthMethod
 	}
 
@@ -92,8 +93,9 @@ func (s OAuthGithubUseCases) ExchangeCode(code, state string) (*entities.TokenPa
 	}, nil
 }
 
-func (s OAuthGithubUseCases) CheckAuthEnabled(provider string) bool {
-	switch provider {
+func (s OAuthUseCases) CheckAuthEnabled() bool {
+	// todo: move this logic somewhere more relevant
+	switch s.Provider.GetName() {
 	case "github":
 		return s.Config.Auth.Providers.GitHub.Enabled
 	default:

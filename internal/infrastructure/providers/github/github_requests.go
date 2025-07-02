@@ -10,6 +10,7 @@ import (
 )
 
 type OAuthGithubRepository struct {
+	Name   string
 	Config entities.Config
 }
 
@@ -17,6 +18,7 @@ var _ secondary.OAuthProviderRequests = OAuthGithubRepository{}
 
 func NewOAuthGithubRepository(c entities.Config) OAuthGithubRepository {
 	return OAuthGithubRepository{
+		Name:   "github",
 		Config: c,
 	}
 }
@@ -38,6 +40,10 @@ type gitHubEmail struct {
 	Email    string `json:"email"`
 	Primary  bool   `json:"primary"`
 	Verified bool   `json:"verified"`
+}
+
+func (p OAuthGithubRepository) GetName() string {
+	return p.Name
 }
 
 func (p OAuthGithubRepository) ExchangeCodeForUserInfos(code, state, redirectUri string) (*entities.UserInfos, error) {

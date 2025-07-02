@@ -1,7 +1,7 @@
 package registry
 
 import (
-	usecases "aegis/internal/application/use_cases"
+	"aegis/internal/application/use_cases"
 	"aegis/internal/domain/entities"
 	"aegis/internal/infrastructure/handlers"
 	"aegis/internal/infrastructure/middlewares"
@@ -14,8 +14,7 @@ import (
 type Registry struct {
 	Handlers         handlers.HandlersInterface
 	Middlewares      middlewares.AuthMiddlewareInterface
-	OAuthHandlers    handlers.OAuthGithubHandlers
-	OAuthMiddlewares middlewares.OAuthGithubMiddlewares
+	Providers []Provider
 }
 
 func NewRegistry(c entities.Config, db *gorm.DB) Registry {
@@ -27,15 +26,13 @@ func NewRegistry(c entities.Config, db *gorm.DB) Registry {
 	authHandlers := handlers.NewHandlers(c, authService)
 	authMiddlewares := middlewares.NewAuthMiddleware(c, authService)
 
-	githubProvider := github.NewOAuthGithubRepository(c)
-	githubUsecases := usecases.NewOAuthGithubUseCases(c, githubProvider, &userRepository, &refreshTokenRepository, &stateRepository)
-	githubHandlers := handlers.NewOAuthGithubHandlers(c, githubUsecases)
-	githubMiddlewares := middlewares.NewOAuthGithubMiddlewares(c)
+	providers := []Provider{
+		NewProvider(c, github.NewOAuthGithubRepository(c), &userRepository, &refreshTokenRepository, &stateRepository),
+	}
 
 	return Registry{
 		Handlers:         authHandlers,
 		Middlewares:      authMiddlewares,
-		OAuthHandlers:    githubHandlers,
-		OAuthMiddlewares: githubMiddlewares,
+		Providers:        providers,
 	}
 }

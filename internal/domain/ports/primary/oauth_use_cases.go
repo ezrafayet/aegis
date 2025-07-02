@@ -8,5 +8,5 @@ type OAuthUseCasesExecutor interface {
 	ExchangeCode(code, state string) (*entities.TokenPair, error)
 
 	// For middlewares
-	CheckAuthEnabled(provider string) bool
+	CheckAuthEnabled() bool
 }

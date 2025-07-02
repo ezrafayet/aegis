@@ -15,22 +15,22 @@ type OAuthMiddlewaresInterface interface {
 	CheckAuthEnabled(next echo.HandlerFunc) echo.HandlerFunc
 }
 
-type OAuthGithubMiddlewares struct {
+type OAuthMiddlewares struct {
 	Config  entities.Config
 	Service primary.OAuthUseCasesExecutor
 }
 
-var _ OAuthMiddlewaresInterface = OAuthGithubMiddlewares{}
+var _ OAuthMiddlewaresInterface = OAuthMiddlewares{}
 
-func NewOAuthGithubMiddlewares(c entities.Config) OAuthGithubMiddlewares {
-	return OAuthGithubMiddlewares{
+func NewOAuthMiddlewares(c entities.Config) OAuthMiddlewares {
+	return OAuthMiddlewares{
 		Config: c,
 	}
 }
 
-func (m OAuthGithubMiddlewares) CheckAuthEnabled(next echo.HandlerFunc) echo.HandlerFunc {
+func (m OAuthMiddlewares) CheckAuthEnabled(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if !m.Service.CheckAuthEnabled("github") {
+		if !m.Service.CheckAuthEnabled() {
 			return c.JSON(http.StatusForbidden, map[string]string{"error": apperrors.ErrAuthMethodNotEnabled.Error()})
 		}
 		return next(c)

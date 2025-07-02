@@ -1,6 +1,6 @@
 package secondary
 
-import "othnx/internal/domain/entities"
+import "aegis/internal/domain/entities"
 
 type RefreshTokenRepository interface {
 	CreateRefreshToken(refreshToken entities.RefreshToken) error

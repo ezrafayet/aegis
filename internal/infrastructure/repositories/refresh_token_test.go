@@ -1,9 +1,9 @@
 package repositories
 
 import (
+	"aegis/internal/domain/entities"
+	"aegis/pkg/fingerprint"
 	"fmt"
-	"othnx/internal/domain/entities"
-	"othnx/pkg/fingerprint"
 	"testing"
 	"time"
 

@@ -1,12 +1,12 @@
 package registry
 
 import (
-	"othnx/internal/application/use_cases"
-	"othnx/internal/domain/entities"
-	"othnx/internal/infrastructure/handlers"
-	"othnx/internal/infrastructure/middlewares"
-	"othnx/internal/infrastructure/providers/github"
-	"othnx/internal/infrastructure/repositories"
+	usecases "aegis/internal/application/use_cases"
+	"aegis/internal/domain/entities"
+	"aegis/internal/infrastructure/handlers"
+	"aegis/internal/infrastructure/middlewares"
+	"aegis/internal/infrastructure/providers/github"
+	"aegis/internal/infrastructure/repositories"
 
 	"gorm.io/gorm"
 )

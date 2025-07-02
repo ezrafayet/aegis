@@ -1,10 +1,10 @@
 package config
 
 import (
+	"aegis/internal/domain/entities"
 	"encoding/json"
 	"errors"
 	"os"
-	"othnx/internal/domain/entities"
 )
 
 func Read(configPath string) (entities.Config, error) {

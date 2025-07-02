@@ -1,8 +1,8 @@
 package database
 
 import (
+	"aegis/internal/domain/entities"
 	"fmt"
-	"othnx/internal/domain/entities"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

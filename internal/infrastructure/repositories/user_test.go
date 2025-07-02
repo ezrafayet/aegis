@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"othnx/internal/domain/entities"
+	"aegis/internal/domain/entities"
 	"testing"
 	"time"
 

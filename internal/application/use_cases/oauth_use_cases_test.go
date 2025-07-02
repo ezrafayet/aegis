@@ -1,11 +1,11 @@
 package usecases
 
 // import (
-// 	"othnx/internal/domain/entities"
-// 	"othnx/internal/domain/ports/secondary_ports"
-// 	"othnx/internal/infrastructure/config"
-// 	"othnx/internal/infrastructure/repositories"
-// 	"othnx/pkg/apperrors"
+// 	"aegis/internal/domain/entities"
+// 	"aegis/internal/domain/ports/secondary_ports"
+// 	"aegis/internal/infrastructure/config"
+// 	"aegis/internal/infrastructure/repositories"
+// 	"aegis/pkg/apperrors"
 // 	"testing"
 // 	"time"
 

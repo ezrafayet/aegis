@@ -1,12 +1,12 @@
 package handlers
 
 import (
+	"aegis/internal/domain/entities"
+	"aegis/internal/domain/ports/primary"
+	"aegis/pkg/apperrors"
+	"aegis/pkg/cookies"
 	"errors"
 	"net/http"
-	"othnx/internal/domain/entities"
-	"othnx/internal/domain/ports/primary"
-	"othnx/pkg/apperrors"
-	"othnx/pkg/cookies"
 
 	"github.com/labstack/echo/v4"
 )

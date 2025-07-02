@@ -1,8 +1,8 @@
 package jwtgen
 
 import (
-	"othnx/internal/domain/entities"
-	"othnx/pkg/apperrors"
+	"aegis/internal/domain/entities"
+	"aegis/pkg/apperrors"
 	"testing"
 	"time"
 )

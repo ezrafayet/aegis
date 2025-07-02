@@ -1,11 +1,11 @@
 package usecases
 
 import (
-	"othnx/internal/domain/entities"
-	"othnx/internal/domain/ports/secondary"
-	"othnx/pkg/apperrors"
-	"othnx/pkg/fingerprint"
-	"othnx/pkg/jwtgen"
+	"aegis/internal/domain/entities"
+	"aegis/internal/domain/ports/secondary"
+	"aegis/pkg/apperrors"
+	"aegis/pkg/fingerprint"
+	"aegis/pkg/jwtgen"
 	"time"
 )
 

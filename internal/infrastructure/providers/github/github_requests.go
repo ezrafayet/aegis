@@ -1,12 +1,12 @@
 package github
 
 import (
+	"aegis/internal/domain/entities"
+	"aegis/internal/domain/ports/secondary"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"othnx/internal/domain/entities"
-	"othnx/internal/domain/ports/secondary"
 )
 
 type OAuthGithubRepository struct {

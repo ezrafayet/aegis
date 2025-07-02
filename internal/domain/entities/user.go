@@ -1,8 +1,8 @@
 package entities
 
 import (
-	"othnx/pkg/fingerprint"
-	"othnx/pkg/uidgen"
+	"aegis/pkg/fingerprint"
+	"aegis/pkg/uidgen"
 	"time"
 )
 

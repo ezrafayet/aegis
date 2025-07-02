@@ -1,7 +1,7 @@
 package entities
 
 import (
-	"othnx/pkg/tokengen"
+	"aegis/pkg/tokengen"
 	"time"
 )
 

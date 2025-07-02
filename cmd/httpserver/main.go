@@ -1,8 +1,8 @@
 package main
 
 import (
+	"aegis/internal/infrastructure/httpserver"
 	"log"
-	"othnx/internal/infrastructure/httpserver"
 )
 
 func main() {

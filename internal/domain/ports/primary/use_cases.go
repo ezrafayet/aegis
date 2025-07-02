@@ -1,6 +1,6 @@
 package primary
 
-import "othnx/internal/domain/entities"
+import "aegis/internal/domain/entities"
 
 type UseCasesExecutor interface {
 	// For handlers

@@ -1,6 +1,6 @@
 package primary
 
-import "othnx/internal/domain/entities"
+import "aegis/internal/domain/entities"
 
 type OAuthUseCasesExecutor interface {
 	// For handlers

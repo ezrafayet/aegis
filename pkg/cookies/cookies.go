@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"othnx/internal/domain/entities"
+	"aegis/internal/domain/entities"
 )
 
 // todo: remove dependency on domain

@@ -1,10 +1,10 @@
 package middlewares
 
 import (
+	"aegis/internal/domain/entities"
+	"aegis/internal/domain/ports/primary"
+	"aegis/pkg/apperrors"
 	"net/http"
-	"othnx/internal/domain/entities"
-	"othnx/internal/domain/ports/primary"
-	"othnx/pkg/apperrors"
 
 	"github.com/labstack/echo/v4"
 )

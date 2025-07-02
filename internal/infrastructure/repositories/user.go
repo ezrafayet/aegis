@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"othnx/internal/domain/entities"
-	"othnx/internal/domain/ports/secondary"
-	"othnx/pkg/apperrors"
+	"aegis/internal/domain/entities"
+	"aegis/internal/domain/ports/secondary"
+	"aegis/pkg/apperrors"
 
 	"gorm.io/gorm"
 )

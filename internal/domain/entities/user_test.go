@@ -1,7 +1,7 @@
 package entities
 
 import (
-	"othnx/pkg/fingerprint"
+	"aegis/pkg/fingerprint"
 	"testing"
 )
 

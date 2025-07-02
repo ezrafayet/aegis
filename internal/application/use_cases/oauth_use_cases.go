@@ -1,13 +1,13 @@
 package usecases
 
 import (
+	"aegis/internal/domain/entities"
+	"aegis/internal/domain/ports/primary"
+	"aegis/internal/domain/ports/secondary"
+	"aegis/internal/domain/services"
+	"aegis/pkg/apperrors"
+	"aegis/pkg/tokengen"
 	"fmt"
-	"othnx/internal/domain/entities"
-	"othnx/internal/domain/ports/primary"
-	"othnx/internal/domain/ports/secondary"
-	"othnx/internal/domain/services"
-	"othnx/pkg/apperrors"
-	"othnx/pkg/tokengen"
 	"time"
 )
 

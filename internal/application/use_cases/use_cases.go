@@ -56,43 +56,48 @@ func (s UseCases) Logout(refreshToken string) (*entities.TokenPair, error) {
 }
 
 func (s UseCases) CheckAndRefreshToken(accessToken, refreshToken string, forceRefresh bool) (*entities.TokenPair, error) {
-	_, err := jwtgen.ReadClaims(accessToken, s.Config)
-	if err == nil && !forceRefresh {
-		return nil, nil
+	if accessToken != "" && !forceRefresh {
+		_, err := jwtgen.ReadClaims(accessToken, s.Config)
+		if err == nil {
+			return nil, nil
+		}
+		if err != nil && err.Error() != apperrors.ErrAccessTokenExpired.Error() {
+			return nil, err
+		}
 	}
-	if err != nil && err.Error() != apperrors.ErrAccessTokenExpired.Error() {
-		return s.eraseTokens(err)
+	if refreshToken == "" {
+		return nil, apperrors.ErrNoRefreshToken
 	}
 	refreshTokenObject, err := s.RefreshTokenRepository.GetRefreshTokenByToken(refreshToken)
 	if err != nil {
-		return s.eraseTokens(err)
+		return nil, err
 	}
 	if refreshTokenObject.IsExpired() {
-		return s.eraseTokens(apperrors.ErrRefreshTokenExpired)
+		return nil, apperrors.ErrRefreshTokenExpired
 	}
 	// todo: check device id
 	user, err := s.UserRepository.GetUserByID(refreshTokenObject.UserID)
 	if err != nil {
-		return s.eraseTokens(err)
+		return nil, err
 	}
 	if user.IsDeleted() {
-		return s.eraseTokens(apperrors.ErrUserDeleted)
+		return nil, apperrors.ErrUserDeleted
 	}
 	if user.IsBlocked() {
-		return s.eraseTokens(apperrors.ErrUserBlocked)
+		return nil, apperrors.ErrUserBlocked
 	}
 	if s.Config.App.EarlyAdoptersOnly && !user.IsEarlyAdopter() {
-		return s.eraseTokens(apperrors.ErrEarlyAdoptersOnly)
+		return nil, apperrors.ErrEarlyAdoptersOnly
 	}
 
 	err = s.RefreshTokenRepository.DeleteRefreshToken(refreshToken)
 	if err != nil {
-		return s.eraseTokens(err)
+		return nil, err
 	}
 	// todo device-id: pass one, since one session per device is allowed
 	accessToken, atExpiresAt, newRefreshToken, rtExpiresAt, err := s.TokenService.GenerateTokensForUser(user, "device-id")
 	if err != nil {
-		return s.eraseTokens(err)
+		return nil, err
 	}
 	return &entities.TokenPair{
 		AccessToken:           accessToken,

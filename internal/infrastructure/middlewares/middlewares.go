@@ -33,15 +33,15 @@ func NewAuthMiddleware(c entities.Config, s primary.UseCasesInterface) AuthMiddl
 
 func (m AuthMiddleware) CheckAndRefreshToken(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		accessToken, err := c.Cookie("access_token")
-		if err != nil {
-			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrGeneric.Error()})
+		accessTokenValue := ""
+		if accessToken, err := c.Cookie("access_token"); err == nil {
+			accessTokenValue = accessToken.Value
 		}
-		refreshToken, err := c.Cookie("refresh_token")
-		if err != nil {
-			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrGeneric.Error()})
+		refreshTokenValue := ""
+		if refreshToken, err := c.Cookie("refresh_token"); err == nil {
+			refreshTokenValue = refreshToken.Value
 		}
-		tokensPair, err := m.Service.CheckAndRefreshToken(accessToken.Value, refreshToken.Value, false)
+		tokensPair, err := m.Service.CheckAndRefreshToken(accessTokenValue, refreshTokenValue, false)
 		if tokensPair != nil {
 			accessCookie := cookies.NewAccessCookie(tokensPair.AccessToken, tokensPair.AccessTokenExpiresAt.Unix(), m.Config)
 			refreshCookie := cookies.NewRefreshCookie(tokensPair.RefreshToken, tokensPair.RefreshTokenExpiresAt.Unix(), m.Config)
@@ -69,15 +69,15 @@ func (m AuthMiddleware) CheckAndRefreshToken(next echo.HandlerFunc) echo.Handler
 
 func (m AuthMiddleware) CheckAndForceRefreshToken(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		accessToken, err := c.Cookie("access_token")
-		if err != nil {
-			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrGeneric.Error()})
+		accessTokenValue := ""
+		if accessToken, err := c.Cookie("access_token"); err == nil {
+			accessTokenValue = accessToken.Value
 		}
-		refreshToken, err := c.Cookie("refresh_token")
-		if err != nil {
-			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrGeneric.Error()})
+		refreshTokenValue := ""
+		if refreshToken, err := c.Cookie("refresh_token"); err == nil {
+			refreshTokenValue = refreshToken.Value
 		}
-		tokensPair, err := m.Service.CheckAndRefreshToken(accessToken.Value, refreshToken.Value, true)
+		tokensPair, err := m.Service.CheckAndRefreshToken(accessTokenValue, refreshTokenValue, true)
 		if tokensPair != nil {
 			accessCookie := cookies.NewAccessCookie(tokensPair.AccessToken, tokensPair.AccessTokenExpiresAt.Unix(), m.Config)
 			refreshCookie := cookies.NewRefreshCookie(tokensPair.RefreshToken, tokensPair.RefreshTokenExpiresAt.Unix(), m.Config)

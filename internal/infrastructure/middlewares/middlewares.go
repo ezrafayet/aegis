@@ -43,8 +43,10 @@ func (m AuthMiddleware) CheckAndRefreshToken(next echo.HandlerFunc) echo.Handler
 		}
 		tokensPair, err := m.Service.CheckAndRefreshToken(accessToken.Value, refreshToken.Value, false)
 		if tokensPair != nil {
-			cookies.NewAccessCookie(tokensPair.AccessToken, tokensPair.AccessTokenExpiresAt.Unix(), m.Config)
-			cookies.NewRefreshCookie(tokensPair.RefreshToken, tokensPair.RefreshTokenExpiresAt.Unix(), m.Config)
+			accessCookie := cookies.NewAccessCookie(tokensPair.AccessToken, tokensPair.AccessTokenExpiresAt.Unix(), m.Config)
+			refreshCookie := cookies.NewRefreshCookie(tokensPair.RefreshToken, tokensPair.RefreshTokenExpiresAt.Unix(), m.Config)
+			c.SetCookie(&accessCookie)
+			c.SetCookie(&refreshCookie)
 		}
 		if err != nil {
 			if errors.Is(err, apperrors.ErrAccessTokenInvalid) {
@@ -77,8 +79,10 @@ func (m AuthMiddleware) CheckAndForceRefreshToken(next echo.HandlerFunc) echo.Ha
 		}
 		tokensPair, err := m.Service.CheckAndRefreshToken(accessToken.Value, refreshToken.Value, true)
 		if tokensPair != nil {
-			cookies.NewAccessCookie(tokensPair.AccessToken, tokensPair.AccessTokenExpiresAt.Unix(), m.Config)
-			cookies.NewRefreshCookie(tokensPair.RefreshToken, tokensPair.RefreshTokenExpiresAt.Unix(), m.Config)
+			accessCookie := cookies.NewAccessCookie(tokensPair.AccessToken, tokensPair.AccessTokenExpiresAt.Unix(), m.Config)
+			refreshCookie := cookies.NewRefreshCookie(tokensPair.RefreshToken, tokensPair.RefreshTokenExpiresAt.Unix(), m.Config)
+			c.SetCookie(&accessCookie)
+			c.SetCookie(&refreshCookie)
 		}
 		if err != nil {
 			if errors.Is(err, apperrors.ErrAccessTokenInvalid) {

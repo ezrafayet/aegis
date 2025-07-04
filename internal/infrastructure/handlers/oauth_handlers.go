@@ -61,8 +61,11 @@ func (h OAuthHandlers) ExchangeCode(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": apperrors.ErrGeneric.Error()})
 	}
 	if tokensPair != nil {
-		cookies.NewAccessCookie(tokensPair.AccessToken, tokensPair.AccessTokenExpiresAt.Unix(), h.Config)
-		cookies.NewRefreshCookie(tokensPair.RefreshToken, tokensPair.RefreshTokenExpiresAt.Unix(), h.Config)
+		accessCookie := cookies.NewAccessCookie(tokensPair.AccessToken, tokensPair.AccessTokenExpiresAt.Unix(), h.Config)
+		refreshCookie := cookies.NewRefreshCookie(tokensPair.RefreshToken, tokensPair.RefreshTokenExpiresAt.Unix(), h.Config)
+
+		c.SetCookie(&accessCookie)
+		c.SetCookie(&refreshCookie)
 	}
 	return c.NoContent(http.StatusOK)
 }

@@ -60,8 +60,10 @@ func (h Handlers) Logout(c echo.Context) error {
 	}
 	tokensPair, err := h.Service.Logout(refreshToken)
 	if tokensPair != nil {
-		cookies.NewAccessCookie(tokensPair.AccessToken, tokensPair.AccessTokenExpiresAt.Unix(), h.Config)
-		cookies.NewRefreshCookie(tokensPair.RefreshToken, tokensPair.RefreshTokenExpiresAt.Unix(), h.Config)
+		accessCookie := cookies.NewAccessCookie(tokensPair.AccessToken, tokensPair.AccessTokenExpiresAt.Unix(), h.Config)
+		refreshCookie := cookies.NewRefreshCookie(tokensPair.RefreshToken, tokensPair.RefreshTokenExpiresAt.Unix(), h.Config)
+		c.SetCookie(&accessCookie)
+		c.SetCookie(&refreshCookie)
 	}
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": apperrors.ErrGeneric.Error()})

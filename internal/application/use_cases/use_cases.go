@@ -58,7 +58,7 @@ func (s UseCases) Logout(refreshToken string) (*entities.TokenPair, error) {
 func (s UseCases) CheckAndRefreshToken(accessToken, refreshToken string, forceRefresh bool) (*entities.TokenPair, error) {
 	_, err := jwtgen.ReadClaims(accessToken, s.Config)
 	if err == nil && !forceRefresh {
-		return s.eraseTokens(nil)
+		return nil, nil
 	}
 	if err != nil && err.Error() != apperrors.ErrAccessTokenExpired.Error() {
 		return s.eraseTokens(err)

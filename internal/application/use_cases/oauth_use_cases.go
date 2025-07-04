@@ -7,7 +7,6 @@ import (
 	"aegis/internal/domain/services"
 	"aegis/pkg/apperrors"
 	"aegis/pkg/tokengen"
-	"fmt"
 	"time"
 )
 
@@ -15,7 +14,7 @@ import (
 
 type OAuthUseCases struct {
 	Config                 entities.Config
-	Provider               secondary.OAuthProviderRequests
+	Provider               secondary.OAuthProviderInterface
 	UserRepository         secondary.UserRepository
 	RefreshTokenRepository secondary.RefreshTokenRepository
 	StateRepository        secondary.StateRepository
@@ -23,9 +22,15 @@ type OAuthUseCases struct {
 	TokenService           *services.TokenService
 }
 
-var _ primary.OAuthUseCasesExecutor = OAuthUseCases{}
+var _ primary.OAuthUseCasesInterface = OAuthUseCases{}
 
-func NewOAuthGithubUseCases(c entities.Config, p secondary.OAuthProviderRequests, userRepository secondary.UserRepository, refreshTokenRepository secondary.RefreshTokenRepository, stateRepository secondary.StateRepository) OAuthUseCases {
+func NewOAuthGithubUseCases(
+	c entities.Config,
+	p secondary.OAuthProviderInterface,
+	userRepository secondary.UserRepository,
+	refreshTokenRepository secondary.RefreshTokenRepository,
+	stateRepository secondary.StateRepository,
+) OAuthUseCases {
 	userService := services.NewUserService(userRepository, c)
 	tokenService := services.NewTokenService(refreshTokenRepository, c)
 	return OAuthUseCases{
@@ -48,12 +53,10 @@ func (s OAuthUseCases) GetAuthURL(redirectUri string) (string, error) {
 	if err := s.StateRepository.CreateState(entities.NewState(state)); err != nil {
 		return "", err
 	}
-	// todo: to support multiple providers, we need to use a map of providers and their config
-	redirectURL := fmt.Sprintf(
-		"https://github.com/login/oauth/authorize?client_id=%s&scope=user:email&state=%s",
-		s.Config.Auth.Providers.GitHub.ClientID,
-		state,
-	)
+	redirectURL, err := s.Provider.GetOauthRedirectURL(redirectUri, state)
+	if err != nil {
+		return "", err
+	}
 	return redirectURL, nil
 }
 
@@ -93,12 +96,6 @@ func (s OAuthUseCases) ExchangeCode(code, state string) (*entities.TokenPair, er
 	}, nil
 }
 
-func (s OAuthUseCases) CheckAuthEnabled() bool {
-	// todo: move this logic somewhere more relevant
-	switch s.Provider.GetName() {
-	case "github":
-		return s.Config.Auth.Providers.GitHub.Enabled
-	default:
-		return false
-	}
+func (s OAuthUseCases) CheckAuthEnabled() (bool, error) {
+	return s.Provider.IsEnabled()
 }

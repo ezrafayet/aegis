@@ -18,12 +18,12 @@ type OAuthHandlersInterface interface {
 
 type OAuthHandlers struct {
 	Config  entities.Config
-	Service primary.OAuthUseCasesExecutor
+	Service primary.OAuthUseCasesInterface
 }
 
 var _ OAuthHandlersInterface = OAuthHandlers{}
 
-func NewOAuthHandlers(c entities.Config, s primary.OAuthUseCasesExecutor) OAuthHandlers {
+func NewOAuthHandlers(c entities.Config, s primary.OAuthUseCasesInterface) OAuthHandlers {
 	return OAuthHandlers{
 		Config:  c,
 		Service: s,

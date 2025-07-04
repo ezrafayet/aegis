@@ -12,9 +12,9 @@ import (
 )
 
 type Registry struct {
-	Handlers         handlers.HandlersInterface
-	Middlewares      middlewares.AuthMiddlewareInterface
-	Providers []Provider
+	Handlers    handlers.HandlersInterface
+	Middlewares middlewares.AuthMiddlewareInterface
+	Providers   []Provider
 }
 
 func NewRegistry(c entities.Config, db *gorm.DB) Registry {
@@ -31,8 +31,8 @@ func NewRegistry(c entities.Config, db *gorm.DB) Registry {
 	}
 
 	return Registry{
-		Handlers:         authHandlers,
-		Middlewares:      authMiddlewares,
-		Providers:        providers,
+		Handlers:    authHandlers,
+		Middlewares: authMiddlewares,
+		Providers:   providers,
 	}
 }

@@ -9,15 +9,13 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// some factory
-
 type OAuthMiddlewaresInterface interface {
 	CheckAuthEnabled(next echo.HandlerFunc) echo.HandlerFunc
 }
 
 type OAuthMiddlewares struct {
 	Config  entities.Config
-	Service primary.OAuthUseCasesExecutor
+	Service primary.OAuthUseCasesInterface
 }
 
 var _ OAuthMiddlewaresInterface = OAuthMiddlewares{}
@@ -30,7 +28,11 @@ func NewOAuthMiddlewares(c entities.Config) OAuthMiddlewares {
 
 func (m OAuthMiddlewares) CheckAuthEnabled(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if !m.Service.CheckAuthEnabled() {
+		enabled, err := m.Service.CheckAuthEnabled()
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": apperrors.ErrGeneric.Error()})
+		}
+		if !enabled {
 			return c.JSON(http.StatusForbidden, map[string]string{"error": apperrors.ErrAuthMethodNotEnabled.Error()})
 		}
 		return next(c)

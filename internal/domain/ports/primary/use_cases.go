@@ -2,11 +2,16 @@ package primary
 
 import "aegis/internal/domain/entities"
 
-type UseCasesExecutor interface {
-	// For handlers
+type UseCasesForHandlers interface {
 	GetSession(accessToken string) (entities.Session, error)
 	Logout(refreshToken string) (*entities.TokenPair, error)
+}
 
-	// For middlewares
+type UseCasesForMiddlewares interface {
 	CheckAndRefreshToken(accessToken, refreshToken string, forceRefresh bool) (*entities.TokenPair, error)
+}
+
+type UseCasesInterface interface {
+	UseCasesForHandlers
+	UseCasesForMiddlewares
 }

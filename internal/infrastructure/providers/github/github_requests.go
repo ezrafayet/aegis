@@ -14,7 +14,7 @@ type OAuthGithubRepository struct {
 	Config entities.Config
 }
 
-var _ secondary.OAuthProviderRequests = OAuthGithubRepository{}
+var _ secondary.OAuthProviderInterface = OAuthGithubRepository{}
 
 func NewOAuthGithubRepository(c entities.Config) OAuthGithubRepository {
 	return OAuthGithubRepository{
@@ -40,6 +40,18 @@ type gitHubEmail struct {
 	Email    string `json:"email"`
 	Primary  bool   `json:"primary"`
 	Verified bool   `json:"verified"`
+}
+
+func (p OAuthGithubRepository) IsEnabled() (bool, error) {
+	return p.Config.Auth.Providers.GitHub.Enabled, nil
+}
+
+func (p OAuthGithubRepository) GetOauthRedirectURL(redirectUrl, state string) (string, error) {
+	return fmt.Sprintf(
+		"https://github.com/login/oauth/authorize?client_id=%s&scope=user:email&state=%s",
+		p.Config.Auth.Providers.GitHub.ClientID,
+		state,
+	), nil
 }
 
 func (p OAuthGithubRepository) GetName() string {

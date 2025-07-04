@@ -17,7 +17,7 @@ type UseCases struct {
 	TokenService           *services.TokenService
 }
 
-var _ primary.UseCasesExecutor = &UseCases{}
+var _ primary.UseCasesInterface = &UseCases{}
 
 func NewService(c entities.Config, r secondary.RefreshTokenRepository, u secondary.UserRepository) UseCases {
 	tokenService := services.NewTokenService(r, c)

@@ -43,10 +43,13 @@ type gitHubEmail struct {
 }
 
 func (p OAuthGithubRepository) IsEnabled() (bool, error) {
+	fmt.Println("Config hit")
+	fmt.Println("IsEnabled", p.Config.Auth.Providers.GitHub.Enabled)
 	return p.Config.Auth.Providers.GitHub.Enabled, nil
 }
 
 func (p OAuthGithubRepository) GetOauthRedirectURL(redirectUrl, state string) (string, error) {
+	fmt.Println("GetOauthRedirectURL", redirectUrl, state, p.Config.Auth.Providers.GitHub.ClientID)
 	return fmt.Sprintf(
 		"https://github.com/login/oauth/authorize?client_id=%s&scope=user:email&state=%s",
 		p.Config.Auth.Providers.GitHub.ClientID,
@@ -55,6 +58,7 @@ func (p OAuthGithubRepository) GetOauthRedirectURL(redirectUrl, state string) (s
 }
 
 func (p OAuthGithubRepository) GetName() string {
+	fmt.Println("GetName", p.Name)
 	return p.Name
 }
 

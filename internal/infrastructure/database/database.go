@@ -16,7 +16,7 @@ func Connect(c entities.Config) (*gorm.DB, error) {
 		fmt.Println("Connected to database")
 	}
 
-	if err := db.AutoMigrate(&entities.User{}, &entities.RefreshToken{}, &entities.State{}); err != nil {
+	if err := Migrate(db); err != nil {
 		return nil, fmt.Errorf("failed to run database migrations: %w", err)
 	}
 
@@ -24,5 +24,10 @@ func Connect(c entities.Config) (*gorm.DB, error) {
 }
 
 func Migrate(db *gorm.DB) error {
-	return db.AutoMigrate(&entities.User{}, &entities.RefreshToken{}, &entities.State{})
+	return db.AutoMigrate(
+		&entities.User{},
+		&entities.Role{},
+		&entities.State{},
+		&entities.RefreshToken{},
+	)
 }

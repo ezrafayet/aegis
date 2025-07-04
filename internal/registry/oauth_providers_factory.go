@@ -23,7 +23,7 @@ func NewProvider(
 ) Provider {
 	service := usecases.NewOAuthGithubUseCases(c, provider, userRepository, refreshTokenRepository, stateRepository)
 	handlers := handlers.NewOAuthHandlers(c, service)
-	middlewares := middlewares.NewOAuthMiddlewares(c)
+	middlewares := middlewares.NewOAuthMiddlewares(c, service)
 
 	return Provider{
 		Name:        provider.GetName(),

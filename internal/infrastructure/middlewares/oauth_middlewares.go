@@ -20,9 +20,10 @@ type OAuthMiddlewares struct {
 
 var _ OAuthMiddlewaresInterface = OAuthMiddlewares{}
 
-func NewOAuthMiddlewares(c entities.Config) OAuthMiddlewares {
+func NewOAuthMiddlewares(c entities.Config, s primary.OAuthUseCasesInterface) OAuthMiddlewares {
 	return OAuthMiddlewares{
-		Config: c,
+		Config:  c,
+		Service: s,
 	}
 }
 

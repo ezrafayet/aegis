@@ -180,3 +180,10 @@ Also it won't support passwords since it is bad practise.
 **Prevention Needed**:
 - **Secret validation**: Ensure JWT secrets are at least 32 characters
 - **Entropy checking**: Validate secret randomness
+
+# Publish a new version on Docker Hub
+
+```
+sudo docker build -t ezrafayet/aegis:v0.3.0 .
+sudo docker push ezrafayet/aegis:v0.3.0
+```

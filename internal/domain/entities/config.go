@@ -7,11 +7,15 @@ type Config struct {
 		// URL of the application (main domain)
 		URL string `json:"url"`
 		// Allowed origins for the application (CORS)
-		AllowedOrigins []string `json:"allowed_origins"`
-		// API keys for the application (internal requests)
-		APIKeys []string `json:"api_keys"`
+		CorsAllowedOrigins []string `json:"cors_allowed_origins"`
 		// New users need to be approved by an admin
 		EarlyAdoptersOnly bool `json:"early_adopters_only"`
+		// Redirect URL after successful login
+		RedirectAfterSuccess string `json:"redirect_after_success"`
+		// Redirect URL after login error
+		RedirectAfterError string `json:"redirect_after_error"`
+		// API keys for the application (internal requests)
+		InternalAPIKeys []string `json:"internal_api_keys"`
 		// Port on which the service must run
 		Port int `json:"port"`
 	} `json:"app"`
@@ -31,14 +35,12 @@ type Config struct {
 				AppName      string `json:"app_name"`
 				ClientID     string `json:"client_id"`
 				ClientSecret string `json:"client_secret"`
-				RedirectURL  string `json:"redirect_url"`
 			} `json:"github"`
 			Discord struct {
 				Enabled      bool   `json:"enabled"`
 				AppName      string `json:"app_name"`
 				ClientID     string `json:"client_id"`
 				ClientSecret string `json:"client_secret"`
-				RedirectURL  string `json:"redirect_url"`
 			} `json:"discord"`
 		} `json:"providers"`
 	} `json:"auth"`

@@ -5,6 +5,7 @@ import (
 	"aegis/internal/domain/ports/primary"
 	"aegis/pkg/apperrors"
 	"aegis/pkg/cookies"
+	"aegis/pkg/urlbuilder"
 	"errors"
 	"net/http"
 
@@ -39,26 +40,35 @@ func (h OAuthHandlers) GetAuthURL(c echo.Context) error {
 }
 
 func (h OAuthHandlers) ExchangeCode(c echo.Context) error {
-	type ExchangeCodeRequest struct {
-		Code  string `json:"code"`
-		State string `json:"state"`
+	code := c.QueryParam("code")
+	state := c.QueryParam("state")
+	error := c.QueryParam("error")
+	if error != "" {
+		redirectURL, err := urlbuilder.Build(h.Config.App.RedirectAfterError, "", map[string]string{"error": error})
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "an error occurred"})
+		}
+		return c.Redirect(http.StatusFound, redirectURL)
 	}
-	var body ExchangeCodeRequest
-	if err := c.Bind(&body); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid request"})
-	}
-	tokensPair, err := h.Service.ExchangeCode(body.Code, body.State)
+	tokensPair, err := h.Service.ExchangeCode(code, state)
 	if err != nil {
-		if errors.Is(err, apperrors.ErrEarlyAdoptersOnly) {
-			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrEarlyAdoptersOnly.Error()})
+		var errorType string
+		if errors.Is(err, apperrors.ErrWrongAuthMethod) {
+			errorType = "wrong_auth_method"
+		} else if errors.Is(err, apperrors.ErrEarlyAdoptersOnly) {
+			errorType = "early_adopters_only"
+		} else if errors.Is(err, apperrors.ErrUserBlocked) {
+			errorType = "user_blocked"
+		} else if errors.Is(err, apperrors.ErrUserDeleted) {
+			errorType = "user_deleted"
+		} else {
+			errorType = "unknown_error"
 		}
-		if errors.Is(err, apperrors.ErrUserBlocked) {
-			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrUserBlocked.Error()})
+		redirectURL, err := urlbuilder.Build(h.Config.App.RedirectAfterError, "", map[string]string{"error": errorType})
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "an error occurred"})
 		}
-		if errors.Is(err, apperrors.ErrUserDeleted) {
-			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrUserDeleted.Error()})
-		}
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": apperrors.ErrGeneric.Error()})
+		return c.Redirect(http.StatusFound, redirectURL)
 	}
 	if tokensPair != nil {
 		accessCookie := cookies.NewAccessCookie(tokensPair.AccessToken, tokensPair.AccessTokenExpiresAt.Unix(), h.Config)
@@ -67,5 +77,5 @@ func (h OAuthHandlers) ExchangeCode(c echo.Context) error {
 		c.SetCookie(&accessCookie)
 		c.SetCookie(&refreshCookie)
 	}
-	return c.NoContent(http.StatusOK)
+	return c.Redirect(http.StatusFound, h.Config.App.RedirectAfterSuccess)
 }

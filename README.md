@@ -46,9 +46,13 @@ COPY ./config.json /app/config.json
 {
     "app": {
         "name": "MyApp",
-        "url": "app.localhost:5000",
-        "allowed_origins": ["http://app.localhost:5000"],
-        "api_keys": ["xxxxxxxxxxxx"],
+        // the url will be used for oauth callbacks, ex: http://app.localhost:5000/auth/github/callback
+        "url": "http://app.localhost:5000",
+        "cors_allowed_origins": ["http://app.localhost:5000"],
+        "early_adopters_only": false,
+        "redirect_after_success": "http://app.localhost:5000/login-success",
+        "redirect_after_error": "http://app.localhost:5000/login-error",
+        "internal_api_keys": ["xxxxxxxxxxxx"],
         "port": 5666
     },
     "db": {
@@ -65,15 +69,13 @@ COPY ./config.json /app/config.json
                 "enabled": true,
                 "app_name": "MyApp",
                 "client_id": "xxxxxxxxxxxx",
-                "client_secret": "xxxxxxxxxxxx",
-                "redirect_url": "http://app.localhost:5000/oauth/github/callback"
+                "client_secret": "xxxxxxxxxxxx"
             },
             "discord": {
                 "enabled": true,
                 "app_name": "MyApp",
                 "client_id": "xxxxxxxxxxxx",
-                "client_secret": "xxxxxxxxxxxx",
-                "redirect_url": "http://app.localhost:5000/oauth/github/callback"
+                "client_secret": "xxxxxxxxxxxx"
             }
         }
     },

@@ -39,26 +39,27 @@ func (h OAuthHandlers) GetAuthURL(c echo.Context) error {
 }
 
 func (h OAuthHandlers) ExchangeCode(c echo.Context) error {
-	type ExchangeCodeRequest struct {
-		Code  string `json:"code"`
-		State string `json:"state"`
+	code := c.QueryParam("code")
+	state := c.QueryParam("state")
+	error := c.QueryParam("error")
+	if error != "" {
+		return c.Redirect(http.StatusFound, h.Config.App.RedirectAfterError)
 	}
-	var body ExchangeCodeRequest
-	if err := c.Bind(&body); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid request"})
-	}
-	tokensPair, err := h.Service.ExchangeCode(body.Code, body.State)
+	tokensPair, err := h.Service.ExchangeCode(code, state)
 	if err != nil {
+		if errors.Is(err, apperrors.ErrWrongAuthMethod) {
+			return c.Redirect(http.StatusFound, h.Config.App.RedirectAfterError)
+		}
 		if errors.Is(err, apperrors.ErrEarlyAdoptersOnly) {
-			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrEarlyAdoptersOnly.Error()})
+			return c.Redirect(http.StatusFound, h.Config.App.RedirectAfterError)
 		}
 		if errors.Is(err, apperrors.ErrUserBlocked) {
-			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrUserBlocked.Error()})
+			return c.Redirect(http.StatusFound, h.Config.App.RedirectAfterError)
 		}
 		if errors.Is(err, apperrors.ErrUserDeleted) {
-			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrUserDeleted.Error()})
+			return c.Redirect(http.StatusFound, h.Config.App.RedirectAfterError)
 		}
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": apperrors.ErrGeneric.Error()})
+		return c.Redirect(http.StatusFound, h.Config.App.RedirectAfterError)
 	}
 	if tokensPair != nil {
 		accessCookie := cookies.NewAccessCookie(tokensPair.AccessToken, tokensPair.AccessTokenExpiresAt.Unix(), h.Config)
@@ -67,5 +68,5 @@ func (h OAuthHandlers) ExchangeCode(c echo.Context) error {
 		c.SetCookie(&accessCookie)
 		c.SetCookie(&refreshCookie)
 	}
-	return c.NoContent(http.StatusOK)
+	return c.Redirect(http.StatusFound, h.Config.App.RedirectAfterSuccess)
 }

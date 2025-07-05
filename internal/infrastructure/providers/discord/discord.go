@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 )
 
 type OAuthDiscordRepository struct {
@@ -47,10 +48,15 @@ func (p OAuthDiscordRepository) IsEnabled() (bool, error) {
 }
 
 func (p OAuthDiscordRepository) GetOauthRedirectURL(state string) (string, error) {
+	base, err := url.Parse(p.Config.App.URL)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse base URL: %w", err)
+	}
+	joined := base.JoinPath("/auth/discord/callback").String()
 	return fmt.Sprintf(
 		"https://discord.com/api/oauth2/authorize?client_id=%s&redirect_uri=%s&response_type=code&scope=identify%%20email&state=%s",
 		p.Config.Auth.Providers.Discord.ClientID,
-		p.Config.Auth.Providers.Discord.RedirectURL,
+		joined,
 		state,
 	), nil
 }
@@ -61,6 +67,11 @@ func (p OAuthDiscordRepository) GetName() string {
 }
 
 func (p OAuthDiscordRepository) ExchangeCodeForUserInfos(code, state string) (*entities.UserInfos, error) {
+	base, err := url.Parse(p.Config.App.URL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse base URL: %w", err)
+	}
+	joined := base.JoinPath("/auth/discord/callback").String()
 
 	// Step 1: get access token
 	data := map[string]string{
@@ -68,7 +79,7 @@ func (p OAuthDiscordRepository) ExchangeCodeForUserInfos(code, state string) (*e
 		"client_secret": p.Config.Auth.Providers.Discord.ClientSecret,
 		"grant_type":    "authorization_code",
 		"code":          code,
-		"redirect_uri":  p.Config.Auth.Providers.Discord.RedirectURL,
+		"redirect_uri":  joined,
 	}
 
 	// Convert data to form-encoded format

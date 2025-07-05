@@ -5,6 +5,7 @@ import (
 	"aegis/internal/domain/ports/primary"
 	"aegis/pkg/apperrors"
 	"aegis/pkg/cookies"
+	"aegis/pkg/urlbuilder"
 	"errors"
 	"net/http"
 
@@ -43,23 +44,31 @@ func (h OAuthHandlers) ExchangeCode(c echo.Context) error {
 	state := c.QueryParam("state")
 	error := c.QueryParam("error")
 	if error != "" {
-		return c.Redirect(http.StatusFound, h.Config.App.RedirectAfterError)
+		redirectURL, err := urlbuilder.Build(h.Config.App.RedirectAfterError, "", map[string]string{"error": error})
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "an error occurred"})
+		}
+		return c.Redirect(http.StatusFound, redirectURL)
 	}
 	tokensPair, err := h.Service.ExchangeCode(code, state)
 	if err != nil {
+		var errorType string
 		if errors.Is(err, apperrors.ErrWrongAuthMethod) {
-			return c.Redirect(http.StatusFound, h.Config.App.RedirectAfterError)
+			errorType = "wrong_auth_method"
+		} else if errors.Is(err, apperrors.ErrEarlyAdoptersOnly) {
+			errorType = "early_adopters_only"
+		} else if errors.Is(err, apperrors.ErrUserBlocked) {
+			errorType = "user_blocked"
+		} else if errors.Is(err, apperrors.ErrUserDeleted) {
+			errorType = "user_deleted"
+		} else {
+			errorType = "unknown_error"
 		}
-		if errors.Is(err, apperrors.ErrEarlyAdoptersOnly) {
-			return c.Redirect(http.StatusFound, h.Config.App.RedirectAfterError)
+		redirectURL, err := urlbuilder.Build(h.Config.App.RedirectAfterError, "", map[string]string{"error": errorType})
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "an error occurred"})
 		}
-		if errors.Is(err, apperrors.ErrUserBlocked) {
-			return c.Redirect(http.StatusFound, h.Config.App.RedirectAfterError)
-		}
-		if errors.Is(err, apperrors.ErrUserDeleted) {
-			return c.Redirect(http.StatusFound, h.Config.App.RedirectAfterError)
-		}
-		return c.Redirect(http.StatusFound, h.Config.App.RedirectAfterError)
+		return c.Redirect(http.StatusFound, redirectURL)
 	}
 	if tokensPair != nil {
 		accessCookie := cookies.NewAccessCookie(tokensPair.AccessToken, tokensPair.AccessTokenExpiresAt.Unix(), h.Config)

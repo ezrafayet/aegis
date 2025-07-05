@@ -48,7 +48,7 @@ func (p OAuthDiscordRepository) IsEnabled() (bool, error) {
 }
 
 func (p OAuthDiscordRepository) GetOauthRedirectURL(state string) (string, error) {
-	redirectUrl, err := urlbuilder.Build(p.Config.App.URL, "/auth/discord/callback")
+	redirectUrl, err := urlbuilder.Build(p.Config.App.URL, "/auth/discord/callback", map[string]string{})
 	if err != nil {
 		return "", fmt.Errorf("failed to parse base URL: %w", err)
 	}
@@ -66,7 +66,7 @@ func (p OAuthDiscordRepository) GetName() string {
 }
 
 func (p OAuthDiscordRepository) ExchangeCodeForUserInfos(code, state string) (*entities.UserInfos, error) {
-	redirectUrl, err := urlbuilder.Build(p.Config.App.URL, "/auth/discord/callback")
+	redirectUrl, err := urlbuilder.Build(p.Config.App.URL, "/auth/discord/callback", map[string]string{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse base URL: %w", err)
 	}

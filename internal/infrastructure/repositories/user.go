@@ -47,9 +47,12 @@ func (r *UserRepository) GetUserByEmail(email string) (entities.User, error) {
 
 func (r *UserRepository) GetUserByID(userID string) (entities.User, error) {
 	var user entities.User
-	result := r.db.Where("id = ?", userID).First(&user)
+	result := r.db.Where("id = ?", userID).Preload("Roles").First(&user)
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
 		return entities.User{}, result.Error
+	}
+	if result.Error == gorm.ErrRecordNotFound {
+		return entities.User{}, apperrors.ErrNoUser
 	}
 	return user, nil
 }

@@ -65,13 +65,15 @@ COPY ./config.json /app/config.json
                 "enabled": true,
                 "app_name": "MyApp",
                 "client_id": "xxxxxxxxxxxx",
-                "client_secret": "xxxxxxxxxxxx"
+                "client_secret": "xxxxxxxxxxxx",
+                "redirect_url": "http://app.localhost:5000/oauth/github/callback"
             },
             "discord": {
                 "enabled": true,
                 "app_name": "MyApp",
                 "client_id": "xxxxxxxxxxxx",
-                "client_secret": "xxxxxxxxxxxx"
+                "client_secret": "xxxxxxxxxxxx",
+                "redirect_url": "http://app.localhost:5000/oauth/github/callback"
             }
         }
     },

@@ -8,6 +8,11 @@
 Drop-in auth service - no SaaS, no lock-in
 ```
 
+# OAuth support:
+
+- GitHub
+- Discord
+
 # Introduction
 
 I found myself rewriting an authorization service each and every time on every project or constantly using the same platforms and tools (Auth0, Supabase, Firebase, Pocket Base), which comes with heavy vendor lock-in, way too many features (I don't want the Gorilla and the whole jungle), big ecosystems and a pretty significant cost.
@@ -57,6 +62,12 @@ COPY ./config.json /app/config.json
     "auth": {
         "providers": {
             "github": {
+                "enabled": true,
+                "app_name": "MyApp",
+                "client_id": "xxxxxxxxxxxx",
+                "client_secret": "xxxxxxxxxxxx"
+            },
+            "discord": {
                 "enabled": true,
                 "app_name": "MyApp",
                 "client_id": "xxxxxxxxxxxx",

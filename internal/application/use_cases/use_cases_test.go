@@ -26,7 +26,7 @@ func TestCheckAndRefreshToken(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		db.AutoMigrate(&entities.User{}, &entities.RefreshToken{})
+		db.AutoMigrate(&entities.User{}, &entities.RefreshToken{}, &entities.Role{})
 		refreshTokenRepository := repositories.NewRefreshTokenRepository(db)
 		userRepository := repositories.NewUserRepository(db)
 		authService := NewService(baseConfig, &refreshTokenRepository, &userRepository)

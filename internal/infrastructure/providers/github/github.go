@@ -48,8 +48,7 @@ func (p OAuthGithubRepository) IsEnabled() (bool, error) {
 	return p.Config.Auth.Providers.GitHub.Enabled, nil
 }
 
-func (p OAuthGithubRepository) GetOauthRedirectURL(redirectUrl, state string) (string, error) {
-	fmt.Println("GetOauthRedirectURL", redirectUrl, state, p.Config.Auth.Providers.GitHub.ClientID)
+func (p OAuthGithubRepository) GetOauthRedirectURL(state string) (string, error) {
 	return fmt.Sprintf(
 		"https://github.com/login/oauth/authorize?client_id=%s&scope=user:email&state=%s",
 		p.Config.Auth.Providers.GitHub.ClientID,
@@ -62,17 +61,13 @@ func (p OAuthGithubRepository) GetName() string {
 	return p.Name
 }
 
-func (p OAuthGithubRepository) ExchangeCodeForUserInfos(code, state, redirectUri string) (*entities.UserInfos, error) {
+func (p OAuthGithubRepository) ExchangeCodeForUserInfos(code, state string) (*entities.UserInfos, error) {
 	// Step 1: get access token
 	data := map[string]string{
 		"client_id":     p.Config.Auth.Providers.GitHub.ClientID,
 		"client_secret": p.Config.Auth.Providers.GitHub.ClientSecret,
 		"code":          code,
 		"state":         state,
-	}
-	fmt.Println(data)
-	if redirectUri != "" {
-		data["redirect_uri"] = redirectUri
 	}
 	body1, _ := json.Marshal(data)
 	req1, _ := http.NewRequest("POST", "https://github.com/login/oauth/access_token", bytes.NewBuffer(body1))

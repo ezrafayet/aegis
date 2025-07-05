@@ -31,7 +31,15 @@ type Config struct {
 				AppName      string `json:"app_name"`
 				ClientID     string `json:"client_id"`
 				ClientSecret string `json:"client_secret"`
+				RedirectURL  string `json:"redirect_url"`
 			} `json:"github"`
+			Discord struct {
+				Enabled      bool   `json:"enabled"`
+				AppName      string `json:"app_name"`
+				ClientID     string `json:"client_id"`
+				ClientSecret string `json:"client_secret"`
+				RedirectURL  string `json:"redirect_url"`
+			} `json:"discord"`
 		} `json:"providers"`
 	} `json:"auth"`
 

@@ -21,6 +21,12 @@ func NewUserService(userRepository secondary.UserRepository, config entities.Con
 // GetOrCreateUserIfAllowed handles the business logic for user creation and validation
 // during OAuth authentication flows
 func (s *UserService) GetOrCreateUserIfAllowed(userInfos *entities.UserInfos, authMethod string) (entities.User, error) {
+	if userInfos.Email == "" {
+		return entities.User{}, apperrors.ErrNoEmail
+	}
+	if userInfos.Name == "" {
+		return entities.User{}, apperrors.ErrNoName
+	}
 	// Check if username already exists
 	nameExists, err := s.userRepository.DoesNameExist(userInfos.Name)
 	if err != nil {
@@ -42,7 +48,12 @@ func (s *UserService) GetOrCreateUserIfAllowed(userInfos *entities.UserInfos, au
 		if err != nil {
 			return entities.User{}, err
 		}
-		err = s.userRepository.CreateUser(user, []entities.Role{entities.NewRole(user.ID, entities.RoleUser)})
+		roles := []entities.Role{entities.NewRole(user.ID, entities.RoleUser)}
+		err = s.userRepository.CreateUser(user, roles)
+		if err != nil {
+			return entities.User{}, err
+		}
+		user, err = s.userRepository.GetUserByEmail(userInfos.Email)
 		if err != nil {
 			return entities.User{}, err
 		}

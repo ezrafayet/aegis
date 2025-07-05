@@ -12,6 +12,8 @@ var (
 	ErrUserDeleted          = errors.New("user_deleted")
 	ErrEarlyAdoptersOnly    = errors.New("early_adopters_only")
 	ErrNameAlreadyExists    = errors.New("name_already_exists")
+	ErrNoName               = errors.New("no_name")
+	ErrNoEmail              = errors.New("no_email")
 	ErrNoRefreshToken       = errors.New("no_refresh_token")
 	ErrTooManyRefreshTokens = errors.New("too_many_refresh_tokens")
 	ErrAccessTokenInvalid   = errors.New("invalid_invalid")

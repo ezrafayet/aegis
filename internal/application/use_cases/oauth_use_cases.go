@@ -53,7 +53,7 @@ func (s OAuthUseCases) GetAuthURL(redirectUri string) (string, error) {
 	if err := s.StateRepository.CreateState(entities.NewState(state)); err != nil {
 		return "", err
 	}
-	redirectURL, err := s.Provider.GetOauthRedirectURL(redirectUri, state)
+	redirectURL, err := s.Provider.GetOauthRedirectURL(state)
 	if err != nil {
 		return "", err
 	}
@@ -68,7 +68,8 @@ func (s OAuthUseCases) ExchangeCode(code, state string) (*entities.TokenPair, er
 	if serverState.IsExpired() {
 		return nil, apperrors.ErrInvalidState
 	}
-	userInfos, err := s.Provider.ExchangeCodeForUserInfos(code, state, "")
+
+	userInfos, err := s.Provider.ExchangeCodeForUserInfos(code, state)
 	if err != nil {
 		return nil, err
 	}
@@ -88,12 +89,14 @@ func (s OAuthUseCases) ExchangeCode(code, state string) (*entities.TokenPair, er
 		return nil, err
 	}
 
-	return &entities.TokenPair{
+	result := &entities.TokenPair{
 		AccessToken:           accessToken,
 		AccessTokenExpiresAt:  time.Unix(atExpiresAt, 0),
 		RefreshToken:          newRefreshToken,
 		RefreshTokenExpiresAt: time.Unix(rtExpiresAt, 0),
-	}, nil
+	}
+
+	return result, nil
 }
 
 func (s OAuthUseCases) CheckAuthEnabled() (bool, error) {

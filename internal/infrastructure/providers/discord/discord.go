@@ -93,8 +93,7 @@ func (p OAuthDiscordRepository) ExchangeCodeForUserInfos(code, state string) (*e
 		// Read error response body
 		var errorBody bytes.Buffer
 		errorBody.ReadFrom(resp1.Body)
-		errorMsg := fmt.Sprintf("discord token exchange failed with status %d: %s", resp1.StatusCode, errorBody.String())
-		return nil, fmt.Errorf(errorMsg)
+		return nil, fmt.Errorf("discord token exchange failed with status %d: %s", resp1.StatusCode, errorBody.String())
 	}
 
 	var tokenResponse discordTokenResponse
@@ -123,8 +122,7 @@ func (p OAuthDiscordRepository) ExchangeCodeForUserInfos(code, state string) (*e
 		// Read error response body
 		var errorBody bytes.Buffer
 		errorBody.ReadFrom(resp2.Body)
-		errorMsg := fmt.Sprintf("discord user info failed with status %d: %s", resp2.StatusCode, errorBody.String())
-		return nil, fmt.Errorf(errorMsg)
+		return nil, fmt.Errorf("discord user info failed with status %d: %s", resp2.StatusCode, errorBody.String())
 	}
 
 	var user discordUser

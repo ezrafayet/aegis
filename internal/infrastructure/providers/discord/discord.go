@@ -46,12 +46,11 @@ func (p OAuthDiscordRepository) IsEnabled() (bool, error) {
 	return p.Config.Auth.Providers.Discord.Enabled, nil
 }
 
-func (p OAuthDiscordRepository) GetOauthRedirectURL(redirectUrl, state string) (string, error) {
-	fmt.Println("GetOauthRedirectURL", redirectUrl, state, p.Config.Auth.Providers.Discord.ClientID)
+func (p OAuthDiscordRepository) GetOauthRedirectURL(state string) (string, error) {
 	return fmt.Sprintf(
 		"https://discord.com/api/oauth2/authorize?client_id=%s&redirect_uri=%s&response_type=code&scope=identify%%20email&state=%s",
 		p.Config.Auth.Providers.Discord.ClientID,
-		redirectUrl,
+		p.Config.Auth.Providers.Discord.RedirectURL,
 		state,
 	), nil
 }
@@ -61,16 +60,16 @@ func (p OAuthDiscordRepository) GetName() string {
 	return p.Name
 }
 
-func (p OAuthDiscordRepository) ExchangeCodeForUserInfos(code, state, redirectUri string) (*entities.UserInfos, error) {
+func (p OAuthDiscordRepository) ExchangeCodeForUserInfos(code, state string) (*entities.UserInfos, error) {
+
 	// Step 1: get access token
 	data := map[string]string{
 		"client_id":     p.Config.Auth.Providers.Discord.ClientID,
 		"client_secret": p.Config.Auth.Providers.Discord.ClientSecret,
 		"grant_type":    "authorization_code",
 		"code":          code,
-		"redirect_uri":  redirectUri,
+		"redirect_uri":  p.Config.Auth.Providers.Discord.RedirectURL,
 	}
-	fmt.Println(data)
 
 	// Convert data to form-encoded format
 	formData := ""
@@ -88,9 +87,24 @@ func (p OAuthDiscordRepository) ExchangeCodeForUserInfos(code, state, redirectUr
 		return nil, fmt.Errorf("failed to get access token: %w", err)
 	}
 	defer resp1.Body.Close()
+
+	// Check if the response is successful
+	if resp1.StatusCode != http.StatusOK {
+		// Read error response body
+		var errorBody bytes.Buffer
+		errorBody.ReadFrom(resp1.Body)
+		errorMsg := fmt.Sprintf("discord token exchange failed with status %d: %s", resp1.StatusCode, errorBody.String())
+		return nil, fmt.Errorf(errorMsg)
+	}
+
 	var tokenResponse discordTokenResponse
 	if err := json.NewDecoder(resp1.Body).Decode(&tokenResponse); err != nil {
 		return nil, fmt.Errorf("failed to decode access token: %w", err)
+	}
+
+	// Check if we got a valid access token
+	if tokenResponse.AccessToken == "" {
+		return nil, fmt.Errorf("no access token received from Discord")
 	}
 
 	// Step 2: get user infos
@@ -104,9 +118,24 @@ func (p OAuthDiscordRepository) ExchangeCodeForUserInfos(code, state, redirectUr
 		return nil, fmt.Errorf("failed to get user info: %w", err)
 	}
 	defer resp2.Body.Close()
+	// Check if the user info response is successful
+	if resp2.StatusCode != http.StatusOK {
+		// Read error response body
+		var errorBody bytes.Buffer
+		errorBody.ReadFrom(resp2.Body)
+		errorMsg := fmt.Sprintf("discord user info failed with status %d: %s", resp2.StatusCode, errorBody.String())
+		return nil, fmt.Errorf(errorMsg)
+	}
+
 	var user discordUser
 	if err := json.NewDecoder(resp2.Body).Decode(&user); err != nil {
 		return nil, fmt.Errorf("failed to decode user info: %w", err)
+	}
+
+	// Check if we got valid user data
+	if user.ID == "" {
+		fmt.Println("ERROR: No user ID received")
+		return nil, fmt.Errorf("no user ID received from Discord")
 	}
 
 	// Construct avatar URL if avatar exists
@@ -121,9 +150,11 @@ func (p OAuthDiscordRepository) ExchangeCodeForUserInfos(code, state, redirectUr
 		displayName = fmt.Sprintf("%s#%s", user.Username, user.Discriminator)
 	}
 
-	return &entities.UserInfos{
+	result := &entities.UserInfos{
 		Name:   displayName,
 		Email:  user.Email,
 		Avatar: avatarURL,
-	}, nil
+	}
+
+	return result, nil
 }

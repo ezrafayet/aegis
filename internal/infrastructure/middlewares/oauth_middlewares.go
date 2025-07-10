@@ -29,10 +29,7 @@ func NewOAuthMiddlewares(c entities.Config, s primary.OAuthUseCasesInterface) OA
 
 func (m OAuthMiddlewares) CheckAuthEnabled(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		enabled, err := m.Service.CheckAuthEnabled()
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]string{"error": apperrors.ErrGeneric.Error()})
-		}
+		enabled := m.Service.CheckAuthEnabled()
 		if !enabled {
 			return c.JSON(http.StatusForbidden, map[string]string{"error": apperrors.ErrAuthMethodNotEnabled.Error()})
 		}

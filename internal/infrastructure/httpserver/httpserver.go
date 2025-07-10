@@ -55,7 +55,10 @@ v0.x.x (needs to be injected)
 		AllowCredentials: true,
 	}))
 
-	r := registry.NewRegistry(c, db)
+	r, err := registry.NewRegistry(c, db)
+	if err != nil {
+		return err
+	}
 
 	group := e.Group("/auth")
 

@@ -6,6 +6,7 @@ import (
 	"aegis/internal/domain/ports/secondary"
 	"aegis/internal/infrastructure/handlers"
 	"aegis/internal/infrastructure/middlewares"
+	"aegis/pkg/plugins/providers"
 )
 
 type Provider struct {
@@ -16,7 +17,7 @@ type Provider struct {
 
 func NewProvider(
 	c entities.Config,
-	provider secondary.OAuthProviderInterface,
+	provider providers.OAuthProviderInterface,
 	userRepository secondary.UserRepository,
 	refreshTokenRepository secondary.RefreshTokenRepository,
 	stateRepository secondary.StateRepository,

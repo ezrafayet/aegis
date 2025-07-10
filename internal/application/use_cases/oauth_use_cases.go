@@ -6,6 +6,7 @@ import (
 	"aegis/internal/domain/ports/secondary"
 	"aegis/internal/domain/services"
 	"aegis/pkg/apperrors"
+	"aegis/pkg/plugins/providers"
 	"aegis/pkg/tokengen"
 	"time"
 )
@@ -14,7 +15,7 @@ import (
 
 type OAuthUseCases struct {
 	Config                 entities.Config
-	Provider               secondary.OAuthProviderInterface
+	Provider               providers.OAuthProviderInterface
 	UserRepository         secondary.UserRepository
 	RefreshTokenRepository secondary.RefreshTokenRepository
 	StateRepository        secondary.StateRepository
@@ -26,7 +27,7 @@ var _ primary.OAuthUseCasesInterface = OAuthUseCases{}
 
 func NewOAuthGithubUseCases(
 	c entities.Config,
-	p secondary.OAuthProviderInterface,
+	p providers.OAuthProviderInterface,
 	userRepository secondary.UserRepository,
 	refreshTokenRepository secondary.RefreshTokenRepository,
 	stateRepository secondary.StateRepository,
@@ -53,10 +54,7 @@ func (s OAuthUseCases) GetAuthURL(redirectUri string) (string, error) {
 	if err := s.StateRepository.CreateState(entities.NewState(state)); err != nil {
 		return "", err
 	}
-	redirectURL, err := s.Provider.GetOauthRedirectURL(state)
-	if err != nil {
-		return "", err
-	}
+	redirectURL := s.Provider.GetOauthRedirectURL(state)
 	return redirectURL, nil
 }
 
@@ -99,6 +97,6 @@ func (s OAuthUseCases) ExchangeCode(code, state string) (*entities.TokenPair, er
 	return result, nil
 }
 
-func (s OAuthUseCases) CheckAuthEnabled() (bool, error) {
+func (s OAuthUseCases) CheckAuthEnabled() bool {
 	return s.Provider.IsEnabled()
 }

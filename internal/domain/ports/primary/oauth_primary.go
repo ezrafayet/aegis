@@ -8,7 +8,7 @@ type OAuthUseCasesForHandlers interface {
 }
 
 type OAuthUseCasesForMiddlewares interface {
-	CheckAuthEnabled() (bool, error)
+	CheckAuthEnabled() bool
 }
 
 type OAuthUseCasesInterface interface {

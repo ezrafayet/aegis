@@ -1,26 +1,24 @@
 package discord
 
 import (
-	"aegis/internal/domain/entities"
-	"aegis/internal/domain/ports/secondary"
-	"aegis/pkg/urlbuilder"
+	"aegis/pkg/plugins/providers"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
 )
 
-type OAuthDiscordRepository struct {
-	Name   string
-	Config entities.Config
-}
+type OAuthDiscordRepository providers.OAuthRepository
 
-var _ secondary.OAuthProviderInterface = OAuthDiscordRepository{}
+var _ providers.OAuthProviderInterface = OAuthDiscordRepository{}
 
-func NewOAuthDiscordRepository(c entities.Config) OAuthDiscordRepository {
+func NewOAuthDiscordRepository(enabled bool, clientID, clientSecret, redirectURL string) OAuthDiscordRepository {
 	return OAuthDiscordRepository{
 		Name:   "discord",
-		Config: c,
+		Enabled: enabled,
+		ClientID: clientID,
+		ClientSecret: clientSecret,
+		RedirectURL: redirectURL,
 	}
 }
 
@@ -41,23 +39,17 @@ type discordUser struct {
 	Verified      bool   `json:"verified"`
 }
 
-func (p OAuthDiscordRepository) IsEnabled() (bool, error) {
-	fmt.Println("Config hit")
-	fmt.Println("IsEnabled", p.Config.Auth.Providers.Discord.Enabled)
-	return p.Config.Auth.Providers.Discord.Enabled, nil
+func (p OAuthDiscordRepository) IsEnabled() bool {
+	return p.Enabled
 }
 
-func (p OAuthDiscordRepository) GetOauthRedirectURL(state string) (string, error) {
-	redirectUrl, err := urlbuilder.Build(p.Config.App.URL, "/auth/discord/callback", map[string]string{})
-	if err != nil {
-		return "", fmt.Errorf("failed to parse base URL: %w", err)
-	}
+func (p OAuthDiscordRepository) GetOauthRedirectURL(state string) string {
 	return fmt.Sprintf(
 		"https://discord.com/api/oauth2/authorize?client_id=%s&redirect_uri=%s&response_type=code&scope=identify%%20email&state=%s",
-		p.Config.Auth.Providers.Discord.ClientID,
-		redirectUrl,
+		p.ClientID,
+		p.RedirectURL,
 		state,
-	), nil
+	)
 }
 
 func (p OAuthDiscordRepository) GetName() string {
@@ -65,19 +57,13 @@ func (p OAuthDiscordRepository) GetName() string {
 	return p.Name
 }
 
-func (p OAuthDiscordRepository) ExchangeCodeForUserInfos(code, state string) (*entities.UserInfos, error) {
-	redirectUrl, err := urlbuilder.Build(p.Config.App.URL, "/auth/discord/callback", map[string]string{})
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse base URL: %w", err)
-	}
-
-	// Step 1: get access token
+func (p OAuthDiscordRepository) ExchangeCodeForUserInfos(code, state string) (*providers.UserInfos, error) {
 	data := map[string]string{
-		"client_id":     p.Config.Auth.Providers.Discord.ClientID,
-		"client_secret": p.Config.Auth.Providers.Discord.ClientSecret,
+		"client_id":     p.ClientID,
+		"client_secret": p.ClientSecret,
 		"grant_type":    "authorization_code",
 		"code":          code,
-		"redirect_uri":  redirectUrl,
+		"redirect_uri":  p.RedirectURL,
 	}
 
 	// Convert data to form-encoded format
@@ -157,7 +143,7 @@ func (p OAuthDiscordRepository) ExchangeCodeForUserInfos(code, state string) (*e
 		displayName = fmt.Sprintf("%s#%s", user.Username, user.Discriminator)
 	}
 
-	result := &entities.UserInfos{
+	result := &providers.UserInfos{
 		Name:   displayName,
 		Email:  user.Email,
 		Avatar: avatarURL,

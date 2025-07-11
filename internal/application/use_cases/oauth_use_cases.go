@@ -11,8 +11,6 @@ import (
 	"time"
 )
 
-// todo: make this package a generic package for all oauth providers and a factory
-
 type OAuthUseCases struct {
 	Config                 entities.Config
 	Provider               providers.OAuthProviderInterface
@@ -23,18 +21,18 @@ type OAuthUseCases struct {
 	TokenService           *services.TokenService
 }
 
-var _ primary.OAuthUseCasesInterface = OAuthUseCases{}
+var _ primary.OAuthUseCasesInterface = (*OAuthUseCases)(nil)
 
-func NewOAuthGithubUseCases(
+func NewOAuthUseCases(
 	c entities.Config,
 	p providers.OAuthProviderInterface,
 	userRepository secondary.UserRepository,
 	refreshTokenRepository secondary.RefreshTokenRepository,
 	stateRepository secondary.StateRepository,
-) OAuthUseCases {
+) *OAuthUseCases {
 	userService := services.NewUserService(userRepository, c)
 	tokenService := services.NewTokenService(refreshTokenRepository, c)
-	return OAuthUseCases{
+	return &OAuthUseCases{
 		Config:                 c,
 		Provider:               p,
 		UserRepository:         userRepository,
@@ -45,8 +43,11 @@ func NewOAuthGithubUseCases(
 	}
 }
 
-// /!\ Can be abused to generate a lot of states - todo: fix
-func (s OAuthUseCases) GetAuthURL(redirectUri string) (string, error) {
+func (s OAuthUseCases) CheckAuthEnabled() bool {
+	return s.Provider.IsEnabled()
+}
+
+func (s *OAuthUseCases) GetAuthURL(redirectUri string) (string, error) {
 	state, err := tokengen.Generate("state_", 13)
 	if err != nil {
 		return "", err
@@ -95,8 +96,4 @@ func (s OAuthUseCases) ExchangeCode(code, state string) (*entities.TokenPair, er
 	}
 
 	return result, nil
-}
-
-func (s OAuthUseCases) CheckAuthEnabled() bool {
-	return s.Provider.IsEnabled()
 }

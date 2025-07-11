@@ -22,10 +22,10 @@ type AuthMiddleware struct {
 	Service primary.UseCasesInterface
 }
 
-var _ AuthMiddlewareInterface = &AuthMiddleware{}
+var _ AuthMiddlewareInterface = (*AuthMiddleware)(nil)
 
-func NewAuthMiddleware(c entities.Config, s primary.UseCasesInterface) AuthMiddleware {
-	return AuthMiddleware{
+func NewAuthMiddleware(c entities.Config, s primary.UseCasesInterface) *AuthMiddleware {
+	return &AuthMiddleware{
 		Config:  c,
 		Service: s,
 	}

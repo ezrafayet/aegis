@@ -21,7 +21,7 @@ func TestCheckAndRefreshToken(t *testing.T) {
 			RefreshTokenExpirationDays: 1,
 		},
 	}
-	prepare := func(t *testing.T) (UseCases, secondary.UserRepository, secondary.RefreshTokenRepository, *gorm.DB) {
+	prepare := func(t *testing.T) (*UseCases, secondary.UserRepository, secondary.RefreshTokenRepository, *gorm.DB) {
 		db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
 		if err != nil {
 			t.Fatal(err)
@@ -29,8 +29,8 @@ func TestCheckAndRefreshToken(t *testing.T) {
 		db.AutoMigrate(&entities.User{}, &entities.RefreshToken{}, &entities.Role{})
 		refreshTokenRepository := repositories.NewRefreshTokenRepository(db)
 		userRepository := repositories.NewUserRepository(db)
-		authService := NewService(baseConfig, &refreshTokenRepository, &userRepository)
-		return authService, &userRepository, &refreshTokenRepository, db
+		authService := NewService(baseConfig, refreshTokenRepository, userRepository)
+		return authService, userRepository, refreshTokenRepository, db
 	}
 	t.Run("invalid access token gets rejected", func(t *testing.T) {
 		authService, _, _, _ := prepare(t)

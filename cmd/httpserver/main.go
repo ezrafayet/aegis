@@ -6,8 +6,7 @@ import (
 )
 
 func main() {
-	err := httpserver.Start()
-	if err != nil {
+	if err := httpserver.Start(); err != nil {
 		log.Fatal(err)
 	}
 }

@@ -10,10 +10,10 @@ import (
 
 type OAuthDiscordRepository providers.OAuthRepository
 
-var _ providers.OAuthProviderInterface = OAuthDiscordRepository{}
+var _ providers.OAuthProviderInterface = (*OAuthDiscordRepository)(nil)
 
-func NewOAuthDiscordRepository(enabled bool, clientID, clientSecret, redirectURL string) OAuthDiscordRepository {
-	return OAuthDiscordRepository{
+func NewOAuthDiscordRepository(enabled bool, clientID, clientSecret, redirectURL string) *OAuthDiscordRepository {
+	return &OAuthDiscordRepository{
 		Name:         "discord",
 		Enabled:      enabled,
 		ClientID:     clientID,

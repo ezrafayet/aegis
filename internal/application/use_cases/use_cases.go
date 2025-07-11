@@ -17,11 +17,11 @@ type UseCases struct {
 	TokenService           *services.TokenService
 }
 
-var _ primary.UseCasesInterface = &UseCases{}
+var _ primary.UseCasesInterface = (*UseCases)(nil)
 
-func NewService(c entities.Config, r secondary.RefreshTokenRepository, u secondary.UserRepository) UseCases {
+func NewService(c entities.Config, r secondary.RefreshTokenRepository, u secondary.UserRepository) *UseCases {
 	tokenService := services.NewTokenService(r, c)
-	return UseCases{
+	return &UseCases{
 		Config:                 c,
 		RefreshTokenRepository: r,
 		UserRepository:         u,

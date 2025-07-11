@@ -38,24 +38,20 @@ func NewCustomClaimsFromValues(userID string, earlyAdopter bool, roles []Role, m
 }
 
 func NewCusomClaimsFromMap(ccMap map[string]any) (*CustomClaims, error) {
+	cClaims := CustomClaims{}
 	if ccMap["user_id"] == nil {
-		return nil, errors.New("custom_claims: user_id is required to un-map custom claims")
+		cClaims.UserID = ccMap["user_id"].(string)
 	}
 	if ccMap["early_adopter"] == nil {
-		return nil, errors.New("custom_claims: early_adopter is required to un-map custom claims")
+		cClaims.EarlyAdopter = ccMap["early_adopter"].(bool)
 	}
 	if ccMap["roles"] == nil {
-		return nil, errors.New("custom_claims: roles are required to un-map custom claims")
+		cClaims.Roles = ccMap["roles"].(string)
 	}
 	if ccMap["metadata"] == nil {
-		return nil, errors.New("custom_claims: metadata is required to un-map custom claims")
+		cClaims.Metadata = ccMap["metadata"].(string)
 	}
-	return &CustomClaims{
-		UserID:       ccMap["user_id"].(string),
-		EarlyAdopter: ccMap["early_adopter"].(bool),
-		Roles:        ccMap["roles"].(string),
-		Metadata:     ccMap["metadata"].(string),
-	}, nil
+	return &cClaims, nil
 }
 
 func (cc *CustomClaims) ToMap() map[string]any {

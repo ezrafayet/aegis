@@ -22,7 +22,7 @@ func NewProvider(
 	refreshTokenRepository secondary.RefreshTokenRepository,
 	stateRepository secondary.StateRepository,
 ) Provider {
-	service := usecases.NewOAuthGithubUseCases(c, provider, userRepository, refreshTokenRepository, stateRepository)
+	service := usecases.NewOAuthUseCases(c, provider, userRepository, refreshTokenRepository, stateRepository)
 	handlers := handlers.NewOAuthHandlers(c, service)
 	middlewares := middlewares.NewOAuthMiddlewares(c, service)
 

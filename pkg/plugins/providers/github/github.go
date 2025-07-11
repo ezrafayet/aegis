@@ -10,10 +10,10 @@ import (
 
 type OAuthGithubRepository providers.OAuthRepository
 
-var _ providers.OAuthProviderInterface = OAuthGithubRepository{}
+var _ providers.OAuthProviderInterface = (*OAuthGithubRepository)(nil)
 
-func NewOAuthGithubRepository(enabled bool, clientID, clientSecret, redirectURL string) OAuthGithubRepository {
-	return OAuthGithubRepository{
+func NewOAuthGithubRepository(enabled bool, clientID, clientSecret, redirectURL string) *OAuthGithubRepository {
+	return &OAuthGithubRepository{
 		Name:         "github",
 		Enabled:      enabled,
 		ClientID:     clientID,

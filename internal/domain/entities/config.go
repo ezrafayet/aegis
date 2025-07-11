@@ -2,26 +2,26 @@ package entities
 
 type Config struct {
 	App struct {
-		// Name of the application
+		// Name of the application (ex: "Aegis")
 		Name string `json:"name"`
-		// URL of the application (main domain)
+		// URL of the application (main domain, ex: https://aegis.example.com)
 		URL string `json:"url"`
-		// Allowed origins for the application (CORS)
+		// Allowed origins for the application (CORS) (ex: ["https://aegis.example.com", "http://localhost:5000])
 		CorsAllowedOrigins []string `json:"cors_allowed_origins"`
-		// New users need to be approved by an admin
+		// New users need to be approved by an admin (ex: true)
 		EarlyAdoptersOnly bool `json:"early_adopters_only"`
-		// Redirect URL after successful login
+		// Redirect URL after successful login (ex: "https://aegis.example.com" or https://aegis.example.com/login-success)
 		RedirectAfterSuccess string `json:"redirect_after_success"`
-		// Redirect URL after login error
+		// Redirect URL after login error (ex: "https://aegis.example.com/login-error")
 		RedirectAfterError string `json:"redirect_after_error"`
-		// API keys for the application (internal requests)
+		// API keys for the application (used for internal requests) (ex: ["1234567890"])
 		InternalAPIKeys []string `json:"internal_api_keys"`
-		// Port on which the service must run
+		// Port on which the service must run (ex: 5666)
 		Port int `json:"port"`
 	} `json:"app"`
 
 	DB struct {
-		// DB connection string
+		// DB connection string (ex: "postgres://user:password@localhost:5432/auth")
 		PostgresURL string `json:"postgres_url"`
 	} `json:"db"`
 
@@ -55,7 +55,7 @@ type Config struct {
 	} `json:"cookie"`
 
 	User struct {
-		// Roles for a user, mandatory roles are: "user" and "platform_admin"
+		// Roles for a user. Mandatory roles are: "user" and "platform_admin"
 		Roles []string `json:"roles"`
 	} `json:"user"`
 }

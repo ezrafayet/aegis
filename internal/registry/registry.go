@@ -25,7 +25,7 @@ func NewRegistry(c entities.Config, db *gorm.DB) (Registry, error) {
 	refreshTokenRepository := repositories.NewRefreshTokenRepository(db)
 	stateRepository := repositories.NewStateRepository(db)
 
-	authService := usecases.NewService(c, &refreshTokenRepository, &userRepository)
+	authService := usecases.NewService(c, refreshTokenRepository, userRepository)
 	authHandlers := handlers.NewHandlers(c, authService)
 	authMiddlewares := middlewares.NewAuthMiddleware(c, authService)
 
@@ -41,18 +41,18 @@ func NewRegistry(c entities.Config, db *gorm.DB) (Registry, error) {
 				c.Auth.Providers.GitHub.ClientID,
 				c.Auth.Providers.GitHub.ClientSecret,
 				fmt.Sprintf(redirectURLBase, "github")),
-			&userRepository,
-			&refreshTokenRepository,
-			&stateRepository),
+			userRepository,
+			refreshTokenRepository,
+			stateRepository),
 		NewProvider(
 			c, discord.NewOAuthDiscordRepository(
 				c.Auth.Providers.Discord.Enabled,
 				c.Auth.Providers.Discord.ClientID,
 				c.Auth.Providers.Discord.ClientSecret,
 				fmt.Sprintf(redirectURLBase, "discord")),
-			&userRepository,
-			&refreshTokenRepository,
-			&stateRepository),
+			userRepository,
+			refreshTokenRepository,
+			stateRepository),
 	}
 
 	return Registry{

@@ -11,10 +11,10 @@ type StateRepository struct {
 	db *gorm.DB
 }
 
-var _ secondary.StateRepository = &StateRepository{}
+var _ secondary.StateRepository = (*StateRepository)(nil)
 
-func NewStateRepository(db *gorm.DB) StateRepository {
-	return StateRepository{db: db}
+func NewStateRepository(db *gorm.DB) *StateRepository {
+	return &StateRepository{db: db}
 }
 
 func (r *StateRepository) CreateState(state entities.State) error {

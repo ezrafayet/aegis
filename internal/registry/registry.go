@@ -37,21 +37,21 @@ func NewRegistry(c entities.Config, db *gorm.DB) (Registry, error) {
 	providers := []Provider{
 		NewProvider(
 			c, github.NewOAuthGithubRepository(
-			c.Auth.Providers.GitHub.Enabled,
-			c.Auth.Providers.GitHub.ClientID,
-			c.Auth.Providers.GitHub.ClientSecret,
-			fmt.Sprintf(redirectURLBase, "github")),
+				c.Auth.Providers.GitHub.Enabled,
+				c.Auth.Providers.GitHub.ClientID,
+				c.Auth.Providers.GitHub.ClientSecret,
+				fmt.Sprintf(redirectURLBase, "github")),
 			&userRepository,
 			&refreshTokenRepository,
 			&stateRepository),
 		NewProvider(
 			c, discord.NewOAuthDiscordRepository(
-			c.Auth.Providers.Discord.Enabled,
-			c.Auth.Providers.Discord.ClientID,
-			c.Auth.Providers.Discord.ClientSecret,
-			fmt.Sprintf(redirectURLBase, "discord")),
-			&userRepository, 
-			&refreshTokenRepository, 
+				c.Auth.Providers.Discord.Enabled,
+				c.Auth.Providers.Discord.ClientID,
+				c.Auth.Providers.Discord.ClientSecret,
+				fmt.Sprintf(redirectURLBase, "discord")),
+			&userRepository,
+			&refreshTokenRepository,
 			&stateRepository),
 	}
 

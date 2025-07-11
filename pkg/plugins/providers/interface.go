@@ -16,11 +16,11 @@ type OAuthProviderInterface interface {
 }
 
 type OAuthRepository struct {
-	Name   string
-	Enabled bool
-	ClientID string
+	Name         string
+	Enabled      bool
+	ClientID     string
 	ClientSecret string
-	RedirectURL string
+	RedirectURL  string
 }
 
 type UserInfos struct {

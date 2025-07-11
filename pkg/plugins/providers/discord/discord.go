@@ -14,11 +14,11 @@ var _ providers.OAuthProviderInterface = OAuthDiscordRepository{}
 
 func NewOAuthDiscordRepository(enabled bool, clientID, clientSecret, redirectURL string) OAuthDiscordRepository {
 	return OAuthDiscordRepository{
-		Name:   "discord",
-		Enabled: enabled,
-		ClientID: clientID,
+		Name:         "discord",
+		Enabled:      enabled,
+		ClientID:     clientID,
 		ClientSecret: clientSecret,
-		RedirectURL: redirectURL,
+		RedirectURL:  redirectURL,
 	}
 }
 

@@ -14,11 +14,11 @@ var _ providers.OAuthProviderInterface = OAuthGithubRepository{}
 
 func NewOAuthGithubRepository(enabled bool, clientID, clientSecret, redirectURL string) OAuthGithubRepository {
 	return OAuthGithubRepository{
-		Name:   "github",
-		Enabled: enabled,
-		ClientID: clientID,
+		Name:         "github",
+		Enabled:      enabled,
+		ClientID:     clientID,
 		ClientSecret: clientSecret,
-		RedirectURL: redirectURL,
+		RedirectURL:  redirectURL,
 	}
 }
 

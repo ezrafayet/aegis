@@ -6,10 +6,10 @@ import (
 )
 
 type CustomClaims struct {
-	UserID       string   `json:"user_id"`
-	EarlyAdopter bool     `json:"early_adopter"`
-	Roles        string   `json:"roles"` // coma separated list
-	Metadata     string   `json:"metadata"`
+	UserID       string `json:"user_id"`
+	EarlyAdopter bool   `json:"early_adopter"`
+	Roles        string `json:"roles"` // coma separated list
+	Metadata     string `json:"metadata"`
 }
 
 func NewCustomClaimsFromValues(userID string, earlyAdopter bool, roles []Role, metadata string) (*CustomClaims, error) {

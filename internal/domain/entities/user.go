@@ -35,14 +35,6 @@ func (u User) IsDeleted() bool {
 	return u.DeletedAt != nil
 }
 
-func (u User) RolesValues() []string {
-	values := make([]string, len(u.Roles))
-	for i, role := range u.Roles {
-		values[i] = role.Value
-	}
-	return values
-}
-
 func NewUser(name, avatar, email string, authMethod string) (User, error) {
 	nameFingerprint, err := fingerprint.GenerateNameFingerprint(name)
 	if err != nil {

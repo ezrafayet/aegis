@@ -30,12 +30,16 @@ func NewService(c entities.Config, r secondary.RefreshTokenRepository, u seconda
 }
 
 func (s UseCases) GetSession(accessToken string) (entities.Session, error) {
-	customClaims, err := jwtgen.ReadClaims(accessToken, s.Config)
+	ccMap, err := jwtgen.ReadClaims(accessToken, s.Config.JWT.Secret)
+	if err != nil {
+		return entities.Session{}, err
+	}
+	cc, err := entities.NewCusomClaimsFromMap(ccMap)
 	if err != nil {
 		return entities.Session{}, err
 	}
 	return entities.Session{
-		CustomClaims: customClaims,
+		CustomClaims: *cc,
 	}, nil
 }
 
@@ -57,7 +61,7 @@ func (s UseCases) Logout(refreshToken string) (*entities.TokenPair, error) {
 
 func (s UseCases) CheckAndRefreshToken(accessToken, refreshToken string, forceRefresh bool) (*entities.TokenPair, error) {
 	if accessToken != "" && !forceRefresh {
-		_, err := jwtgen.ReadClaims(accessToken, s.Config)
+		_, err := jwtgen.ReadClaims(accessToken, s.Config.JWT.Secret)
 		if err == nil {
 			return nil, nil
 		}

@@ -60,12 +60,11 @@ func (s *TokenService) GenerateTokensForUser(user entities.User, deviceID string
 	}
 
 	// Generate access token
-	accessToken, atExpiresAt, err = jwtgen.Generate(entities.CustomClaims{
-		UserID:       user.ID,
-		EarlyAdopter: user.EarlyAdopter,
-		Metadata:     user.Metadata,
-		Roles:        user.RolesValues(),
-	}, s.config, time.Now())
+	cc, err := entities.NewCustomClaimsFromValues(user.ID, user.EarlyAdopter, user.Roles, user.Metadata)
+	if err != nil {
+		return "", -1, "", -1, err
+	}
+	accessToken, atExpiresAt, err = jwtgen.Generate(cc.ToMap(), time.Now(), s.config.JWT.AccessTokenExpirationMin, s.config.App.Name, s.config.JWT.Secret)
 	if err != nil {
 		return "", -1, "", -1, err
 	}

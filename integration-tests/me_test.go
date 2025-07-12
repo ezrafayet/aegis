@@ -11,31 +11,32 @@ import (
 	"testing"
 	"time"
 
+	"aegis/integration-tests/testkit"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestMe(t *testing.T) {
 	t.Run("calling GET /me without a session returns 401", func(t *testing.T) {
-		suite := setupTestSuite(t)
-		defer suite.teardown()
-		resp, err := http.Get(suite.server.URL + "/auth/me")
+		suite := testkit.SetupTestSuite(t)
+		defer suite.Teardown()
+		resp, err := http.Get(suite.Server.URL + "/auth/me")
 		require.NoError(t, err)
 		assert.Equal(t, http.StatusUnauthorized, resp.StatusCode)
 	})
 	t.Run("calling GET /me with a session returns 200 and the session", func(t *testing.T) {
-		suite := setupTestSuite(t)
-		defer suite.teardown()
+		suite := testkit.SetupTestSuite(t)
+		defer suite.Teardown()
 		user, err := entities.NewUser("cloude", "https://example.com/avatar.jpg", "cloude@example.com", "github")
 		require.NoError(t, err)
 		user = suite.CreateUser(t, user, []string{"user"})
 		require.NoError(t, err)
 		cClaims, err := entities.NewCustomClaimsFromValues(user.ID, false, user.Roles, user.Metadata)
 		require.NoError(t, err)
-		accessToken, atExp, err := jwtgen.Generate(cClaims.ToMap(), time.Now(), 10, "MyApp", suite.config.JWT.Secret)
+		accessToken, atExp, err := jwtgen.Generate(cClaims.ToMap(), time.Now(), 10, "MyApp", suite.Config.JWT.Secret)
 		require.NoError(t, err)
-		atCookie := cookies.NewAccessCookie(accessToken, atExp, suite.config)
-		req, err := http.NewRequest("GET", suite.server.URL+"/auth/me", nil)
+		atCookie := cookies.NewAccessCookie(accessToken, atExp, suite.Config)
+		req, err := http.NewRequest("GET", suite.Server.URL+"/auth/me", nil)
 		require.NoError(t, err)
 		req.AddCookie(&atCookie)
 		resp, err := http.DefaultClient.Do(req)

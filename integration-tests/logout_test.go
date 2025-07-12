@@ -7,15 +7,16 @@ import (
 	"testing"
 	"time"
 
+	"aegis/integration-tests/testkit"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestLogout(t *testing.T) {
 	t.Run("calling GET /logout sets zero cookies", func(t *testing.T) {
-		suite := setupTestSuite(t)
-		defer suite.teardown()
-		resp, err := http.Get(suite.server.URL + "/auth/logout")
+		suite := testkit.SetupTestSuite(t)
+		defer suite.Teardown()
+		resp, err := http.Get(suite.Server.URL + "/auth/logout")
 		require.NoError(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 		cookies := resp.Cookies()
@@ -29,29 +30,29 @@ func TestLogout(t *testing.T) {
 	})
 
 	t.Run("calling GET /logout with a refresh token deletes the refresh token", func(t *testing.T) {
-		suite := setupTestSuite(t)
-		defer suite.teardown()
+		suite := testkit.SetupTestSuite(t)
+		defer suite.Teardown()
 
 		// Create a user
 		user, err := entities.NewUser("testuser", "https://example.com/avatar.jpg", "test@example.com", "github")
 		require.NoError(t, err)
 		user = suite.CreateUser(t, user, []string{"user"})
 
-		refreshTokenEntity, _, err := entities.NewRefreshToken(user, "refresh_token", suite.config)
+		refreshTokenEntity, _, err := entities.NewRefreshToken(user, "refresh_token", suite.Config)
 		require.NoError(t, err)
 		refreshTokenEntity = suite.CreateRefreshToken(t, refreshTokenEntity)
 
 		// Verify the refresh token exists in the database
 		var count int64
-		err = suite.db.Model(&entities.RefreshToken{}).Where("token = ?", refreshTokenEntity.Token).Count(&count).Error
+		err = suite.Db.Model(&entities.RefreshToken{}).Where("token = ?", refreshTokenEntity.Token).Count(&count).Error
 		require.NoError(t, err)
 		assert.Equal(t, int64(1), count)
 
 		// Create a request with the refresh token cookie
-		req, err := http.NewRequest("GET", suite.server.URL+"/auth/logout", nil)
+		req, err := http.NewRequest("GET", suite.Server.URL+"/auth/logout", nil)
 		require.NoError(t, err)
 
-		refreshCookie := cookies.NewRefreshCookie(refreshTokenEntity.Token, refreshTokenEntity.ExpiresAt.Unix(), suite.config)
+		refreshCookie := cookies.NewRefreshCookie(refreshTokenEntity.Token, refreshTokenEntity.ExpiresAt.Unix(), suite.Config)
 		req.AddCookie(&refreshCookie)
 
 		// Make the request
@@ -60,7 +61,7 @@ func TestLogout(t *testing.T) {
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 
 		// Verify the refresh token was deleted from the database
-		err = suite.db.Model(&entities.RefreshToken{}).Where("token = ?", refreshTokenEntity.Token).Count(&count).Error
+		err = suite.Db.Model(&entities.RefreshToken{}).Where("token = ?", refreshTokenEntity.Token).Count(&count).Error
 		require.NoError(t, err)
 		assert.Equal(t, int64(0), count)
 	})

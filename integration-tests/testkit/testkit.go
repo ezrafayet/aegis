@@ -1,4 +1,4 @@
-package integration
+package testkit
 
 import (
 	"aegis/internal/domain/entities"
@@ -23,24 +23,24 @@ import (
 )
 
 type TestSuite struct {
-	t           *testing.T
-	ctx         context.Context
-	pgContainer *postgresContainer.PostgresContainer
-	db          *gorm.DB
-	server      *httptest.Server
-	mockGithub  *httptest.Server
-	mockDiscord *httptest.Server
-	config      entities.Config
+	T           *testing.T
+	CTX         context.Context
+	PgContainer *postgresContainer.PostgresContainer
+	Db          *gorm.DB
+	Server      *httptest.Server
+	MockGithub  *httptest.Server
+	MockDiscord *httptest.Server
+	Config      entities.Config
 }
 
-func setupTestSuite(t *testing.T) *TestSuite {
+func SetupTestSuite(t *testing.T) *TestSuite {
 	ctx := context.Background()
 	pgContainer, db, connStr := setupDatabase(t, ctx)
 	suite := &TestSuite{
-		t:           t,
-		ctx:         ctx,
-		pgContainer: pgContainer,
-		db:          db,
+		T:           t,
+		CTX:         ctx,
+		PgContainer: pgContainer,
+		Db:          db,
 	}
 	suite.setupMockServers()
 	suite.setupConfig(connStr)
@@ -72,7 +72,7 @@ func setupDatabase(t *testing.T, ctx context.Context) (*postgresContainer.Postgr
 
 func (s *TestSuite) setupMockServers() {
 	// Mock GitHub OAuth server
-	s.mockGithub = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	s.MockGithub = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/login/oauth/access_token":
 			w.Header().Set("Content-Type", "application/json")
@@ -104,7 +104,7 @@ func (s *TestSuite) setupMockServers() {
 	}))
 
 	// Mock Discord OAuth server
-	s.mockDiscord = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	s.MockDiscord = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/api/oauth2/token":
 			w.Header().Set("Content-Type", "application/json")
@@ -129,51 +129,51 @@ func (s *TestSuite) setupMockServers() {
 }
 
 func (s *TestSuite) setupConfig(dbURL string) {
-	s.config = entities.Config{}
+	s.Config = entities.Config{}
 
 	// App configuration
-	s.config.App.Name = "TestApp"
-	s.config.App.URL = "http://localhost:8080"
-	s.config.App.CorsAllowedOrigins = []string{"http://localhost:8080"}
-	s.config.App.EarlyAdoptersOnly = false
-	s.config.App.RedirectAfterSuccess = "http://localhost:8080/login-success"
-	s.config.App.RedirectAfterError = "http://localhost:8080/login-error"
-	s.config.App.InternalAPIKeys = []string{"test-api-key"}
-	s.config.App.Port = 8080
+	s.Config.App.Name = "TestApp"
+	s.Config.App.URL = "http://localhost:8080"
+	s.Config.App.CorsAllowedOrigins = []string{"http://localhost:8080"}
+	s.Config.App.EarlyAdoptersOnly = false
+	s.Config.App.RedirectAfterSuccess = "http://localhost:8080/login-success"
+	s.Config.App.RedirectAfterError = "http://localhost:8080/login-error"
+	s.Config.App.InternalAPIKeys = []string{"test-api-key"}
+	s.Config.App.Port = 8080
 
 	// Database configuration
-	s.config.DB.PostgresURL = dbURL
+	s.Config.DB.PostgresURL = dbURL
 
 	// JWT configuration
-	s.config.JWT.Secret = "test-jwt-secret-key-for-testing"
-	s.config.JWT.AccessTokenExpirationMin = 15
-	s.config.JWT.RefreshTokenExpirationDays = 7
+	s.Config.JWT.Secret = "test-jwt-secret-key-for-testing"
+	s.Config.JWT.AccessTokenExpirationMin = 15
+	s.Config.JWT.RefreshTokenExpirationDays = 7
 
 	// Auth providers configuration
-	s.config.Auth.Providers.GitHub.Enabled = true
-	s.config.Auth.Providers.GitHub.AppName = "TestApp"
-	s.config.Auth.Providers.GitHub.ClientID = "test-github-client-id"
-	s.config.Auth.Providers.GitHub.ClientSecret = "test-github-client-secret"
+	s.Config.Auth.Providers.GitHub.Enabled = true
+	s.Config.Auth.Providers.GitHub.AppName = "TestApp"
+	s.Config.Auth.Providers.GitHub.ClientID = "test-github-client-id"
+	s.Config.Auth.Providers.GitHub.ClientSecret = "test-github-client-secret"
 
-	s.config.Auth.Providers.Discord.Enabled = true
-	s.config.Auth.Providers.Discord.AppName = "TestApp"
-	s.config.Auth.Providers.Discord.ClientID = "test-discord-client-id"
-	s.config.Auth.Providers.Discord.ClientSecret = "test-discord-client-secret"
+	s.Config.Auth.Providers.Discord.Enabled = true
+	s.Config.Auth.Providers.Discord.AppName = "TestApp"
+	s.Config.Auth.Providers.Discord.ClientID = "test-discord-client-id"
+	s.Config.Auth.Providers.Discord.ClientSecret = "test-discord-client-secret"
 
 	// Cookies configuration
-	s.config.Cookies.Domain = "localhost"
-	s.config.Cookies.Secure = false
-	s.config.Cookies.HTTPOnly = true
-	s.config.Cookies.SameSite = 1
-	s.config.Cookies.Path = "/"
+	s.Config.Cookies.Domain = "localhost"
+	s.Config.Cookies.Secure = false
+	s.Config.Cookies.HTTPOnly = true
+	s.Config.Cookies.SameSite = 1
+	s.Config.Cookies.Path = "/"
 
 	// User configuration
-	s.config.User.Roles = []string{"user", "platform_admin"}
+	s.Config.User.Roles = []string{"user", "platform_admin"}
 }
 
 func (s *TestSuite) setupTestServer() {
-	r, err := registry.NewRegistry(s.config, s.db)
-	require.NoError(s.t, err)
+	r, err := registry.NewRegistry(s.Config, s.Db)
+	require.NoError(s.T, err)
 	e := echo.New()
 	e.HideBanner = true
 	e.Use(middleware.Logger())
@@ -187,31 +187,31 @@ func (s *TestSuite) setupTestServer() {
 		group.GET(fmt.Sprintf("/%s", provider.Name), provider.Handlers.GetAuthURL, provider.Middlewares.CheckAuthEnabled)
 		group.GET(fmt.Sprintf("/%s/callback", provider.Name), provider.Handlers.ExchangeCode, provider.Middlewares.CheckAuthEnabled)
 	}
-	s.server = httptest.NewServer(e)
+	s.Server = httptest.NewServer(e)
 }
 
-func (s *TestSuite) teardown() {
-	if s.server != nil {
-		s.server.Close()
+func (s *TestSuite) Teardown() {
+	if s.Server != nil {
+		s.Server.Close()
 	}
-	if s.mockGithub != nil {
-		s.mockGithub.Close()
+	if s.MockGithub != nil {
+		s.MockGithub.Close()
 	}
-	if s.mockDiscord != nil {
-		s.mockDiscord.Close()
+	if s.MockDiscord != nil {
+		s.MockDiscord.Close()
 	}
-	if s.pgContainer != nil {
-		s.pgContainer.Terminate(s.ctx)
+	if s.PgContainer != nil {
+		s.PgContainer.Terminate(s.CTX)
 	}
 }
 
 func (s *TestSuite) CreateUser(t *testing.T, user entities.User, roles []string) entities.User {
-	err := s.db.Model(&entities.User{}).Create(&user).Error
+	err := s.Db.Model(&entities.User{}).Create(&user).Error
 	require.NoError(t, err)
 	userRoles := []entities.Role{}
 	if len(roles) > 0 {
 		for _, role := range roles {
-			err := s.db.Model(&entities.Role{}).Create(&entities.Role{
+			err := s.Db.Model(&entities.Role{}).Create(&entities.Role{
 				UserID: user.ID,
 				Value:  role,
 			}).Error
@@ -227,7 +227,7 @@ func (s *TestSuite) CreateUser(t *testing.T, user entities.User, roles []string)
 }
 
 func (s *TestSuite) CreateRefreshToken(t *testing.T, refreshToken entities.RefreshToken) entities.RefreshToken {
-	err := s.db.Model(&entities.RefreshToken{}).Create(&refreshToken).Error
+	err := s.Db.Model(&entities.RefreshToken{}).Create(&refreshToken).Error
 	require.NoError(t, err)
 	return refreshToken
 }

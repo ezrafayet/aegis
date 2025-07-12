@@ -39,16 +39,16 @@ func NewCustomClaimsFromValues(userID string, earlyAdopter bool, roles []Role, m
 
 func NewCusomClaimsFromMap(ccMap map[string]any) (*CustomClaims, error) {
 	cClaims := CustomClaims{}
-	if ccMap["user_id"] == nil {
+	if ccMap["user_id"] != nil {
 		cClaims.UserID = ccMap["user_id"].(string)
 	}
-	if ccMap["early_adopter"] == nil {
+	if ccMap["early_adopter"] != nil {
 		cClaims.EarlyAdopter = ccMap["early_adopter"].(bool)
 	}
-	if ccMap["roles"] == nil {
+	if ccMap["roles"] != nil {
 		cClaims.Roles = ccMap["roles"].(string)
 	}
-	if ccMap["metadata"] == nil {
+	if ccMap["metadata"] != nil {
 		cClaims.Metadata = ccMap["metadata"].(string)
 	}
 	return &cClaims, nil

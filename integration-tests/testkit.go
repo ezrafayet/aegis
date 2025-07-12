@@ -204,3 +204,24 @@ func (s *TestSuite) teardown() {
 		s.pgContainer.Terminate(s.ctx)
 	}
 }
+
+func (s *TestSuite) CreateUser(t *testing.T, user entities.User, roles []string) entities.User {
+	err := s.db.Model(&entities.User{}).Create(&user).Error
+	require.NoError(t, err)
+	userRoles := []entities.Role{}
+	if len(roles) > 0 {
+		for _, role := range roles {
+			err := s.db.Model(&entities.Role{}).Create(&entities.Role{
+				UserID: user.ID,
+				Value:  role,
+			}).Error
+			require.NoError(t, err)
+			userRoles = append(userRoles, entities.Role{
+				UserID: user.ID,
+				Value:  role,
+			})
+		}
+	}
+	user.Roles = userRoles
+	return user
+}

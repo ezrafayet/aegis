@@ -225,3 +225,9 @@ func (s *TestSuite) CreateUser(t *testing.T, user entities.User, roles []string)
 	user.Roles = userRoles
 	return user
 }
+
+func (s *TestSuite) CreateRefreshToken(t *testing.T, refreshToken entities.RefreshToken) entities.RefreshToken {
+	err := s.db.Model(&entities.RefreshToken{}).Create(&refreshToken).Error
+	require.NoError(t, err)
+	return refreshToken
+}

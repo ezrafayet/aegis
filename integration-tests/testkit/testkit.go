@@ -33,7 +33,7 @@ type TestSuite struct {
 	Config      entities.Config
 }
 
-func SetupTestSuite(t *testing.T) *TestSuite {
+func SetupTestSuite(t *testing.T, config entities.Config) *TestSuite {
 	ctx := context.Background()
 	pgContainer, db, connStr := setupDatabase(t, ctx)
 	suite := &TestSuite{
@@ -43,7 +43,7 @@ func SetupTestSuite(t *testing.T) *TestSuite {
 		Db:          db,
 	}
 	suite.setupMockServers()
-	suite.setupConfig(connStr)
+	suite.setupConfig(connStr, config)
 	suite.setupTestServer()
 	return suite
 }
@@ -128,47 +128,54 @@ func (s *TestSuite) setupMockServers() {
 	}))
 }
 
-func (s *TestSuite) setupConfig(dbURL string) {
-	s.Config = entities.Config{}
+func (s *TestSuite) setupConfig(dbURL string, config entities.Config) {
+	config.DB.PostgresURL = dbURL
+	s.Config = config
+}
+
+func GetBaseConfig() entities.Config {
+	config := entities.Config{}
 
 	// App configuration
-	s.Config.App.Name = "TestApp"
-	s.Config.App.URL = "http://localhost:8080"
-	s.Config.App.CorsAllowedOrigins = []string{"http://localhost:8080"}
-	s.Config.App.EarlyAdoptersOnly = false
-	s.Config.App.RedirectAfterSuccess = "http://localhost:8080/login-success"
-	s.Config.App.RedirectAfterError = "http://localhost:8080/login-error"
-	s.Config.App.InternalAPIKeys = []string{"test-api-key"}
-	s.Config.App.Port = 8080
+	config.App.Name = "TestApp"
+	config.App.URL = "http://localhost:8080"
+	config.App.CorsAllowedOrigins = []string{"http://localhost:8080"}
+	config.App.EarlyAdoptersOnly = false
+	config.App.RedirectAfterSuccess = "http://localhost:8080/login-success"
+	config.App.RedirectAfterError = "http://localhost:8080/login-error"
+	config.App.InternalAPIKeys = []string{"test-api-key"}
+	config.App.Port = 8080
 
 	// Database configuration
-	s.Config.DB.PostgresURL = dbURL
+	config.DB.PostgresURL = "dburl, replaced by testkit"
 
 	// JWT configuration
-	s.Config.JWT.Secret = "test-jwt-secret-key-for-testing"
-	s.Config.JWT.AccessTokenExpirationMin = 15
-	s.Config.JWT.RefreshTokenExpirationDays = 7
+	config.JWT.Secret = "test-jwt-secret-key-for-testing"
+	config.JWT.AccessTokenExpirationMin = 15
+	config.JWT.RefreshTokenExpirationDays = 7
 
 	// Auth providers configuration
-	s.Config.Auth.Providers.GitHub.Enabled = true
-	s.Config.Auth.Providers.GitHub.AppName = "TestApp"
-	s.Config.Auth.Providers.GitHub.ClientID = "test-github-client-id"
-	s.Config.Auth.Providers.GitHub.ClientSecret = "test-github-client-secret"
+	config.Auth.Providers.GitHub.Enabled = true
+	config.Auth.Providers.GitHub.AppName = "TestApp"
+	config.Auth.Providers.GitHub.ClientID = "test-github-client-id"
+	config.Auth.Providers.GitHub.ClientSecret = "test-github-client-secret"
 
-	s.Config.Auth.Providers.Discord.Enabled = true
-	s.Config.Auth.Providers.Discord.AppName = "TestApp"
-	s.Config.Auth.Providers.Discord.ClientID = "test-discord-client-id"
-	s.Config.Auth.Providers.Discord.ClientSecret = "test-discord-client-secret"
+	config.Auth.Providers.Discord.Enabled = true
+	config.Auth.Providers.Discord.AppName = "TestApp"
+	config.Auth.Providers.Discord.ClientID = "test-discord-client-id"
+	config.Auth.Providers.Discord.ClientSecret = "test-discord-client-secret"
 
 	// Cookies configuration
-	s.Config.Cookies.Domain = "localhost"
-	s.Config.Cookies.Secure = false
-	s.Config.Cookies.HTTPOnly = true
-	s.Config.Cookies.SameSite = 1
-	s.Config.Cookies.Path = "/"
+	config.Cookies.Domain = "localhost"
+	config.Cookies.Secure = false
+	config.Cookies.HTTPOnly = true
+	config.Cookies.SameSite = 1
+	config.Cookies.Path = "/"
 
 	// User configuration
-	s.Config.User.Roles = []string{"user", "platform_admin"}
+	config.User.Roles = []string{"user", "platform_admin"}
+
+	return config
 }
 
 func (s *TestSuite) setupTestServer() {

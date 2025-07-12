@@ -11,7 +11,7 @@ import (
 
 func TestHealthEndpoint(t *testing.T) {
 	t.Run("calling GET /health returns 200", func(t *testing.T) {
-		suite := testkit.SetupTestSuite(t)
+		suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
 		defer suite.Teardown()
 		resp, err := http.Get(suite.Server.URL + "/auth/health")
 		require.NoError(t, err)

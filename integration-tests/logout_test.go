@@ -14,7 +14,7 @@ import (
 
 func TestLogout(t *testing.T) {
 	t.Run("calling GET /logout sets zero cookies", func(t *testing.T) {
-		suite := testkit.SetupTestSuite(t)
+		suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
 		defer suite.Teardown()
 		resp, err := http.Get(suite.Server.URL + "/auth/logout")
 		require.NoError(t, err)
@@ -30,7 +30,7 @@ func TestLogout(t *testing.T) {
 	})
 
 	t.Run("calling GET /logout with a refresh token deletes the refresh token", func(t *testing.T) {
-		suite := testkit.SetupTestSuite(t)
+		suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
 		defer suite.Teardown()
 
 		// Create a user

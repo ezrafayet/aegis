@@ -16,14 +16,14 @@ import (
 )
 
 func TestMe(t *testing.T) {
-	t.Run("asking /me without a session returns 401", func(t *testing.T) {
+	t.Run("calling GET /me without a session returns 401", func(t *testing.T) {
 		suite := setupTestSuite(t)
 		defer suite.teardown()
 		resp, err := http.Get(suite.server.URL + "/auth/me")
 		require.NoError(t, err)
 		assert.Equal(t, http.StatusUnauthorized, resp.StatusCode)
 	})
-	t.Run("asking /me with a session returns 200 and the session", func(t *testing.T) {
+	t.Run("calling GET /me with a session returns 200 and the session", func(t *testing.T) {
 		suite := setupTestSuite(t)
 		defer suite.teardown()
 		user, err := entities.NewUser("cloude", "https://example.com/avatar.jpg", "cloude@example.com", "github")

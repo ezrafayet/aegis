@@ -22,16 +22,16 @@ func TestIntegration(t *testing.T) {
 	})
 	t.Run("calling GET /provider/callback", func(t *testing.T) {
 		t.Run("unhappy scenarios: generic cases", func(t *testing.T) {
-			t.Run("returns 403 if the provider is not enabled", func(t *testing.T) {})
+			t.Run("returns 403 if the provider is not enabled", integration_test_cases.ProviderCallback_NotEnabledReturns403)
 		})
 		t.Run("unhappy scenarios: cases that must redirect to error page", func(t *testing.T) {
-			t.Run("redirects to error page if state is invalid", func(t *testing.T) {})
-			t.Run("redirects to error page if code is invalid", func(t *testing.T) {})
-			t.Run("redirects to error page if user declines auth", func(t *testing.T) {})
-			t.Run("redirects to error page if user is using another method", func(t *testing.T) {})
-			t.Run("redirects to error page if user is blocked", func(t *testing.T) {})
-			t.Run("redirects to error page if user is deleted", func(t *testing.T) {})
-			t.Run("redirects to error page if user is not an early adopter", func(t *testing.T) {})
+			t.Run("redirects to error page if state is invalid", integration_test_cases.ProviderCallback_MustRedirectToErrorPage_InvalidState)
+			t.Run("redirects to error page if code is invalid", integration_test_cases.ProviderCallback_MustRedirectToErrorPage_InvalidCode)
+			t.Run("redirects to error page if user declines auth", integration_test_cases.ProviderCallback_MustRedirectToErrorPage_UserDeclinesAuth)
+			t.Run("redirects to error page if user is using another method", integration_test_cases.ProviderCallback_MustRedirectToErrorPage_UserUsingAnotherMethod)
+			t.Run("redirects to error page if user is blocked", integration_test_cases.ProviderCallback_MustRedirectToErrorPage_UserBlocked)
+			t.Run("redirects to error page if user is deleted", integration_test_cases.ProviderCallback_MustRedirectToErrorPage_UserDeleted)
+			t.Run("redirects to error page if user is not an early adopter", integration_test_cases.ProviderCallback_MustRedirectToErrorPage_UserNotAnEarlyAdopter)
 		})
 		t.Run("happy scenarios", func(t *testing.T) {
 			t.Run("gives [access_token, refresh_token] if the user already exists", func(t *testing.T) {})
@@ -70,10 +70,10 @@ func TestIntegration(t *testing.T) {
 		})
 		t.Run("soft refresh (generate new tokens if this is needed only, ex: /me)", func(t *testing.T) {
 			t.Run("must not refresh the user (1)", func(t *testing.T) {
-				t.Run("if user does not exist", func(t *testing.T) {/*todo*/})
-				t.Run("if user is deleted", func(t *testing.T) {/*todo*/})
-				t.Run("if user is blocked", func(t *testing.T) {/*todo*/})
-				t.Run("if user is not an early adopter", func(t *testing.T) {/*todo*/})
+				t.Run("if user does not exist", func(t *testing.T) { /*todo*/ })
+				t.Run("if user is deleted", func(t *testing.T) { /*todo*/ })
+				t.Run("if user is blocked", func(t *testing.T) { /*todo*/ })
+				t.Run("if user is not an early adopter", func(t *testing.T) { /*todo*/ })
 			})
 			t.Run("must refresh the user", func(t *testing.T) {
 				t.Run("if no access_token but refresh_token is valid", integration_test_cases.SoftRefresh_MustRefresh_EmptyAT)

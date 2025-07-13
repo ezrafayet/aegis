@@ -1,13 +1,16 @@
 package testkit
 
 import (
+	usecases "aegis/internal/application/use_cases"
 	"aegis/internal/domain/entities"
 	"aegis/internal/infrastructure/database"
+	"aegis/internal/infrastructure/handlers"
+	"aegis/internal/infrastructure/middlewares"
+	"aegis/internal/infrastructure/repositories"
 	"aegis/internal/registry"
+	"aegis/pkg/urlbuilder"
 	"context"
-	"encoding/json"
 	"fmt"
-	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
@@ -28,8 +31,6 @@ type TestSuite struct {
 	PgContainer *postgresContainer.PostgresContainer
 	Db          *gorm.DB
 	Server      *httptest.Server
-	MockGithub  *httptest.Server
-	MockDiscord *httptest.Server
 	Config      entities.Config
 }
 
@@ -71,92 +72,8 @@ func setupDatabase(t *testing.T, ctx context.Context) (*postgresContainer.Postgr
 }
 
 func (s *TestSuite) setupMockServers() {
-	// Mock GitHub OAuth server
-	s.MockGithub = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case "/login/oauth/access_token":
-			if err := r.ParseForm(); err != nil {
-				w.WriteHeader(http.StatusBadRequest)
-				return
-			}
-			code := r.FormValue("code")
-
-			switch code {
-			case "rejected_code":
-				// Code for a user that must be rejected by GitHub
-				w.Header().Set("Content-Type", "application/json")
-				w.WriteHeader(http.StatusBadRequest)
-				json.NewEncoder(w).Encode(map[string]string{
-					"error":             "invalid_grant",
-					"error_description": "The authorization code is invalid or has expired",
-				})
-				return
-			case "declined_code":
-				// Code for a user that declined to log in
-				w.Header().Set("Content-Type", "application/json")
-				w.WriteHeader(http.StatusBadRequest)
-				json.NewEncoder(w).Encode(map[string]string{
-					"error":             "access_denied",
-					"error_description": "User declined to authorize the application",
-				})
-				return
-			case "accepted_code":
-				// Code for a user that accepted the login
-				w.Header().Set("Content-Type", "application/json")
-				json.NewEncoder(w).Encode(map[string]string{
-					"access_token": "mock_access_token",
-					"token_type":   "bearer",
-					"scope":        "user:email",
-				})
-				return
-			default:
-				panic(fmt.Sprintf("unexpected code: %s, the codes for the mockup are: rejected_code, declined_code, accepted_code", code))
-			}
-		case "/user":
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"login":      "testuser",
-				"name":       "Test User",
-				"email":      "test@example.com",
-				"avatar_url": "https://avatars.githubusercontent.com/u/123?v=4",
-			})
-		case "/user/emails":
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode([]map[string]interface{}{
-				{
-					"email":    "test@example.com",
-					"primary":  true,
-					"verified": true,
-				},
-			})
-		default:
-			w.WriteHeader(http.StatusNotFound)
-		}
-	}))
-
-	// Mock Discord OAuth server
-	//s.MockDiscord = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	//	switch r.URL.Path {
-	//	case "/api/oauth2/token":
-	//		w.Header().Set("Content-Type", "application/json")
-	//		json.NewEncoder(w).Encode(map[string]string{
-	//			"access_token": "mock_discord_access_token",
-	//			"token_type":   "Bearer",
-	//			"scope":        "identify email",
-	//		})
-	//	case "/api/users/@me":
-	//		w.Header().Set("Content-Type", "application/json")
-	//		json.NewEncoder(w).Encode(map[string]interface{}{
-	//			"id":            "123456789",
-	//			"username":      "testuser",
-	//			"email":         "test@example.com",
-	//			"avatar":        "a_1234567890abcdef",
-	//			"discriminator": "0001",
-	//		})
-	//	default:
-	//		w.WriteHeader(http.StatusNotFound)
-	//	}
-	//}))
+	// No mock servers needed with fake providers!
+	// The fake providers handle everything internally
 }
 
 func (s *TestSuite) setupConfig(dbURL string, config entities.Config) {
@@ -210,7 +127,8 @@ func GetBaseConfig() entities.Config {
 }
 
 func (s *TestSuite) setupTestServer() {
-	r, err := registry.NewRegistry(s.Config, s.Db)
+	// Create a custom registry with mock server URLs
+	r, err := s.createTestRegistry()
 	require.NoError(s.T, err)
 	e := echo.New()
 	e.HideBanner = true
@@ -228,15 +146,54 @@ func (s *TestSuite) setupTestServer() {
 	s.Server = httptest.NewServer(e)
 }
 
+func (s *TestSuite) createTestRegistry() (registry.Registry, error) {
+	userRepository := repositories.NewUserRepository(s.Db)
+	refreshTokenRepository := repositories.NewRefreshTokenRepository(s.Db)
+	stateRepository := repositories.NewStateRepository(s.Db)
+
+	authService := usecases.NewService(s.Config, refreshTokenRepository, userRepository)
+	authHandlers := handlers.NewHandlers(s.Config, authService)
+	authMiddlewares := middlewares.NewAuthMiddleware(s.Config, authService)
+
+	redirectURLBase, err := urlbuilder.Build(s.Config.App.URL, "/auth/%s/callback", map[string]string{})
+	if err != nil {
+		return registry.Registry{}, err
+	}
+
+	// Use fake providers
+	providers := []registry.Provider{
+		registry.NewProvider(
+			s.Config, NewFakeOAuthProvider(
+				"github",
+				s.Config.Auth.Providers.GitHub.Enabled,
+				s.Config.Auth.Providers.GitHub.ClientID,
+				s.Config.Auth.Providers.GitHub.ClientSecret,
+				fmt.Sprintf(redirectURLBase, "github")),
+			userRepository,
+			refreshTokenRepository,
+			stateRepository),
+		registry.NewProvider(
+			s.Config, NewFakeOAuthProvider(
+				"discord",
+				s.Config.Auth.Providers.Discord.Enabled,
+				s.Config.Auth.Providers.Discord.ClientID,
+				s.Config.Auth.Providers.Discord.ClientSecret,
+				fmt.Sprintf(redirectURLBase, "discord")),
+			userRepository,
+			refreshTokenRepository,
+			stateRepository),
+	}
+
+	return registry.Registry{
+		Handlers:    authHandlers,
+		Middlewares: authMiddlewares,
+		Providers:   providers,
+	}, nil
+}
+
 func (s *TestSuite) Teardown() {
 	if s.Server != nil {
 		s.Server.Close()
-	}
-	if s.MockGithub != nil {
-		s.MockGithub.Close()
-	}
-	if s.MockDiscord != nil {
-		s.MockDiscord.Close()
 	}
 	if s.PgContainer != nil {
 		s.PgContainer.Terminate(s.CTX)

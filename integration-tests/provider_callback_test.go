@@ -277,7 +277,7 @@ func TestProviderCallback(t *testing.T) {
 			err = suite.Db.Model(&entities.State{}).Create(&state).Error
 			require.NoError(t, err)
 
-			req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?code=valid_code&state=valid_state", nil)
+			req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?code=accepted_code&state=valid_state", nil)
 			require.NoError(t, err)
 
 			client := &http.Client{
@@ -291,7 +291,7 @@ func TestProviderCallback(t *testing.T) {
 
 			assert.Equal(t, http.StatusFound, resp.StatusCode)
 			location := resp.Header.Get("Location")
-			assert.Equal(t, location, "http://localhost:8080/login-success")
+			assert.Equal(t, "http://localhost:8080/login-success", location)
 
 			// Verify cookies are set
 			cookies := resp.Cookies()
@@ -306,6 +306,12 @@ func TestProviderCallback(t *testing.T) {
 			}
 			assert.NotEmpty(t, accessToken)
 			assert.NotEmpty(t, refreshToken)
+
+			// check user length is 1
+			var count int64
+			err = suite.Db.Model(&entities.User{}).Count(&count).Error
+			require.NoError(t, err)
+			assert.Equal(t, int64(1), count)
 		})
 
 		t.Run("calling GET /provider/callback gives [access_token, refresh_token] and creates user if the user does not exist", func(t *testing.T) {
@@ -326,7 +332,7 @@ func TestProviderCallback(t *testing.T) {
 			require.NoError(t, err)
 			assert.Equal(t, int64(0), count)
 
-			req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?code=valid_code&state=valid_state", nil)
+			req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?code=accepted_code&state=valid_state", nil)
 			require.NoError(t, err)
 
 			client := &http.Client{
@@ -340,7 +346,7 @@ func TestProviderCallback(t *testing.T) {
 
 			assert.Equal(t, http.StatusFound, resp.StatusCode)
 			location := resp.Header.Get("Location")
-			assert.Equal(t, location, "http://localhost:8080/login-success")
+			assert.Equal(t, "http://localhost:8080/login-success", location)
 
 			// Verify cookies are set
 			cookies := resp.Cookies()
@@ -380,7 +386,7 @@ func TestProviderCallback(t *testing.T) {
 			require.NoError(t, err)
 			assert.Equal(t, int64(1), count)
 
-			req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?code=valid_code&state=valid_state", nil)
+			req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?code=accepted_code&state=valid_state", nil)
 			require.NoError(t, err)
 
 			client := &http.Client{
@@ -411,7 +417,7 @@ func TestProviderCallback(t *testing.T) {
 			err := suite.Db.Model(&entities.State{}).Create(&state).Error
 			require.NoError(t, err)
 
-			req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?code=valid_code&state=valid_state", nil)
+			req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?code=accepted_code&state=valid_state", nil)
 			require.NoError(t, err)
 
 			client := &http.Client{

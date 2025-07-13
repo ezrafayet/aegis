@@ -1,7 +1,7 @@
 package integration
 
 import (
-	"aegis/integration-tests/testkit"
+	"aegis/integration/integration_testkit"
 	"aegis/internal/domain/entities"
 	"aegis/pkg/apperrors"
 	"encoding/json"
@@ -17,9 +17,9 @@ import (
 func TestProviderCallback(t *testing.T) {
 	t.Run("unhappy scenarios: generic cases", func(t *testing.T) {
 		t.Run("calling GET /provider/callback returns 403 if the provider is not enabled", func(t *testing.T) {
-			config := testkit.GetBaseConfig()
+			config := integration_testkit.GetBaseConfig()
 			config.Auth.Providers.GitHub.Enabled = false
-			suite := testkit.SetupTestSuite(t, config)
+			suite := integration_testkit.SetupTestSuite(t, config)
 			defer suite.Teardown()
 
 			resp, err := http.Get(suite.Server.URL + "/auth/github/callback")
@@ -38,7 +38,7 @@ func TestProviderCallback(t *testing.T) {
 	t.Run("unhappy scenarios: cases that must redirect to error page", func(t *testing.T) {
 
 		t.Run("calling GET /provider/callback redirects to error page if state is invalid", func(t *testing.T) {
-			suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
+			suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 			defer suite.Teardown()
 			req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?code=valid_code&state=invalid_state", nil)
 			require.NoError(t, err)
@@ -60,7 +60,7 @@ func TestProviderCallback(t *testing.T) {
 		})
 
 		t.Run("calling GET /provider/callback redirects to error page if code is invalid", func(t *testing.T) {
-			suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
+			suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 			defer suite.Teardown()
 
 			// Create a valid state first
@@ -89,7 +89,7 @@ func TestProviderCallback(t *testing.T) {
 		})
 
 		t.Run("calling GET /provider/callback returns to error page if user declines auth", func(t *testing.T) {
-			suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
+			suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 			defer suite.Teardown()
 
 			req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?error=access_denied", nil)
@@ -110,7 +110,7 @@ func TestProviderCallback(t *testing.T) {
 		})
 
 		t.Run("calling GET /provider/callback returns to error page if user is using another method", func(t *testing.T) {
-			suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
+			suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 			defer suite.Teardown()
 
 			// Create a user with discord auth method
@@ -148,7 +148,7 @@ func TestProviderCallback(t *testing.T) {
 		})
 
 		t.Run("calling GET /provider/callback returns to error page if user is blocked", func(t *testing.T) {
-			suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
+			suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 			defer suite.Teardown()
 
 			// Create a blocked user
@@ -184,7 +184,7 @@ func TestProviderCallback(t *testing.T) {
 		})
 
 		t.Run("calling GET /provider/callback returns to error page if user is deleted", func(t *testing.T) {
-			suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
+			suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 			defer suite.Teardown()
 
 			// Create a deleted user
@@ -221,9 +221,9 @@ func TestProviderCallback(t *testing.T) {
 		})
 
 		t.Run("calling GET /provider/callback returns to error page if user is not an early user", func(t *testing.T) {
-			config := testkit.GetBaseConfig()
+			config := integration_testkit.GetBaseConfig()
 			config.App.EarlyAdoptersOnly = true
-			suite := testkit.SetupTestSuite(t, config)
+			suite := integration_testkit.SetupTestSuite(t, config)
 			defer suite.Teardown()
 
 			// Create a user who is not an early adopter
@@ -261,7 +261,7 @@ func TestProviderCallback(t *testing.T) {
 
 	t.Run("happy scenarios", func(t *testing.T) {
 		t.Run("calling GET /provider/callback gives [access_token, refresh_token] if the user already exists", func(t *testing.T) {
-			suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
+			suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 			defer suite.Teardown()
 
 			// Create an existing user
@@ -315,7 +315,7 @@ func TestProviderCallback(t *testing.T) {
 		})
 
 		t.Run("calling GET /provider/callback gives [access_token, refresh_token] and creates user if the user does not exist", func(t *testing.T) {
-			suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
+			suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 			defer suite.Teardown()
 
 			// Create a valid state
@@ -369,7 +369,7 @@ func TestProviderCallback(t *testing.T) {
 		})
 
 		t.Run("calling GET /provider/callback cleans the state", func(t *testing.T) {
-			suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
+			suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 			defer suite.Teardown()
 
 			// Create a valid state
@@ -406,7 +406,7 @@ func TestProviderCallback(t *testing.T) {
 		})
 
 		t.Run("calling GET /provider/callback redirects to the welcome page", func(t *testing.T) {
-			suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
+			suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 			defer suite.Teardown()
 
 			// Create a valid state

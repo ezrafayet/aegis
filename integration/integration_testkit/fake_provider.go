@@ -1,4 +1,4 @@
-package testkit
+package integration_testkit
 
 import (
 	"aegis/pkg/plugins/providers"

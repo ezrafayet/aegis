@@ -1,7 +1,7 @@
 package integration
 
 import (
-	"aegis/integration-tests/testkit"
+	"aegis/integration/integration_testkit"
 	"aegis/internal/domain/entities"
 	"aegis/pkg/apperrors"
 	"encoding/json"
@@ -15,9 +15,9 @@ import (
 
 func TestProvider(t *testing.T) {
 	t.Run("calling GET /provider returns 403 if the provider is not enabled", func(t *testing.T) {
-		config := testkit.GetBaseConfig()
+		config := integration_testkit.GetBaseConfig()
 		config.Auth.Providers.GitHub.Enabled = false
-		suite := testkit.SetupTestSuite(t, config)
+		suite := integration_testkit.SetupTestSuite(t, config)
 		defer suite.Teardown()
 
 		resp, err := http.Get(suite.Server.URL + "/auth/github")
@@ -33,9 +33,9 @@ func TestProvider(t *testing.T) {
 	})
 
 	t.Run("calling GET /provider returns the url for client to redirect to, and saves a state", func(t *testing.T) {
-		config := testkit.GetBaseConfig()
+		config := integration_testkit.GetBaseConfig()
 		config.Auth.Providers.GitHub.Enabled = true
-		suite := testkit.SetupTestSuite(t, config)
+		suite := integration_testkit.SetupTestSuite(t, config)
 		defer suite.Teardown()
 
 		resp, err := http.Get(suite.Server.URL + "/auth/github")

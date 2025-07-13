@@ -1,7 +1,7 @@
 package integration
 
 import (
-	"aegis/integration-tests/testkit"
+	"aegis/integration/integration_testkit"
 	"aegis/internal/domain/entities"
 	"aegis/pkg/apperrors"
 	"aegis/pkg/cookies"
@@ -30,7 +30,7 @@ func TestRefresh_HardRefresh(t *testing.T) {
 	})
 
 	t.Run("calling GET /refresh with [valid access_token, valid refresh_token] returns a new [access_token, refresh_token]", func(t *testing.T) {
-		suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
+		suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 		defer suite.Teardown()
 
 		// Create a user
@@ -88,7 +88,7 @@ func TestRefresh_HardRefresh(t *testing.T) {
 
 	t.Run("calling GET /refresh with [invalid access_token, valid refresh_token] returns a new [access_token, refresh_token]", func(t *testing.T) {
 		t.Run("access_token is expired", func(t *testing.T) {
-			suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
+			suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 			defer suite.Teardown()
 
 			// Create a user
@@ -145,7 +145,7 @@ func TestRefresh_HardRefresh(t *testing.T) {
 		})
 
 		t.Run("access_token is malformed", func(t *testing.T) {
-			suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
+			suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 			defer suite.Teardown()
 
 			// Create a user
@@ -202,7 +202,7 @@ func TestRefresh_HardRefresh(t *testing.T) {
 		})
 
 		t.Run("access_token is empty", func(t *testing.T) {
-			suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
+			suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 			defer suite.Teardown()
 
 			// Create a user
@@ -252,7 +252,7 @@ func TestRefresh_HardRefresh(t *testing.T) {
 
 	t.Run("calling GET /refresh with [invalid access_token, invalid refresh_token] returns 401", func(t *testing.T) {
 		t.Run("refresh_token is expired", func(t *testing.T) {
-			suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
+			suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 			defer suite.Teardown()
 
 			// Create a user
@@ -292,7 +292,7 @@ func TestRefresh_HardRefresh(t *testing.T) {
 		})
 
 		t.Run("refresh_token is malformed", func(t *testing.T) {
-			suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
+			suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 			defer suite.Teardown()
 
 			// Create request with malformed refresh token
@@ -318,7 +318,7 @@ func TestRefresh_HardRefresh(t *testing.T) {
 		})
 
 		t.Run("refresh_token is empty", func(t *testing.T) {
-			suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
+			suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 			defer suite.Teardown()
 
 			// Create request without refresh token
@@ -344,7 +344,7 @@ func TestRefresh_HardRefresh(t *testing.T) {
 
 func TestRefresh_SoftRefresh(t *testing.T) {
 	t.Run("calling a route with check & soft refresh, with [valid access_token, valid refresh_token] does not update the tokens", func(t *testing.T) {
-		suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
+		suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 		defer suite.Teardown()
 
 		// Create a user
@@ -384,7 +384,7 @@ func TestRefresh_SoftRefresh(t *testing.T) {
 
 	t.Run("calling a route with check & soft refresh, with [invalid access_token, valid refresh_token] returns a new [access_token]", func(t *testing.T) {
 		t.Run("access_token is expired", func(t *testing.T) {
-			suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
+			suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 			defer suite.Teardown()
 
 			// Create a user
@@ -548,7 +548,7 @@ func TestRefresh_SoftRefresh(t *testing.T) {
 
 	t.Run("calling a route with check & soft refresh, with [invalid access_token, invalid refresh_token] returns 401", func(t *testing.T) {
 		t.Run("refresh_token is expired", func(t *testing.T) {
-			suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
+			suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 			defer suite.Teardown()
 
 			// Create a user
@@ -592,7 +592,7 @@ func TestRefresh_SoftRefresh(t *testing.T) {
 		})
 
 		t.Run("refresh_token is malformed", func(t *testing.T) {
-			suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
+			suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 			defer suite.Teardown()
 
 			// Create request with malformed refresh token
@@ -621,7 +621,7 @@ func TestRefresh_SoftRefresh(t *testing.T) {
 		})
 
 		t.Run("refresh_token is empty", func(t *testing.T) {
-			suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
+			suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 			defer suite.Teardown()
 
 			// Create request without refresh token

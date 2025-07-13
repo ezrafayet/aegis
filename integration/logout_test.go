@@ -7,14 +7,14 @@ import (
 	"testing"
 	"time"
 
-	"aegis/integration-tests/testkit"
+	"aegis/integration/integration_testkit"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestLogout(t *testing.T) {
 	t.Run("calling GET /logout sets zero cookies + calling without a refresh token does not break", func(t *testing.T) {
-		suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
+		suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 		defer suite.Teardown()
 		resp, err := http.Get(suite.Server.URL + "/auth/logout")
 		require.NoError(t, err)
@@ -30,7 +30,7 @@ func TestLogout(t *testing.T) {
 	})
 
 	t.Run("calling GET /logout with a refresh token deletes the refresh token", func(t *testing.T) {
-		suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
+		suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 		defer suite.Teardown()
 
 		// Create a user

@@ -11,21 +11,21 @@ import (
 	"testing"
 	"time"
 
-	"aegis/integration-tests/testkit"
+	"aegis/integration/integration_testkit"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestMe(t *testing.T) {
 	t.Run("calling GET /me without a session returns 401", func(t *testing.T) {
-		suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
+		suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 		defer suite.Teardown()
 		resp, err := http.Get(suite.Server.URL + "/auth/me")
 		require.NoError(t, err)
 		assert.Equal(t, http.StatusUnauthorized, resp.StatusCode)
 	})
 	t.Run("calling GET /me with a session returns 200 and the session", func(t *testing.T) {
-		suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
+		suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 		defer suite.Teardown()
 		user, err := entities.NewUser("cloude", "https://example.com/avatar.jpg", "cloude@example.com", "github")
 		require.NoError(t, err)

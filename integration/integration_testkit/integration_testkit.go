@@ -1,4 +1,4 @@
-package testkit
+package integration_testkit
 
 import (
 	usecases "aegis/internal/application/use_cases"

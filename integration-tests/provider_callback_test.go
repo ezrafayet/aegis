@@ -15,7 +15,7 @@ import (
 )
 
 // func TestProviderCallback(t *testing.T) {
-// 	t.Run("unhappy scenarios: invalid data / generic", func(t *testing.T) {
+// 	t.Run("unhappy scenarios: generic cases", func(t *testing.T) {
 // 		t.Run("calling GET /provider/callback returns 403 if the provider is not enabled", func(t *testing.T) {
 // 			config := testkit.GetBaseConfig()
 // 			config.Auth.Providers.GitHub.Enabled = false
@@ -85,7 +85,7 @@ import (
 // 		})
 // 	})
 
-// 	t.Run("unhappy scenarios: error page", func(t *testing.T) {
+// 	t.Run("unhappy scenarios: cases that must redirect to error page", func(t *testing.T) {
 // 		t.Run("calling GET /provider/callback returns to error page if user declines auth", func(t *testing.T) {
 // 			suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
 // 			defer suite.Teardown()

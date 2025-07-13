@@ -75,12 +75,43 @@ func (s *TestSuite) setupMockServers() {
 	s.MockGithub = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/login/oauth/access_token":
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(map[string]string{
-				"access_token": "mock_access_token",
-				"token_type":   "bearer",
-				"scope":        "user:email",
-			})
+			if err := r.ParseForm(); err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+			code := r.FormValue("code")
+
+			switch code {
+			case "rejected_code":
+				// Code for a user that must be rejected by GitHub
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(map[string]string{
+					"error":             "invalid_grant",
+					"error_description": "The authorization code is invalid or has expired",
+				})
+				return
+			case "declined_code":
+				// Code for a user that declined to log in
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(map[string]string{
+					"error":             "access_denied",
+					"error_description": "User declined to authorize the application",
+				})
+				return
+			case "accepted_code":
+				// Code for a user that accepted the login
+				w.Header().Set("Content-Type", "application/json")
+				json.NewEncoder(w).Encode(map[string]string{
+					"access_token": "mock_access_token",
+					"token_type":   "bearer",
+					"scope":        "user:email",
+				})
+				return
+			default:
+				panic(fmt.Sprintf("unexpected code: %s, the codes for the mockup are: rejected_code, declined_code, accepted_code", code))
+			}
 		case "/user":
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(map[string]interface{}{
@@ -104,28 +135,28 @@ func (s *TestSuite) setupMockServers() {
 	}))
 
 	// Mock Discord OAuth server
-	s.MockDiscord = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case "/api/oauth2/token":
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(map[string]string{
-				"access_token": "mock_discord_access_token",
-				"token_type":   "Bearer",
-				"scope":        "identify email",
-			})
-		case "/api/users/@me":
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"id":            "123456789",
-				"username":      "testuser",
-				"email":         "test@example.com",
-				"avatar":        "a_1234567890abcdef",
-				"discriminator": "0001",
-			})
-		default:
-			w.WriteHeader(http.StatusNotFound)
-		}
-	}))
+	//s.MockDiscord = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	//	switch r.URL.Path {
+	//	case "/api/oauth2/token":
+	//		w.Header().Set("Content-Type", "application/json")
+	//		json.NewEncoder(w).Encode(map[string]string{
+	//			"access_token": "mock_discord_access_token",
+	//			"token_type":   "Bearer",
+	//			"scope":        "identify email",
+	//		})
+	//	case "/api/users/@me":
+	//		w.Header().Set("Content-Type", "application/json")
+	//		json.NewEncoder(w).Encode(map[string]interface{}{
+	//			"id":            "123456789",
+	//			"username":      "testuser",
+	//			"email":         "test@example.com",
+	//			"avatar":        "a_1234567890abcdef",
+	//			"discriminator": "0001",
+	//		})
+	//	default:
+	//		w.WriteHeader(http.StatusNotFound)
+	//	}
+	//}))
 }
 
 func (s *TestSuite) setupConfig(dbURL string, config entities.Config) {

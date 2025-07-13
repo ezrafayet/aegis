@@ -70,25 +70,25 @@ func TestIntegration(t *testing.T) {
 		})
 		t.Run("soft refresh (generate new tokens if this is needed only, ex: /me)", func(t *testing.T) {
 			t.Run("must not refresh the user (1)", func(t *testing.T) {
-				t.Run("if user does not exist", func(t *testing.T) {})
-				t.Run("if user is deleted", func(t *testing.T) {})
-				t.Run("if user is blocked", func(t *testing.T) {})
-				t.Run("if user is not an early adopter", func(t *testing.T) {})
+				t.Run("if user does not exist", func(t *testing.T) {/*todo*/})
+				t.Run("if user is deleted", func(t *testing.T) {/*todo*/})
+				t.Run("if user is blocked", func(t *testing.T) {/*todo*/})
+				t.Run("if user is not an early adopter", func(t *testing.T) {/*todo*/})
 			})
 			t.Run("must refresh the user", func(t *testing.T) {
-				t.Run("if no access_token but refresh_token is valid", func(t *testing.T) {})
-				t.Run("if expired access_token and refresh_token is valid", func(t *testing.T) {})
-				t.Run("if malformed access_token and refresh_token is valid", func(t *testing.T) {})
+				t.Run("if no access_token but refresh_token is valid", integration_test_cases.SoftRefresh_MustRefresh_EmptyAT)
+				t.Run("if expired access_token and refresh_token is valid", integration_test_cases.SoftRefresh_MustRefresh_ExpiredAT)
+				t.Run("if malformed access_token and refresh_token is valid", integration_test_cases.SoftRefresh_MustRefresh_MalformedAT)
 			})
 			t.Run("must not refresh the user (2)", func(t *testing.T) {
 				// todo: could be improved to cover the 9 cases
-				t.Run("if no refresh_token", func(t *testing.T) {})
-				t.Run("if expired refresh_token", func(t *testing.T) {})
-				t.Run("if malformed refresh_token", func(t *testing.T) {})
+				t.Run("if no refresh_token", integration_test_cases.SoftRefresh_MustNotRefresh_EmptyRT)
+				t.Run("if expired refresh_token", integration_test_cases.SoftRefresh_MustNotRefresh_ExpiredRT)
+				t.Run("if malformed refresh_token", integration_test_cases.SoftRefresh_MustNotRefresh_MalformedRT)
 			})
 
 			t.Run("must not refresh the user (3)", func(t *testing.T) {
-				t.Run("if access_token is valid", func(t *testing.T) {})
+				t.Run("if access_token is valid", integration_test_cases.SoftRefresh_MustNotRefresh_ValidAT)
 			})
 		})
 		t.Run("rate limiting", func(t *testing.T) { /*todo*/ })

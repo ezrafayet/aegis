@@ -54,7 +54,6 @@ func (p OAuthGithubRepository) GetOauthRedirectURL(state string) string {
 }
 
 func (p OAuthGithubRepository) GetName() string {
-	fmt.Println("GetName", p.Name)
 	return p.Name
 }
 

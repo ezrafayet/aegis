@@ -53,7 +53,6 @@ func (p OAuthDiscordRepository) GetOauthRedirectURL(state string) string {
 }
 
 func (p OAuthDiscordRepository) GetName() string {
-	fmt.Println("GetName", p.Name)
 	return p.Name
 }
 

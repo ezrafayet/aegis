@@ -35,7 +35,7 @@ func ProviderCallback_NotEnabledReturns403(t *testing.T) {
 func ProviderCallback_MustRedirectToErrorPage_InvalidState(t *testing.T) {
 	suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 	defer suite.Teardown()
-	req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?code=valid_code&state=invalid_state", nil)
+	req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?code=accepted_code&state=invalid_state", nil)
 	require.NoError(t, err)
 	client := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
@@ -50,7 +50,6 @@ func ProviderCallback_MustRedirectToErrorPage_InvalidState(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusFound, resp.StatusCode)
 	location := resp.Header.Get("Location")
-	// todo: proper error ?
 	assert.Equal(t, location, "http://localhost:8080/login-error?error=unknown_error")
 }
 
@@ -66,7 +65,7 @@ func ProviderCallback_MustRedirectToErrorPage_InvalidCode(t *testing.T) {
 	err := suite.Db.Model(&entities.State{}).Create(&state).Error
 	require.NoError(t, err)
 
-	req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?code=invalid_code&state=valid_state", nil)
+	req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?code=rejected_code&state=valid_state", nil)
 	require.NoError(t, err)
 
 	client := &http.Client{
@@ -87,7 +86,7 @@ func ProviderCallback_MustRedirectToErrorPage_UserDeclinesAuth(t *testing.T) {
 	suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 	defer suite.Teardown()
 
-	req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?error=access_denied", nil)
+	req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?error=access_declined", nil)
 	require.NoError(t, err)
 
 	client := &http.Client{
@@ -101,7 +100,7 @@ func ProviderCallback_MustRedirectToErrorPage_UserDeclinesAuth(t *testing.T) {
 
 	assert.Equal(t, http.StatusFound, resp.StatusCode)
 	location := resp.Header.Get("Location")
-	assert.Equal(t, location, "http://localhost:8080/login-error?error=access_denied")
+	assert.Equal(t, location, "http://localhost:8080/login-error?error=access_declined")
 }
 
 func ProviderCallback_MustRedirectToErrorPage_UserUsingAnotherMethod(t *testing.T) {
@@ -124,7 +123,7 @@ func ProviderCallback_MustRedirectToErrorPage_UserUsingAnotherMethod(t *testing.
 	// Mock GitHub to return the same email as the discord user
 	// This would require modifying the mock server to return the same email
 	// For now, we'll test the basic flow
-	req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?code=valid_code&state=valid_state", nil)
+	req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?code=accepted_code&state=valid_state", nil)
 	require.NoError(t, err)
 
 	client := &http.Client{
@@ -138,8 +137,7 @@ func ProviderCallback_MustRedirectToErrorPage_UserUsingAnotherMethod(t *testing.
 
 	assert.Equal(t, http.StatusFound, resp.StatusCode)
 	location := resp.Header.Get("Location")
-	// todo: check proper error
-	assert.Equal(t, "http://localhost:8080/login-error?error=unknown_error", location)
+	assert.Equal(t, "http://localhost:8080/login-error?error=wrong_auth_method", location)
 }
 
 func ProviderCallback_MustRedirectToErrorPage_UserBlocked(t *testing.T) {
@@ -161,7 +159,7 @@ func ProviderCallback_MustRedirectToErrorPage_UserBlocked(t *testing.T) {
 	err = suite.Db.Model(&entities.State{}).Create(&state).Error
 	require.NoError(t, err)
 
-	req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?code=valid_code&state=valid_state", nil)
+	req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?code=accepted_code&state=valid_state", nil)
 	require.NoError(t, err)
 
 	client := &http.Client{
@@ -175,7 +173,7 @@ func ProviderCallback_MustRedirectToErrorPage_UserBlocked(t *testing.T) {
 
 	assert.Equal(t, http.StatusFound, resp.StatusCode)
 	location := resp.Header.Get("Location")
-	assert.Equal(t, location, "http://localhost:8080/login-error?error=unknown_error")
+	assert.Equal(t, location, "http://localhost:8080/login-error?error=user_blocked")
 }
 
 func ProviderCallback_MustRedirectToErrorPage_UserDeleted(t *testing.T) {
@@ -197,7 +195,7 @@ func ProviderCallback_MustRedirectToErrorPage_UserDeleted(t *testing.T) {
 	err = suite.Db.Model(&entities.State{}).Create(&state).Error
 	require.NoError(t, err)
 
-	req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?code=valid_code&state=valid_state", nil)
+	req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?code=accepted_code&state=valid_state", nil)
 	require.NoError(t, err)
 
 	client := &http.Client{
@@ -212,7 +210,7 @@ func ProviderCallback_MustRedirectToErrorPage_UserDeleted(t *testing.T) {
 	assert.Equal(t, http.StatusFound, resp.StatusCode)
 	location := resp.Header.Get("Location")
 	// todo: check error
-	assert.Equal(t, location, "http://localhost:8080/login-error?error=unknown_error")
+	assert.Equal(t, location, "http://localhost:8080/login-error?error=user_deleted")
 }
 
 func ProviderCallback_MustRedirectToErrorPage_UserNotAnEarlyAdopter(t *testing.T) {
@@ -235,7 +233,7 @@ func ProviderCallback_MustRedirectToErrorPage_UserNotAnEarlyAdopter(t *testing.T
 	err = suite.Db.Model(&entities.State{}).Create(&state).Error
 	require.NoError(t, err)
 
-	req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?code=valid_code&state=valid_state", nil)
+	req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?code=accepted_code&state=valid_state", nil)
 	require.NoError(t, err)
 
 	client := &http.Client{
@@ -250,7 +248,7 @@ func ProviderCallback_MustRedirectToErrorPage_UserNotAnEarlyAdopter(t *testing.T
 	assert.Equal(t, http.StatusFound, resp.StatusCode)
 	location := resp.Header.Get("Location")
 	// todo: check error
-	assert.Equal(t, location, "http://localhost:8080/login-error?error=unknown_error")
+	assert.Equal(t, location, "http://localhost:8080/login-error?error=early_adopters_only")
 }
 
 func ProviderCallback_Success_UserExists(t *testing.T) {

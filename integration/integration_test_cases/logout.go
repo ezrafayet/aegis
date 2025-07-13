@@ -38,37 +38,37 @@ func Logout_WithoutRefreshTokenDoesNotBreak(t *testing.T) {
 
 func Logout_DeletesRefreshToken(t *testing.T) {
 	suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
-		defer suite.Teardown()
+	defer suite.Teardown()
 
-		// Create a user
-		user, err := entities.NewUser("testuser", "https://example.com/avatar.jpg", "test@example.com", "github")
-		require.NoError(t, err)
-		user = suite.CreateUser(t, user, []string{"user"})
+	// Create a user
+	user, err := entities.NewUser("testuser", "https://example.com/avatar.jpg", "test@example.com", "github")
+	require.NoError(t, err)
+	user = suite.CreateUser(t, user, []string{"user"})
 
-		refreshTokenEntity, _, err := entities.NewRefreshToken(user, "refresh_token", suite.Config)
-		require.NoError(t, err)
-		refreshTokenEntity = suite.CreateRefreshToken(t, refreshTokenEntity)
+	refreshTokenEntity, _, err := entities.NewRefreshToken(user, "refresh_token", suite.Config)
+	require.NoError(t, err)
+	refreshTokenEntity = suite.CreateRefreshToken(t, refreshTokenEntity)
 
-		// Verify the refresh token exists in the database
-		var count int64
-		err = suite.Db.Model(&entities.RefreshToken{}).Where("token = ?", refreshTokenEntity.Token).Count(&count).Error
-		require.NoError(t, err)
-		assert.Equal(t, int64(1), count)
+	// Verify the refresh token exists in the database
+	var count int64
+	err = suite.Db.Model(&entities.RefreshToken{}).Where("token = ?", refreshTokenEntity.Token).Count(&count).Error
+	require.NoError(t, err)
+	assert.Equal(t, int64(1), count)
 
-		// Create a request with the refresh token cookie
-		req, err := http.NewRequest("GET", suite.Server.URL+"/auth/logout", nil)
-		require.NoError(t, err)
+	// Create a request with the refresh token cookie
+	req, err := http.NewRequest("GET", suite.Server.URL+"/auth/logout", nil)
+	require.NoError(t, err)
 
-		refreshCookie := cookies.NewRefreshCookie(refreshTokenEntity.Token, refreshTokenEntity.ExpiresAt.Unix(), suite.Config)
-		req.AddCookie(&refreshCookie)
+	refreshCookie := cookies.NewRefreshCookie(refreshTokenEntity.Token, refreshTokenEntity.ExpiresAt.Unix(), suite.Config)
+	req.AddCookie(&refreshCookie)
 
-		// Make the request
-		resp, err := http.DefaultClient.Do(req)
-		require.NoError(t, err)
-		assert.Equal(t, http.StatusOK, resp.StatusCode)
+	// Make the request
+	resp, err := http.DefaultClient.Do(req)
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
-		// Verify the refresh token was deleted from the database
-		err = suite.Db.Model(&entities.RefreshToken{}).Where("token = ?", refreshTokenEntity.Token).Count(&count).Error
-		require.NoError(t, err)
-		assert.Equal(t, int64(0), count)
+	// Verify the refresh token was deleted from the database
+	err = suite.Db.Model(&entities.RefreshToken{}).Where("token = ?", refreshTokenEntity.Token).Count(&count).Error
+	require.NoError(t, err)
+	assert.Equal(t, int64(0), count)
 }

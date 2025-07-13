@@ -91,25 +91,24 @@ func SoftRefresh_MustRefresh_ExpiredAT(t *testing.T) {
 	// Make the request
 	resp, err := http.DefaultClient.Do(req)
 	require.NoError(t, err)
-	// todo: must be fixed, actual error //////!\\\\\\
-	//assert.Equal(t, http.StatusOK, resp.StatusCode)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
 	// Verify new access token cookie is set
 	cookies := resp.Cookies()
 	var newAccessToken string
-	//var newRefreshToken string
+	var newRefreshToken string
 	for _, cookie := range cookies {
 		if cookie.Name == "access_token" {
 			newAccessToken = cookie.Value
-			break
 		}
-		//if cookie.Name == "refresh_token" {
-		//	newRefreshToken = cookie.Value
-		//	break
-		//}
+		if cookie.Name == "refresh_token" {
+			newRefreshToken = cookie.Value
+		}
 	}
 	assert.NotEmpty(t, newAccessToken)
 	assert.NotEqual(t, accessToken, newAccessToken)
+	assert.NotEmpty(t, newRefreshToken)
+	assert.NotEqual(t, refreshTokenEntity.Token, newRefreshToken)
 
 	// verify old refresh token is not there
 	var count int64
@@ -117,12 +116,11 @@ func SoftRefresh_MustRefresh_ExpiredAT(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, int64(0), count)
 
-	// todo: fix
 	// verify new refresh token is there
-	//var count2 int64
-	//err = suite.Db.Model(&entities.RefreshToken{}).Where("token = ? AND user_id = ?", newRefreshToken, user.ID).Count(&count2).Error
-	//require.NoError(t, err)
-	//assert.Equal(t, int64(1), count2)
+	var count2 int64
+	err = suite.Db.Model(&entities.RefreshToken{}).Where("token = ? AND user_id = ?", newRefreshToken, user.ID).Count(&count2).Error
+	require.NoError(t, err)
+	assert.Equal(t, int64(1), count2)
 }
 
 func SoftRefresh_MustRefresh_MalformedAT(t *testing.T) {

@@ -635,4 +635,12 @@ func TestRefresh(t *testing.T) {
 	t.Run("no refresh: calling a route with only a check (ex: /authorize) should never refresh tokens", func(t *testing.T) {
 		// todo: test when /authorize is implemented
 	})
+
+	t.Run("rate limiting", func(t *testing.T) {
+		// todo: implement and test rate limiting
+	})
+
+	t.Run("devices ids", func(t *testing.T) {
+		// todo: implement and test different devices ids
+	})
 }

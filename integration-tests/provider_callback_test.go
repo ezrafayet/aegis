@@ -398,3 +398,10 @@ import (
 // 		})
 // 	})
 // }
+
+// t.Run("rate limiting", func(t *testing.T) {
+// 	// todo: implement and test rate limiting
+// })
+// t.Run("devices ids", func(t *testing.T) {
+// 	// todo: implement and test different devices ids
+// })

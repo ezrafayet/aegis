@@ -65,4 +65,8 @@ func TestProvider(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, int64(1), stateCount)
 	})
+
+	t.Run("rate limiting", func(t *testing.T) {
+		// todo: implement and test rate limiting
+	})
 }

@@ -69,4 +69,8 @@ func TestLogout(t *testing.T) {
 	t.Run("calling GET /logout without a refresh token does not break", func(t *testing.T) {
 		// Tested in the first test above
 	})
+
+	// t.Run("rate limiting", func(t *testing.T) {
+	// 	// todo: implement and test rate limiting
+	// })
 }

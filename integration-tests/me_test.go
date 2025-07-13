@@ -52,4 +52,8 @@ func TestMe(t *testing.T) {
 		assert.Equal(t, "{}", sessionResponse.Metadata)
 		assert.Equal(t, user.EarlyAdopter, sessionResponse.EarlyAdopter)
 	})
+	// side effects of soft refresh tested in refresh_test.go
+	// t.Run("rate limiting", func(t *testing.T) {
+	// 	// todo: implement and test rate limiting
+	// })
 }

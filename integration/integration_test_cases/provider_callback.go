@@ -209,7 +209,6 @@ func ProviderCallback_MustRedirectToErrorPage_UserDeleted(t *testing.T) {
 
 	assert.Equal(t, http.StatusFound, resp.StatusCode)
 	location := resp.Header.Get("Location")
-	// todo: check error
 	assert.Equal(t, location, "http://localhost:8080/login-error?error=user_deleted")
 }
 
@@ -247,7 +246,6 @@ func ProviderCallback_MustRedirectToErrorPage_UserNotAnEarlyAdopter(t *testing.T
 
 	assert.Equal(t, http.StatusFound, resp.StatusCode)
 	location := resp.Header.Get("Location")
-	// todo: check error
 	assert.Equal(t, location, "http://localhost:8080/login-error?error=early_adopters_only")
 }
 

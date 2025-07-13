@@ -28,7 +28,7 @@ func HardRefresh_MustRefresh_ValidTokens(t *testing.T) {
 	// Create valid access token
 	cClaims, err := entities.NewCustomClaimsFromValues(user.ID, false, user.Roles, user.Metadata)
 	require.NoError(t, err)
-	accessToken, atExp, err := jwtgen.Generate(cClaims.ToMap(), time.Now(), 15, "TestApp", suite.Config.JWT.Secret)
+	accessToken, atExp, err := jwtgen.Generate(cClaims.ToMap(), time.Now().Add(-10*time.Second), 15, "TestApp", suite.Config.JWT.Secret)
 	require.NoError(t, err)
 
 	// Create valid refresh token
@@ -63,7 +63,7 @@ func HardRefresh_MustRefresh_ValidTokens(t *testing.T) {
 	}
 	assert.NotEmpty(t, newAccessToken)
 	assert.NotEmpty(t, newRefreshToken)
-	// assert.NotEqual(t, accessToken, newAccessToken) // todo: fix it, should be a new AT
+	assert.NotEqual(t, accessToken, newAccessToken)
 	assert.NotEqual(t, refreshTokenEntity.Token, newRefreshToken)
 
 	// Verify old refresh token is deleted
@@ -71,6 +71,12 @@ func HardRefresh_MustRefresh_ValidTokens(t *testing.T) {
 	err = suite.Db.Model(&entities.RefreshToken{}).Where("token = ?", refreshTokenEntity.Token).Count(&count).Error
 	require.NoError(t, err)
 	assert.Equal(t, int64(0), count)
+
+	// verify new refresh token is created
+	var count2 int64
+	err = suite.Db.Model(&entities.RefreshToken{}).Where("token = ?", newRefreshToken).Count(&count2).Error
+	require.NoError(t, err)
+	assert.Equal(t, int64(1), count2)
 }
 
 func HardRefresh_MustRefresh_EmptyAT(t *testing.T) {

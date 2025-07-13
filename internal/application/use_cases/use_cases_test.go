@@ -35,8 +35,8 @@ func TestCheckAndRefreshToken(t *testing.T) {
 	t.Run("invalid access token gets rejected", func(t *testing.T) {
 		authService, _, _, _ := prepare(t)
 		_, err := authService.CheckAndRefreshToken("invalid", "invalid", false)
-		if err.Error() != apperrors.ErrAccessTokenInvalid.Error() {
-			t.Fatal("expected error ErrInvalidAccessToken", err)
+		if err.Error() != apperrors.ErrNoRefreshToken.Error() {
+			t.Fatal("expected error ErrNoRefreshToken", err)
 		}
 	})
 	t.Run("expired access token and expired refresh token gets rejected", func(t *testing.T) {

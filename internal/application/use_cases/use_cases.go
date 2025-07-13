@@ -65,7 +65,7 @@ func (s UseCases) CheckAndRefreshToken(accessToken, refreshToken string, forceRe
 		if err == nil {
 			return nil, nil
 		}
-		if err != nil && err.Error() != apperrors.ErrAccessTokenInvalid.Error() && err.Error() != apperrors.ErrAccessTokenExpired.Error() {
+		if err.Error() != apperrors.ErrAccessTokenInvalid.Error() && err.Error() != apperrors.ErrAccessTokenExpired.Error() {
 			return nil, err
 		}
 	}
@@ -99,12 +99,12 @@ func (s UseCases) CheckAndRefreshToken(accessToken, refreshToken string, forceRe
 		return nil, err
 	}
 	// todo device-id: pass one, since one session per device is allowed
-	accessToken, atExpiresAt, newRefreshToken, rtExpiresAt, err := s.TokenService.GenerateTokensForUser(user, "device-id")
+	newAccessToken, atExpiresAt, newRefreshToken, rtExpiresAt, err := s.TokenService.GenerateTokensForUser(user, "device-id")
 	if err != nil {
 		return nil, err
 	}
 	return &entities.TokenPair{
-		AccessToken:           accessToken,
+		AccessToken:           newAccessToken,
 		AccessTokenExpiresAt:  time.Unix(atExpiresAt, 0),
 		RefreshToken:          newRefreshToken,
 		RefreshTokenExpiresAt: time.Unix(rtExpiresAt, 0),

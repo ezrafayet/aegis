@@ -13,7 +13,7 @@ import (
 )
 
 func TestLogout(t *testing.T) {
-	t.Run("calling GET /logout sets zero cookies", func(t *testing.T) {
+	t.Run("calling GET /logout sets zero cookies + calling without a refresh token does not break", func(t *testing.T) {
 		suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
 		defer suite.Teardown()
 		resp, err := http.Get(suite.Server.URL + "/auth/logout")
@@ -64,10 +64,6 @@ func TestLogout(t *testing.T) {
 		err = suite.Db.Model(&entities.RefreshToken{}).Where("token = ?", refreshTokenEntity.Token).Count(&count).Error
 		require.NoError(t, err)
 		assert.Equal(t, int64(0), count)
-	})
-
-	t.Run("calling GET /logout without a refresh token does not break", func(t *testing.T) {
-		// Tested in the first test above
 	})
 
 	// t.Run("rate limiting", func(t *testing.T) {

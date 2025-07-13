@@ -4,6 +4,7 @@ import (
 	"aegis/internal/domain/entities"
 	"aegis/internal/domain/ports/secondary"
 	"aegis/pkg/apperrors"
+	"aegis/pkg/plugins/providers"
 )
 
 type UserService struct {
@@ -20,7 +21,7 @@ func NewUserService(userRepository secondary.UserRepository, config entities.Con
 
 // GetOrCreateUserIfAllowed handles the business logic for user creation and validation
 // during OAuth authentication flows
-func (s *UserService) GetOrCreateUserIfAllowed(userInfos *entities.UserInfos, authMethod string) (entities.User, error) {
+func (s *UserService) GetOrCreateUserIfAllowed(userInfos *providers.UserInfos, authMethod string) (entities.User, error) {
 	if userInfos.Email == "" {
 		return entities.User{}, apperrors.ErrNoEmail
 	}

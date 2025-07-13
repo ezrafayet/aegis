@@ -22,10 +22,10 @@ type Handlers struct {
 	Service primary.UseCasesInterface
 }
 
-var _ HandlersInterface = &Handlers{}
+var _ HandlersInterface = (*Handlers)(nil)
 
-func NewHandlers(c entities.Config, s primary.UseCasesInterface) Handlers {
-	return Handlers{
+func NewHandlers(c entities.Config, s primary.UseCasesInterface) *Handlers {
+	return &Handlers{
 		Config:  c,
 		Service: s,
 	}

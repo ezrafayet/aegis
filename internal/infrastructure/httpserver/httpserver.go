@@ -55,7 +55,10 @@ v0.x.x (needs to be injected)
 		AllowCredentials: true,
 	}))
 
-	r := registry.NewRegistry(c, db)
+	r, err := registry.NewRegistry(c, db)
+	if err != nil {
+		return err
+	}
 
 	group := e.Group("/auth")
 
@@ -68,15 +71,6 @@ v0.x.x (needs to be injected)
 		group.GET(fmt.Sprintf("/%s", provider.Name), provider.Handlers.GetAuthURL, provider.Middlewares.CheckAuthEnabled)
 		group.GET(fmt.Sprintf("/%s/callback", provider.Name), provider.Handlers.ExchangeCode, provider.Middlewares.CheckAuthEnabled)
 	}
-
-	// e.GET("/auth/me", r.Handlers.GetSession, r.Middlewares.CheckAndRefreshToken)
-	// e.GET("/auth/refresh", r.Handlers.DoNothing, r.Middlewares.CheckAndForceRefreshToken)
-	// e.GET("/auth/logout", r.Handlers.Logout)
-	// e.GET("/auth/health", r.Handlers.DoNothing)
-
-	// group := e.Group("/auth/github", r.AuthMiddleware.CheckAuthEnabled)
-	// group.GET("", r.Handlers.GetAuthURL)
-	// group.POST("/callback", r.Handlers.ExchangeCode)
 
 	return e.Start(fmt.Sprintf(":%d", c.App.Port))
 }

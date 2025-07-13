@@ -1,25 +1,24 @@
 package github
 
 import (
-	"aegis/internal/domain/entities"
-	"aegis/internal/domain/ports/secondary"
+	"aegis/pkg/plugins/providers"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
 )
 
-type OAuthGithubRepository struct {
-	Name   string
-	Config entities.Config
-}
+type OAuthGithubRepository providers.OAuthRepository
 
-var _ secondary.OAuthProviderInterface = OAuthGithubRepository{}
+var _ providers.OAuthProviderInterface = (*OAuthGithubRepository)(nil)
 
-func NewOAuthGithubRepository(c entities.Config) OAuthGithubRepository {
-	return OAuthGithubRepository{
-		Name:   "github",
-		Config: c,
+func NewOAuthGithubRepository(enabled bool, clientID, clientSecret, redirectURL string) *OAuthGithubRepository {
+	return &OAuthGithubRepository{
+		Name:         "github",
+		Enabled:      enabled,
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
+		RedirectURL:  redirectURL,
 	}
 }
 
@@ -42,30 +41,27 @@ type gitHubEmail struct {
 	Verified bool   `json:"verified"`
 }
 
-func (p OAuthGithubRepository) IsEnabled() (bool, error) {
-	fmt.Println("Config hit")
-	fmt.Println("IsEnabled", p.Config.Auth.Providers.GitHub.Enabled)
-	return p.Config.Auth.Providers.GitHub.Enabled, nil
+func (p OAuthGithubRepository) IsEnabled() bool {
+	return p.Enabled
 }
 
-func (p OAuthGithubRepository) GetOauthRedirectURL(state string) (string, error) {
+func (p OAuthGithubRepository) GetOauthRedirectURL(state string) string {
 	return fmt.Sprintf(
 		"https://github.com/login/oauth/authorize?client_id=%s&scope=user:email&state=%s",
-		p.Config.Auth.Providers.GitHub.ClientID,
+		p.ClientID,
 		state,
-	), nil
+	)
 }
 
 func (p OAuthGithubRepository) GetName() string {
-	fmt.Println("GetName", p.Name)
 	return p.Name
 }
 
-func (p OAuthGithubRepository) ExchangeCodeForUserInfos(code, state string) (*entities.UserInfos, error) {
+func (p OAuthGithubRepository) ExchangeCodeForUserInfos(code, state string) (*providers.UserInfos, error) {
 	// Step 1: get access token
 	data := map[string]string{
-		"client_id":     p.Config.Auth.Providers.GitHub.ClientID,
-		"client_secret": p.Config.Auth.Providers.GitHub.ClientSecret,
+		"client_id":     p.ClientID,
+		"client_secret": p.ClientSecret,
 		"code":          code,
 		"state":         state,
 	}
@@ -128,7 +124,7 @@ func (p OAuthGithubRepository) ExchangeCodeForUserInfos(code, state string) (*en
 
 	userName := user.Name
 
-	return &entities.UserInfos{
+	return &providers.UserInfos{
 		Name:   userName,
 		Email:  em,
 		Avatar: user.AvatarURL,

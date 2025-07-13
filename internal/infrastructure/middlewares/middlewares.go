@@ -6,6 +6,7 @@ import (
 	"aegis/pkg/apperrors"
 	"aegis/pkg/cookies"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -22,10 +23,10 @@ type AuthMiddleware struct {
 	Service primary.UseCasesInterface
 }
 
-var _ AuthMiddlewareInterface = &AuthMiddleware{}
+var _ AuthMiddlewareInterface = (*AuthMiddleware)(nil)
 
-func NewAuthMiddleware(c entities.Config, s primary.UseCasesInterface) AuthMiddleware {
-	return AuthMiddleware{
+func NewAuthMiddleware(c entities.Config, s primary.UseCasesInterface) *AuthMiddleware {
+	return &AuthMiddleware{
 		Config:  c,
 		Service: s,
 	}
@@ -47,6 +48,9 @@ func (m AuthMiddleware) CheckAndRefreshToken(next echo.HandlerFunc) echo.Handler
 			refreshCookie := cookies.NewRefreshCookie(tokensPair.RefreshToken, tokensPair.RefreshTokenExpiresAt.Unix(), m.Config)
 			c.SetCookie(&accessCookie)
 			c.SetCookie(&refreshCookie)
+			// Override cookies in the request for the next middleware/handler to use,
+			// todo: should pass it as a context
+			c.Request().Header.Set("Cookie", fmt.Sprintf("access_token=%s; refresh_token=%s", tokensPair.AccessToken, tokensPair.RefreshToken))
 		}
 		if err != nil {
 			if errors.Is(err, apperrors.ErrAccessTokenInvalid) {
@@ -83,6 +87,8 @@ func (m AuthMiddleware) CheckAndForceRefreshToken(next echo.HandlerFunc) echo.Ha
 			refreshCookie := cookies.NewRefreshCookie(tokensPair.RefreshToken, tokensPair.RefreshTokenExpiresAt.Unix(), m.Config)
 			c.SetCookie(&accessCookie)
 			c.SetCookie(&refreshCookie)
+			// Override cookies in the request for the next middleware/handler to use
+			c.Request().Header.Set("Cookie", fmt.Sprintf("access_token=%s; refresh_token=%s", tokensPair.AccessToken, tokensPair.RefreshToken))
 		}
 		if err != nil {
 			if errors.Is(err, apperrors.ErrAccessTokenInvalid) {

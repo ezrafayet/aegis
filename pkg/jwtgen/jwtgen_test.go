@@ -1,29 +1,23 @@
 package jwtgen
 
 import (
-	"aegis/internal/domain/entities"
 	"aegis/pkg/apperrors"
 	"testing"
 	"time"
 )
 
 func TestAccessToken(t *testing.T) {
+
 	t.Run("should create a new access token", func(t *testing.T) {
-		token, expires_at, err := Generate(entities.CustomClaims{
-			UserID:   "123",
-			Roles:    []string{""},
-			Metadata: "{foo:bar}",
-		}, entities.Config{
-			JWT: entities.JWTConfig{
-				Secret:                     "xxxsecret",
-				AccessTokenExpirationMin:   15,
-				RefreshTokenExpirationDays: 30,
-			},
-		}, time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC))
+		token, expires_at, err := Generate(map[string]any{
+			"user_id":  "123",
+			"roles":    []string{""},
+			"metadata": "{foo:bar}",
+		}, time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC), 15, "app_name", "xxxsecret")
 		if err != nil {
 			t.Fatal(err)
 		}
-		expected := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIiLCJlYXJseV9hZG9wdGVyIjpmYWxzZSwiZXhwIjoxNjcyNTMyMTAwLCJpc3MiOiIiLCJpc3N1ZWRfYXQiOjE2NzI1MzEyMDAsIm1ldGFkYXRhIjoie2ZvbzpiYXJ9Iiwicm9sZXMiOiIiLCJ1c2VyX2lkIjoiMTIzIn0.kL101I2ojpEvHEENfOUiREkiYNYUMP6x9xeAoeqgzhY"
+		expected := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhcHBfbmFtZSIsImV4cCI6MTY3MjUzMjEwMCwiaXNzIjoiYXBwX25hbWUiLCJpc3N1ZWRfYXQiOjE2NzI1MzEyMDAsIm1ldGFkYXRhIjoie2ZvbzpiYXJ9Iiwicm9sZXMiOlsiIl0sInVzZXJfaWQiOiIxMjMifQ.OGXhwu11b6QWOCS_S7FrmHYRPZbw8w9W0g7M49I-Tj4"
 		if token != expected {
 			t.Fatal("expected token to not be empty", token)
 		}
@@ -32,100 +26,59 @@ func TestAccessToken(t *testing.T) {
 		}
 	})
 	t.Run("should read claims from a valid access token", func(t *testing.T) {
-		token, _, err := Generate(entities.CustomClaims{
-			UserID:   "123",
-			Roles:    []string{"some-role"},
-			Metadata: "{foo:bar}",
-		}, entities.Config{
-			JWT: entities.JWTConfig{
-				Secret:                     "xxxsecret",
-				AccessTokenExpirationMin:   15,
-				RefreshTokenExpirationDays: 30,
-			},
-		}, time.Now())
+		token, _, err := Generate(map[string]any{
+			"user_id":  "123",
+			"roles":    []string{"some-role"},
+			"metadata": "{foo:bar}",
+		}, time.Now(), 15, "app_name", "xxxsecret")
 		if err != nil {
 			t.Fatal(err)
 		}
-		claims, err := ReadClaims(token, entities.Config{
-			JWT: entities.JWTConfig{
-				Secret:                     "xxxsecret",
-				AccessTokenExpirationMin:   15,
-				RefreshTokenExpirationDays: 30,
-			},
-		})
+		claims, err := ReadClaims(token, "xxxsecret")
 		if err != nil {
 			t.Fatal(err)
 		}
-		if claims.UserID != "123" {
-			t.Fatal("expected user_id to be 123", claims.UserID)
+		if claims["user_id"] != "123" {
+			t.Fatal("expected user_id to be 123", claims["user_id"])
 		}
-		if claims.Metadata != "{foo:bar}" {
-			t.Fatal("expected metadata to be {foo:bar}", claims.Metadata)
+		if claims["metadata"] != "{foo:bar}" {
+			t.Fatal("expected metadata to be {foo:bar}", claims["metadata"])
 		}
-		if claims.Roles[0] != "some-role" {
-			t.Fatal("expected roles_values to be some-role", claims.Roles)
+		roles := claims["roles"].([]interface{})
+		if len(roles) == 0 || roles[0].(string) != "some-role" {
+			t.Fatal("expected roles_values to be some-role", claims["roles"])
 		}
 	})
 	t.Run("should return an error if the token is invalid", func(t *testing.T) {
-		_, err := ReadClaims("token", entities.Config{
-			JWT: entities.JWTConfig{
-				Secret:                     "xxxsecret",
-				AccessTokenExpirationMin:   15,
-				RefreshTokenExpirationDays: 30,
-			},
-		})
+		_, err := ReadClaims("token", "xxxsecret")
 		if err == nil {
 			t.Fatal(err)
 		}
 	})
 	t.Run("should return an error if the token is expired", func(t *testing.T) {
-		token, _, err := Generate(entities.CustomClaims{
-			UserID:   "123",
-			Roles:    []string{""},
-			Metadata: "{foo:bar}",
-		}, entities.Config{
-			JWT: entities.JWTConfig{
-				Secret:                     "xxxsecret",
-				AccessTokenExpirationMin:   15,
-				RefreshTokenExpirationDays: 30,
-			},
-		}, time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC))
+		token, _, err := Generate(map[string]any{
+			"user_id":  "123",
+			"roles":    []string{""},
+			"metadata": "{foo:bar}",
+		}, time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC), 15, "app_name", "xxxsecret")
 		if err != nil {
 			t.Fatal(err)
 		}
-		_, err = ReadClaims(token, entities.Config{
-			JWT: entities.JWTConfig{
-				Secret:                     "xxxsecret",
-				AccessTokenExpirationMin:   15,
-				RefreshTokenExpirationDays: 30,
-			},
-		})
+		_, err = ReadClaims(token, "xxxsecret")
 		if err.Error() != apperrors.ErrAccessTokenExpired.Error() {
 			t.Fatal("expected error to be 'access_token_expired'", err)
 		}
 	})
 	t.Run("should return an error if the JWT secret is wrong", func(t *testing.T) {
-		token, _, err := Generate(entities.CustomClaims{
-			UserID:   "123",
-			Roles:    []string{""},
-			Metadata: "{foo:bar}",
-		}, entities.Config{
-			JWT: entities.JWTConfig{
-				Secret:                     "xxxsecret",
-				AccessTokenExpirationMin:   15,
-				RefreshTokenExpirationDays: 30,
-			},
-		}, time.Now())
+		token, _, err := Generate(map[string]any{
+			"user_id":  "123",
+			"roles":    []string{""},
+			"metadata": "{foo:bar}",
+		}, time.Now(), 15, "app_name", "xxxsecret")
 		if err != nil {
 			t.Fatal(err)
 		}
-		_, err = ReadClaims(token, entities.Config{
-			JWT: entities.JWTConfig{
-				Secret:                     "xxxsecret2",
-				AccessTokenExpirationMin:   15,
-				RefreshTokenExpirationDays: 30,
-			},
-		})
+		_, err = ReadClaims(token, "xxxsecret2")
 		if err == nil {
 			t.Fatal("expected an error")
 		}

@@ -21,7 +21,7 @@ func TestCheckAndRefreshToken(t *testing.T) {
 			RefreshTokenExpirationDays: 1,
 		},
 	}
-	prepare := func(t *testing.T) (UseCases, secondary.UserRepository, secondary.RefreshTokenRepository, *gorm.DB) {
+	prepare := func(t *testing.T) (*UseCases, secondary.UserRepository, secondary.RefreshTokenRepository, *gorm.DB) {
 		db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
 		if err != nil {
 			t.Fatal(err)
@@ -29,14 +29,14 @@ func TestCheckAndRefreshToken(t *testing.T) {
 		db.AutoMigrate(&entities.User{}, &entities.RefreshToken{}, &entities.Role{})
 		refreshTokenRepository := repositories.NewRefreshTokenRepository(db)
 		userRepository := repositories.NewUserRepository(db)
-		authService := NewService(baseConfig, &refreshTokenRepository, &userRepository)
-		return authService, &userRepository, &refreshTokenRepository, db
+		authService := NewService(baseConfig, refreshTokenRepository, userRepository)
+		return authService, userRepository, refreshTokenRepository, db
 	}
 	t.Run("invalid access token gets rejected", func(t *testing.T) {
 		authService, _, _, _ := prepare(t)
 		_, err := authService.CheckAndRefreshToken("invalid", "invalid", false)
-		if err.Error() != apperrors.ErrAccessTokenInvalid.Error() {
-			t.Fatal("expected error ErrInvalidAccessToken", err)
+		if err.Error() != apperrors.ErrNoRefreshToken.Error() {
+			t.Fatal("expected error ErrNoRefreshToken", err)
 		}
 	})
 	t.Run("expired access token and expired refresh token gets rejected", func(t *testing.T) {
@@ -46,13 +46,22 @@ func TestCheckAndRefreshToken(t *testing.T) {
 			t.Fatal("expected no error", err)
 		}
 		db.Create(&newUser)
+		db.Save(&newUser)
 		refreshToken, _, err := entities.NewRefreshToken(newUser, "some-device-id", baseConfig)
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
 		refreshToken.ExpiresAt = time.Now().Add(-time.Hour * 24)
 		db.Save(&refreshToken)
-		accessToken, _, err := jwtgen.Generate(entities.CustomClaims{UserID: newUser.ID}, baseConfig, time.Now().Add(-time.Hour*24))
+		newUser.Roles = []entities.Role{
+			{UserID: newUser.ID, Value: "user"},
+		}
+		db.Save(&newUser)
+		cc, err := entities.NewCustomClaimsFromValues(newUser.ID, newUser.EarlyAdopter, newUser.Roles, newUser.Metadata)
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		accessToken, _, err := jwtgen.Generate(cc.ToMap(), time.Now().Add(-time.Hour*24), baseConfig.JWT.AccessTokenExpirationMin, baseConfig.App.Name, baseConfig.JWT.Secret)
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
@@ -73,7 +82,15 @@ func TestCheckAndRefreshToken(t *testing.T) {
 			t.Fatal("expected no error", err)
 		}
 		db.Save(&refreshToken)
-		accessToken, _, err := jwtgen.Generate(entities.CustomClaims{UserID: newUser.ID}, baseConfig, time.Now().Add(-time.Hour*24))
+		newUser.Roles = []entities.Role{
+			{UserID: newUser.ID, Value: "user"},
+		}
+		db.Save(&newUser)
+		cc, err := entities.NewCustomClaimsFromValues(newUser.ID, newUser.EarlyAdopter, newUser.Roles, newUser.Metadata)
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		accessToken, _, err := jwtgen.Generate(cc.ToMap(), time.Now().Add(-time.Hour*24), baseConfig.JWT.AccessTokenExpirationMin, baseConfig.App.Name, baseConfig.JWT.Secret)
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
@@ -102,7 +119,15 @@ func TestCheckAndRefreshToken(t *testing.T) {
 			t.Fatal("expected no error", err)
 		}
 		db.Save(&refreshToken)
-		accessToken, _, err := jwtgen.Generate(entities.CustomClaims{UserID: newUser.ID}, baseConfig, time.Now())
+		newUser.Roles = []entities.Role{
+			{UserID: newUser.ID, Value: "user"},
+		}
+		db.Save(&newUser)
+		cc, err := entities.NewCustomClaimsFromValues(newUser.ID, newUser.EarlyAdopter, newUser.Roles, newUser.Metadata)
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		accessToken, _, err := jwtgen.Generate(cc.ToMap(), time.Now(), baseConfig.JWT.AccessTokenExpirationMin, baseConfig.App.Name, baseConfig.JWT.Secret)
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
@@ -129,7 +154,15 @@ func TestCheckAndRefreshToken(t *testing.T) {
 			t.Fatal("expected no error", err)
 		}
 		db.Save(&refreshToken)
-		accessToken, _, err := jwtgen.Generate(entities.CustomClaims{UserID: newUser.ID}, baseConfig, time.Now())
+		newUser.Roles = []entities.Role{
+			{UserID: newUser.ID, Value: "user"},
+		}
+		db.Save(&newUser)
+		cc, err := entities.NewCustomClaimsFromValues(newUser.ID, newUser.EarlyAdopter, newUser.Roles, newUser.Metadata)
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		accessToken, _, err := jwtgen.Generate(cc.ToMap(), time.Now(), baseConfig.JWT.AccessTokenExpirationMin, baseConfig.App.Name, baseConfig.JWT.Secret)
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}

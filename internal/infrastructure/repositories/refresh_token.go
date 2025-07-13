@@ -13,10 +13,10 @@ type RefreshTokenRepository struct {
 	db *gorm.DB
 }
 
-var _ secondary.RefreshTokenRepository = &RefreshTokenRepository{}
+var _ secondary.RefreshTokenRepository = (*RefreshTokenRepository)(nil)
 
-func NewRefreshTokenRepository(db *gorm.DB) RefreshTokenRepository {
-	return RefreshTokenRepository{db: db}
+func NewRefreshTokenRepository(db *gorm.DB) *RefreshTokenRepository {
+	return &RefreshTokenRepository{db: db}
 }
 
 func (r *RefreshTokenRepository) CreateRefreshToken(refreshToken entities.RefreshToken) error {

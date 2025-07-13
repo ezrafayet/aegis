@@ -22,10 +22,10 @@ type OAuthHandlers struct {
 	Service primary.OAuthUseCasesInterface
 }
 
-var _ OAuthHandlersInterface = OAuthHandlers{}
+var _ OAuthHandlersInterface = (*OAuthHandlers)(nil)
 
-func NewOAuthHandlers(c entities.Config, s primary.OAuthUseCasesInterface) OAuthHandlers {
-	return OAuthHandlers{
+func NewOAuthHandlers(c entities.Config, s primary.OAuthUseCasesInterface) *OAuthHandlers {
+	return &OAuthHandlers{
 		Config:  c,
 		Service: s,
 	}

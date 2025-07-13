@@ -1,6 +1,3 @@
-start:
-	go run cmd/httpserver/main.go
-
 build:
 	go build -o main cmd/httpserver/main.go
 
@@ -16,8 +13,12 @@ fmt-ci:
 vet:
 	go vet ./...
 
-lint:
-	golangci-lint run
-
 test:
-	go test ./...
+	make test-unit
+	make test-integration
+
+test-integration:
+	go test -tags=integration -timeout=240s ./integration/...
+
+test-unit:
+	go test -timeout=15s ./internal/... ./pkg/...

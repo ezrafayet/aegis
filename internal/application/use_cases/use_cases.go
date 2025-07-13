@@ -17,11 +17,11 @@ type UseCases struct {
 	TokenService           *services.TokenService
 }
 
-var _ primary.UseCasesInterface = &UseCases{}
+var _ primary.UseCasesInterface = (*UseCases)(nil)
 
-func NewService(c entities.Config, r secondary.RefreshTokenRepository, u secondary.UserRepository) UseCases {
+func NewService(c entities.Config, r secondary.RefreshTokenRepository, u secondary.UserRepository) *UseCases {
 	tokenService := services.NewTokenService(r, c)
-	return UseCases{
+	return &UseCases{
 		Config:                 c,
 		RefreshTokenRepository: r,
 		UserRepository:         u,
@@ -30,12 +30,16 @@ func NewService(c entities.Config, r secondary.RefreshTokenRepository, u seconda
 }
 
 func (s UseCases) GetSession(accessToken string) (entities.Session, error) {
-	customClaims, err := jwtgen.ReadClaims(accessToken, s.Config)
+	ccMap, err := jwtgen.ReadClaims(accessToken, s.Config.JWT.Secret)
+	if err != nil {
+		return entities.Session{}, err
+	}
+	cc, err := entities.NewCusomClaimsFromMap(ccMap)
 	if err != nil {
 		return entities.Session{}, err
 	}
 	return entities.Session{
-		CustomClaims: customClaims,
+		CustomClaims: *cc,
 	}, nil
 }
 
@@ -57,11 +61,11 @@ func (s UseCases) Logout(refreshToken string) (*entities.TokenPair, error) {
 
 func (s UseCases) CheckAndRefreshToken(accessToken, refreshToken string, forceRefresh bool) (*entities.TokenPair, error) {
 	if accessToken != "" && !forceRefresh {
-		_, err := jwtgen.ReadClaims(accessToken, s.Config)
+		_, err := jwtgen.ReadClaims(accessToken, s.Config.JWT.Secret)
 		if err == nil {
 			return nil, nil
 		}
-		if err != nil && err.Error() != apperrors.ErrAccessTokenExpired.Error() {
+		if err.Error() != apperrors.ErrAccessTokenInvalid.Error() && err.Error() != apperrors.ErrAccessTokenExpired.Error() {
 			return nil, err
 		}
 	}
@@ -95,12 +99,12 @@ func (s UseCases) CheckAndRefreshToken(accessToken, refreshToken string, forceRe
 		return nil, err
 	}
 	// todo device-id: pass one, since one session per device is allowed
-	accessToken, atExpiresAt, newRefreshToken, rtExpiresAt, err := s.TokenService.GenerateTokensForUser(user, "device-id")
+	newAccessToken, atExpiresAt, newRefreshToken, rtExpiresAt, err := s.TokenService.GenerateTokensForUser(user, "device-id")
 	if err != nil {
 		return nil, err
 	}
 	return &entities.TokenPair{
-		AccessToken:           accessToken,
+		AccessToken:           newAccessToken,
 		AccessTokenExpiresAt:  time.Unix(atExpiresAt, 0),
 		RefreshToken:          newRefreshToken,
 		RefreshTokenExpiresAt: time.Unix(rtExpiresAt, 0),

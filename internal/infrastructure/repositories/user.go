@@ -12,10 +12,10 @@ type UserRepository struct {
 	db *gorm.DB
 }
 
-var _ secondary.UserRepository = &UserRepository{}
+var _ secondary.UserRepository = (*UserRepository)(nil)
 
-func NewUserRepository(db *gorm.DB) UserRepository {
-	return UserRepository{db: db}
+func NewUserRepository(db *gorm.DB) *UserRepository {
+	return &UserRepository{db: db}
 }
 
 func (r *UserRepository) CreateUser(user entities.User, roles []entities.Role) error {

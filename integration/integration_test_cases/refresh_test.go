@@ -1,4 +1,4 @@
-package integration
+package integration_test_cases
 
 import (
 	"aegis/integration/integration_testkit"

@@ -1,4 +1,4 @@
-package integration
+package integration_test_cases
 
 import (
 	"aegis/internal/domain/entities"
@@ -12,25 +12,32 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestLogout(t *testing.T) {
-	t.Run("calling GET /logout sets zero cookies + calling without a refresh token does not break", func(t *testing.T) {
-		suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
-		defer suite.Teardown()
-		resp, err := http.Get(suite.Server.URL + "/auth/logout")
-		require.NoError(t, err)
-		assert.Equal(t, http.StatusOK, resp.StatusCode)
-		cookies := resp.Cookies()
-		assert.Len(t, cookies, 2)
-		require.NotNil(t, cookies[0])
-		assert.Equal(t, "", cookies[0].Value)
-		assert.True(t, cookies[0].Expires.Before(time.Now()) || cookies[0].Expires.Equal(time.Unix(0, 0)))
-		require.NotNil(t, cookies[1])
-		assert.Equal(t, "", cookies[1].Value)
-		assert.True(t, cookies[1].Expires.Before(time.Now()) || cookies[1].Expires.Equal(time.Unix(0, 0)))
-	})
+func Logout_SetsZeroCookies(t *testing.T) {
+	suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
+	defer suite.Teardown()
+	resp, err := http.Get(suite.Server.URL + "/auth/logout")
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	cookies := resp.Cookies()
+	assert.Len(t, cookies, 2)
+	require.NotNil(t, cookies[0])
+	assert.Equal(t, "", cookies[0].Value)
+	assert.True(t, cookies[0].Expires.Before(time.Now()) || cookies[0].Expires.Equal(time.Unix(0, 0)))
+	require.NotNil(t, cookies[1])
+	assert.Equal(t, "", cookies[1].Value)
+	assert.True(t, cookies[1].Expires.Before(time.Now()) || cookies[1].Expires.Equal(time.Unix(0, 0)))
+}
 
-	t.Run("calling GET /logout with a refresh token deletes the refresh token", func(t *testing.T) {
-		suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
+func Logout_WithoutRefreshTokenDoesNotBreak(t *testing.T) {
+	suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
+	defer suite.Teardown()
+	resp, err := http.Get(suite.Server.URL + "/auth/logout")
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+}
+
+func Logout_DeletesRefreshToken(t *testing.T) {
+	suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 		defer suite.Teardown()
 
 		// Create a user
@@ -64,9 +71,4 @@ func TestLogout(t *testing.T) {
 		err = suite.Db.Model(&entities.RefreshToken{}).Where("token = ?", refreshTokenEntity.Token).Count(&count).Error
 		require.NoError(t, err)
 		assert.Equal(t, int64(0), count)
-	})
-
-	// t.Run("rate limiting", func(t *testing.T) {
-	// 	// todo: implement and test rate limiting
-	// })
 }

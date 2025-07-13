@@ -1,4 +1,4 @@
-package integration
+package integration_test_cases
 
 import (
 	"aegis/internal/domain/entities"
@@ -16,16 +16,16 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestMe(t *testing.T) {
-	t.Run("calling GET /me without a session returns 401", func(t *testing.T) {
-		suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
-		defer suite.Teardown()
-		resp, err := http.Get(suite.Server.URL + "/auth/me")
-		require.NoError(t, err)
-		assert.Equal(t, http.StatusUnauthorized, resp.StatusCode)
-	})
-	t.Run("calling GET /me with a session returns 200 and the session", func(t *testing.T) {
-		suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
+func Me_WithoutSessionReturns401(t *testing.T) {
+	suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
+	defer suite.Teardown()
+	resp, err := http.Get(suite.Server.URL + "/auth/me")
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusUnauthorized, resp.StatusCode)
+}
+
+func Me_WithSessionReturns200(t *testing.T) {
+	suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
 		defer suite.Teardown()
 		user, err := entities.NewUser("cloude", "https://example.com/avatar.jpg", "cloude@example.com", "github")
 		require.NoError(t, err)
@@ -51,9 +51,4 @@ func TestMe(t *testing.T) {
 		assert.Equal(t, "user", sessionResponse.Roles)
 		assert.Equal(t, "{}", sessionResponse.Metadata)
 		assert.Equal(t, user.EarlyAdopter, sessionResponse.EarlyAdopter)
-	})
-	// side effects of soft refresh tested in refresh_test.go
-	// t.Run("rate limiting", func(t *testing.T) {
-	// 	// todo: implement and test rate limiting
-	// })
 }

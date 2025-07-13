@@ -252,3 +252,177 @@ func ProviderCallback_MustRedirectToErrorPage_UserNotAnEarlyAdopter(t *testing.T
 	// todo: check error
 	assert.Equal(t, location, "http://localhost:8080/login-error?error=unknown_error")
 }
+
+func ProviderCallback_Success_UserExists(t *testing.T) {
+	suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
+	defer suite.Teardown()
+
+	// Create an existing user
+	user, err := entities.NewUser("testuser", "https://example.com/avatar.jpg", "test@example.com", "github")
+	require.NoError(t, err)
+	user = suite.CreateUser(t, user, []string{"user"})
+
+	// Create a valid state
+	state := entities.State{
+		Value:     "valid_state",
+		ExpiresAt: time.Now().Add(10 * time.Minute),
+	}
+	err = suite.Db.Model(&entities.State{}).Create(&state).Error
+	require.NoError(t, err)
+
+	req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?code=accepted_code&state=valid_state", nil)
+	require.NoError(t, err)
+
+	client := &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
+
+	resp, err := client.Do(req)
+	require.NoError(t, err)
+
+	assert.Equal(t, http.StatusFound, resp.StatusCode)
+	location := resp.Header.Get("Location")
+	assert.Equal(t, "http://localhost:8080/login-success", location)
+
+	// Verify cookies are set
+	cookies := resp.Cookies()
+	var accessToken, refreshToken string
+	for _, cookie := range cookies {
+		if cookie.Name == "access_token" {
+			accessToken = cookie.Value
+		}
+		if cookie.Name == "refresh_token" {
+			refreshToken = cookie.Value
+		}
+	}
+	assert.NotEmpty(t, accessToken)
+	assert.NotEmpty(t, refreshToken)
+
+	// check user length is 1
+	var count int64
+	err = suite.Db.Model(&entities.User{}).Count(&count).Error
+	require.NoError(t, err)
+	assert.Equal(t, int64(1), count)
+}
+
+func ProviderCallback_Success_UserDoesNotExist(t *testing.T) {
+	suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
+	defer suite.Teardown()
+
+	// Create a valid state
+	state := entities.State{
+		Value:     "valid_state",
+		ExpiresAt: time.Now().Add(10 * time.Minute),
+	}
+	err := suite.Db.Model(&entities.State{}).Create(&state).Error
+	require.NoError(t, err)
+
+	// Verify no user exists with the email from mock
+	var count int64
+	err = suite.Db.Model(&entities.User{}).Where("email = ?", "test@example.com").Count(&count).Error
+	require.NoError(t, err)
+	assert.Equal(t, int64(0), count)
+
+	req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?code=accepted_code&state=valid_state", nil)
+	require.NoError(t, err)
+
+	client := &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
+
+	resp, err := client.Do(req)
+	require.NoError(t, err)
+
+	assert.Equal(t, http.StatusFound, resp.StatusCode)
+	location := resp.Header.Get("Location")
+	assert.Equal(t, "http://localhost:8080/login-success", location)
+
+	// Verify cookies are set
+	cookies := resp.Cookies()
+	var accessToken, refreshToken string
+	for _, cookie := range cookies {
+		if cookie.Name == "access_token" {
+			accessToken = cookie.Value
+		}
+		if cookie.Name == "refresh_token" {
+			refreshToken = cookie.Value
+		}
+	}
+	assert.NotEmpty(t, accessToken)
+	assert.NotEmpty(t, refreshToken)
+
+	// Verify user was created
+	err = suite.Db.Model(&entities.User{}).Where("email = ?", "test@example.com").Count(&count).Error
+	require.NoError(t, err)
+	assert.Equal(t, int64(1), count)
+}
+
+func ProviderCallback_Success_CleansState(t *testing.T) {
+	suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
+	defer suite.Teardown()
+
+	// Create a valid state
+	state := entities.State{
+		Value:     "valid_state",
+		ExpiresAt: time.Now().Add(10 * time.Minute),
+	}
+	err := suite.Db.Model(&entities.State{}).Create(&state).Error
+	require.NoError(t, err)
+
+	// Verify state exists
+	var count int64
+	err = suite.Db.Model(&entities.State{}).Where("value = ?", "valid_state").Count(&count).Error
+	require.NoError(t, err)
+	assert.Equal(t, int64(1), count)
+
+	req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?code=accepted_code&state=valid_state", nil)
+	require.NoError(t, err)
+
+	client := &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
+
+	resp, err := client.Do(req)
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusFound, resp.StatusCode)
+
+	// Verify state was deleted
+	err = suite.Db.Model(&entities.State{}).Where("value = ?", "valid_state").Count(&count).Error
+	require.NoError(t, err)
+	assert.Equal(t, int64(0), count)
+}
+
+func ProviderCallback_Success_RedirectsToWelcomePage(t *testing.T) {
+	suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
+	defer suite.Teardown()
+
+	// Create a valid state
+	state := entities.State{
+		Value:     "valid_state",
+		ExpiresAt: time.Now().Add(10 * time.Minute),
+	}
+	err := suite.Db.Model(&entities.State{}).Create(&state).Error
+	require.NoError(t, err)
+
+	req, err := http.NewRequest("GET", suite.Server.URL+"/auth/github/callback?code=accepted_code&state=valid_state", nil)
+	require.NoError(t, err)
+
+	client := &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
+
+	resp, err := client.Do(req)
+	require.NoError(t, err)
+
+	assert.Equal(t, http.StatusFound, resp.StatusCode)
+	location := resp.Header.Get("Location")
+	assert.Equal(t, suite.Config.App.RedirectAfterSuccess, location)
+}

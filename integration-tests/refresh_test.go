@@ -22,7 +22,7 @@ func AreAccessTokenClaimsValid(accessToken string, expectedClaims map[string]int
 }
 
 func TestRefresh(t *testing.T) {
-	t.Run("hard refresh: calling /refresh should always hard refresh tokens", func(t *testing.T) {
+	t.Run("hard refresh: calling /refresh should always refresh both tokens", func(t *testing.T) {
 		t.Run("unhappy scenarios: user should not be refreshed", func(t *testing.T) {
 			t.Run("user does not exist", func(t *testing.T) {})
 			t.Run("user is deleted", func(t *testing.T) {})
@@ -341,7 +341,7 @@ func TestRefresh(t *testing.T) {
 		})
 	})
 
-	t.Run("soft refresh: calling a route that soft-refreshes should always refresh tokens if it is needed (ex: /me)", func(t *testing.T) {
+	t.Run("soft refresh: calling a route that soft-refreshes (ex: /me) should refresh both tokens if needed", func(t *testing.T) {
 		t.Run("calling a route with check & soft refresh, with [valid access_token, valid refresh_token] does not update the tokens", func(t *testing.T) {
 			suite := testkit.SetupTestSuite(t, testkit.GetBaseConfig())
 			defer suite.Teardown()
@@ -632,7 +632,7 @@ func TestRefresh(t *testing.T) {
 		})
 	})
 
-	t.Run("no refresh: calling a route with only a check should never refresh tokens (ex: /authorize)", func(t *testing.T) {
+	t.Run("no refresh: calling a route with only a check (ex: /authorize) should never refresh tokens", func(t *testing.T) {
 		// todo: test when /authorize is implemented
 	})
 }

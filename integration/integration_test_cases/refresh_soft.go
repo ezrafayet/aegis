@@ -56,7 +56,65 @@ func SoftRefresh_MustNotRefresh_ValidAT(t *testing.T) {
 }
 
 func SoftRefresh_MustRefresh_EmptyAT(t *testing.T) {
-	// todo
+	suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
+	defer suite.Teardown()
+
+	// Create a user
+	user, err := entities.NewUser("testuser", "https://example.com/avatar.jpg", "test@example.com", "github")
+	require.NoError(t, err)
+	user = suite.CreateUser(t, user, []string{"user"})
+
+	// Create expired access token
+	accessToken := ""
+	atExp := time.Now().Add(-2 * time.Minute).Unix()
+
+	// Create empty refresh token
+	refreshTokenEntity, _, err := entities.NewRefreshToken(user, "device-fingerprint", suite.Config)
+	require.NoError(t, err)
+	refreshTokenEntity = suite.CreateRefreshToken(t, refreshTokenEntity)
+
+	// Create request with expired access token and valid refresh token
+	req, err := http.NewRequest("GET", suite.Server.URL+"/auth/me", nil)
+	require.NoError(t, err)
+
+	accessCookie := cookies.NewAccessCookie(accessToken, atExp, suite.Config)
+	refreshCookie := cookies.NewRefreshCookie(refreshTokenEntity.Token, refreshTokenEntity.ExpiresAt.Unix(), suite.Config)
+	req.AddCookie(&accessCookie)
+	req.AddCookie(&refreshCookie)
+
+	// Make the request
+	resp, err := http.DefaultClient.Do(req)
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+	// Verify new access token cookie is set
+	cookies := resp.Cookies()
+	var newAccessToken string
+	var newRefreshToken string
+	for _, cookie := range cookies {
+		if cookie.Name == "access_token" {
+			newAccessToken = cookie.Value
+		}
+		if cookie.Name == "refresh_token" {
+			newRefreshToken = cookie.Value
+		}
+	}
+	assert.NotEmpty(t, newAccessToken)
+	assert.NotEqual(t, accessToken, newAccessToken)
+	assert.NotEmpty(t, newRefreshToken)
+	assert.NotEqual(t, refreshTokenEntity.Token, newRefreshToken)
+
+	// verify old refresh token is not there
+	var count int64
+	err = suite.Db.Model(&entities.RefreshToken{}).Where("token = ?", refreshTokenEntity.Token).Count(&count).Error
+	require.NoError(t, err)
+	assert.Equal(t, int64(0), count)
+
+	// verify new refresh token is there
+	var count2 int64
+	err = suite.Db.Model(&entities.RefreshToken{}).Where("token = ? AND user_id = ?", newRefreshToken, user.ID).Count(&count2).Error
+	require.NoError(t, err)
+	assert.Equal(t, int64(1), count2)
 }
 
 func SoftRefresh_MustRefresh_ExpiredAT(t *testing.T) {
@@ -124,7 +182,65 @@ func SoftRefresh_MustRefresh_ExpiredAT(t *testing.T) {
 }
 
 func SoftRefresh_MustRefresh_MalformedAT(t *testing.T) {
-	// todo
+	suite := integration_testkit.SetupTestSuite(t, integration_testkit.GetBaseConfig())
+	defer suite.Teardown()
+
+	// Create a user
+	user, err := entities.NewUser("testuser", "https://example.com/avatar.jpg", "test@example.com", "github")
+	require.NoError(t, err)
+	user = suite.CreateUser(t, user, []string{"user"})
+
+	// Create malformed access token
+	accessToken := "foo"
+	atExp := time.Now().Add(time.Hour).Unix()
+
+	// Create valid refresh token
+	refreshTokenEntity, _, err := entities.NewRefreshToken(user, "device-fingerprint", suite.Config)
+	require.NoError(t, err)
+	refreshTokenEntity = suite.CreateRefreshToken(t, refreshTokenEntity)
+
+	// Create request with expired access token and valid refresh token
+	req, err := http.NewRequest("GET", suite.Server.URL+"/auth/me", nil)
+	require.NoError(t, err)
+
+	accessCookie := cookies.NewAccessCookie(accessToken, atExp, suite.Config)
+	refreshCookie := cookies.NewRefreshCookie(refreshTokenEntity.Token, refreshTokenEntity.ExpiresAt.Unix(), suite.Config)
+	req.AddCookie(&accessCookie)
+	req.AddCookie(&refreshCookie)
+
+	// Make the request
+	resp, err := http.DefaultClient.Do(req)
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+	// Verify new access token cookie is set
+	cookies := resp.Cookies()
+	var newAccessToken string
+	var newRefreshToken string
+	for _, cookie := range cookies {
+		if cookie.Name == "access_token" {
+			newAccessToken = cookie.Value
+		}
+		if cookie.Name == "refresh_token" {
+			newRefreshToken = cookie.Value
+		}
+	}
+	assert.NotEmpty(t, newAccessToken)
+	assert.NotEqual(t, accessToken, newAccessToken)
+	assert.NotEmpty(t, newRefreshToken)
+	assert.NotEqual(t, refreshTokenEntity.Token, newRefreshToken)
+
+	// verify old refresh token is not there
+	var count int64
+	err = suite.Db.Model(&entities.RefreshToken{}).Where("token = ?", refreshTokenEntity.Token).Count(&count).Error
+	require.NoError(t, err)
+	assert.Equal(t, int64(0), count)
+
+	// verify new refresh token is there
+	var count2 int64
+	err = suite.Db.Model(&entities.RefreshToken{}).Where("token = ? AND user_id = ?", newRefreshToken, user.ID).Count(&count2).Error
+	require.NoError(t, err)
+	assert.Equal(t, int64(1), count2)
 }
 
 func SoftRefresh_MustNotRefresh_EmptyRT(t *testing.T) {

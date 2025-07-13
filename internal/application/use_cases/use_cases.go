@@ -65,7 +65,7 @@ func (s UseCases) CheckAndRefreshToken(accessToken, refreshToken string, forceRe
 		if err == nil {
 			return nil, nil
 		}
-		if err != nil && err.Error() != apperrors.ErrAccessTokenExpired.Error() {
+		if err != nil && err.Error() != apperrors.ErrAccessTokenInvalid.Error() && err.Error() != apperrors.ErrAccessTokenExpired.Error() {
 			return nil, err
 		}
 	}

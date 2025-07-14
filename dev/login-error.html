@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Failed - Aegis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 3rem;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .error-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .error-icon::after {
+            content: "✕";
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        p {
+            color: #7f8c8d;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .error-details {
+            background: #f8f9fa;
+            border-left: 4px solid #ff6b6b;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: left;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .error-details h3 {
+            color: #e74c3c;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .error-details p {
+            color: #6c757d;
+            margin-bottom: 0;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            margin: 0 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        .btn-secondary:hover {
+            background: #d5dbdb;
+            box-shadow: 0 8px 20px rgba(44, 62, 80, 0.2);
+        }
+
+        .btn-retry {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        }
+
+        .btn-retry:hover {
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .footer {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #ecf0f1;
+            color: #95a5a6;
+            font-size: 0.9rem;
+        }
+
+        .help-links {
+            margin-top: 1rem;
+        }
+
+        .help-links a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin: 0 0.5rem;
+        }
+
+        .help-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="error-icon"></div>
+        <h1>Login Failed</h1>
+        <p>We encountered an issue while processing your login request. Please try again or contact support if the problem persists.</p>
+        
+        <div class="error-details">
+            <h3>Possible causes:</h3>
+            <p>• Authentication provider is temporarily unavailable</p>
+            <p>• Invalid or expired authorization code</p>
+            <p>• Network connectivity issues</p>
+            <p>• Server configuration problems</p>
+        </div>
+        
+        <div>
+            <a href="/auth/login" class="btn btn-retry">Try Again</a>
+            <a href="/" class="btn btn-secondary">Go Home</a>
+        </div>
+        
+        <div class="help-links">
+            <a href="/support">Contact Support</a>
+            <a href="/docs">Documentation</a>
+        </div>
+        
+        <div class="footer">
+            <p>Powered by Aegis Authentication</p>
+        </div>
+    </div>
+
+    <script>
+        // Get error details from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+        const errorDescription = urlParams.get('error_description');
+        
+        if (error || errorDescription) {
+            const errorDetails = document.querySelector('.error-details');
+            if (error) {
+                const errorTitle = document.createElement('h3');
+                errorTitle.textContent = `Error: ${error}`;
+                errorTitle.style.color = '#e74c3c';
+                errorDetails.appendChild(errorTitle);
+            }
+            if (errorDescription) {
+                const errorDesc = document.createElement('p');
+                errorDesc.textContent = errorDescription;
+                errorDesc.style.color = '#6c757d';
+                errorDetails.appendChild(errorDesc);
+            }
+        }
+    </script>
+</body>
+</html> 

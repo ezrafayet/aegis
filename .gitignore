@@ -34,6 +34,7 @@ go.work.sum
 config.json
 
 main
+*/**/main
 
 .idea
 out/*

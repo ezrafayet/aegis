@@ -12,12 +12,11 @@ import (
 func Login_Returns200(t *testing.T) {
 	config := integration_testkit.GetBaseConfig()
 	config.LoginPage.Enabled = true
-	config.LoginPage.FullPath = "/login"
 
 	suite := integration_testkit.SetupTestSuite(t, config)
 	defer suite.Teardown()
 
-	resp, err := http.Get(suite.Server.URL + "/login")
+	resp, err := http.Get(suite.Server.URL + config.LoginPage.FullPath)
 	require.NoError(t, err)
 	defer resp.Body.Close()
 
@@ -32,7 +31,7 @@ func Login_DisabledReturns404(t *testing.T) {
 	suite := integration_testkit.SetupTestSuite(t, config)
 	defer suite.Teardown()
 
-	resp, err := http.Get(suite.Server.URL + "/login")
+	resp, err := http.Get(suite.Server.URL + config.LoginPage.FullPath)
 	require.NoError(t, err)
 	defer resp.Body.Close()
 

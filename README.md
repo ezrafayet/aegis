@@ -8,14 +8,9 @@
 Drop-in auth service - no SaaS, no lock-in
 ```
 
-# OAuth support:
-
-- GitHub
-- Discord
-
 # Introduction
 
-I found myself rewriting an authorization service each and every time on every project or constantly using the same platforms and tools (Auth0, Supabase, Firebase, Pocket Base), which comes with heavy vendor lock-in, way too many features (I don't want the Gorilla and the whole jungle), big ecosystems and a pretty significant cost.
+I found myself rewriting an authorization service each and every time on every project or constantly using the same platforms and tools (Auth0, Supabase, Firebase, Pocket Base), which comes with heavy vendor lock-in, way too many features (I don't want the Gorilla and the whole universe), big ecosystems and a pretty significant cost.
 
 I want to have just this: a simple DROP-IN auth service that I can just use in a docker for any project, with a single config file... Pretty much as one would use Nginx.
 
@@ -29,18 +24,31 @@ And that's it! Let's see if I can do that over night...
 Spoiler alert: I did code it over night!
 Another spoiler alert: I've been improving it since then
 
+Also it won't support passwords since it should be considered bad practise.
+
+# Supported auth methods
+
+- GitHub
+- Discord
+
 # How to use the auth service
 
 In your project, just drop 2 files:
 
-## 1. A Dockerfile
+```
+auth
+|--- Dockerfile
+|--- config.json
+```
+
+## 1. Dockerfile
 
 ```Dockerfile
-FROM ezrafayet/aegix:v0.2.0
+FROM ezrafayet/aegix:v0.6.0
 COPY ./config.json /app/config.json
 ```
 
-## 2. A config.json
+## 2. config.json
 
 ```json
 {
@@ -104,19 +112,12 @@ COPY ./config.json /app/config.json
 }
 ```
 
-# Project status
-- Implemented GitHub OAuth to get started
-- Finished all the basic flows and life cycyles of the access token and refresh token
-- Must add tests (especially integration)
-
 # Should be implemented
 - Server 2 server checks
 - creation of api tokens
 - adding metadata
 - More providers!
 - A dashboard
-
-Also it won't support passwords since it is bad practise.
 
 # Doc to write
 - How to get started under the same domain <= tested and works

@@ -124,6 +124,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
             gap: 0.5rem;
             padding: 0.75rem;
             border: 2px solid #e1e5e9;
@@ -213,32 +214,65 @@
     </div>
 
     <script>
+        // Reset button states on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            resetOAuthButtons();
+        });
+
+        function resetOAuthButtons() {
+            const buttons = document.querySelectorAll('.oauth-btn');
+            buttons.forEach(btn => {
+                btn.disabled = false;
+                btn.style.pointerEvents = 'auto';
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+            });
+        }
+
         async function onOAuthBtnClick(provider) {
             const btn = document.getElementById(`login-btn-${provider}`);
+            
+            // Prevent multiple clicks
+            if (btn.disabled) {
+                return;
+            }
+            
             try {
+                // Disable button
                 btn.disabled = true;
                 btn.style.pointerEvents = 'none';
                 btn.style.opacity = '0.6';
+                btn.style.cursor = 'not-allowed';
+                
                 const url = `/auth/${provider}`;
                 const response = await fetch(url);
+                
                 if (!response.ok) {
                     throw new Error('Login failed. Please try again.');
                 }
+                
                 const {redirect_url} = await response.json();
-                console.log(redirect_url);
+                
                 if (!redirect_url) {
                     throw new Error('Login failed. Please try again.');
                 }
+
+                resetOAuthButtons();
+                
+                // Clear any existing error messages
+                const errorMsg = document.getElementById('error-message');
+                errorMsg.style.display = 'none';
+                
+                // Redirect to OAuth provider
                 window.location.href = redirect_url;
             } catch(error) {
                 console.error(error);
                 const errorMsg = document.getElementById('error-message');
                 errorMsg.textContent = 'Login failed. Please try again.';
                 errorMsg.style.display = 'block';
-            } finally {
-                btn.disabled = false;
-                btn.style.pointerEvents = 'pointer';
-                btn.style.opacity = '1';
+                
+                // Re-enable button on error
+                resetOAuthButtons();
             }
         }
     </script>

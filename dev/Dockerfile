@@ -7,6 +7,8 @@ RUN apk add --no-cache curl
 # Copy the HTML files to nginx's default serving directory
 COPY login-success.html /usr/share/nginx/html/
 COPY login-error.html /usr/share/nginx/html/
+COPY home.html /usr/share/nginx/html/
+COPY 404.html /usr/share/nginx/html/
 
 # Copy the custom nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
@@ -16,10 +18,6 @@ RUN echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=/
 
 # Expose port 80
 EXPOSE 80
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost/health || exit 1
 
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"] 

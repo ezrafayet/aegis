@@ -34,3 +34,11 @@ test-integration:
 test-unit:
 	cd src
 	go test -timeout=15s ./internal/... ./pkg/...
+
+# For dev
+
+start:
+	sudo docker-compose -f docker-compose-dev.yml up --build --force-recreate
+
+kill:
+	sudo docker-compose -f docker-compose-dev.yml down -v

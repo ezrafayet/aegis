@@ -10,7 +10,7 @@ Drop-in auth service - no SaaS, no lock-in
 
 # Introduction
 
-I found myself rewriting an authorization service each and every time on every project or constantly using the same platforms and tools (Auth0, Supabase, Firebase, Pocket Base), which comes with heavy vendor lock-in, way too many features (I don't want the Gorilla and the whole universe), big ecosystems and a pretty significant cost.
+I found myself either rewriting an authorization service each and every time on every project, or constantly re-using the same platforms and tools (Auth0, Supabase, Firebase, Pocket Base), which comes with heavy vendor lock-in, way too many features, big ecosystems and a pretty significant cost. I don't want the Gorilla and the whole universe.
 
 I want to have just this: a simple DROP-IN auth service that I can just use in a docker for any project, with a single config file... Pretty much as one would use Nginx.
 
@@ -20,18 +20,60 @@ auth
 |--- config.json
 ```
 
-And that's it! Let's see if I can do that over night...
-Spoiler alert: I did code it over night!
+Let's see if I can do that over night...  
+Spoiler alert: I did code it over night.  
 Another spoiler alert: I've been improving it since then
 
-Also it won't support passwords since it should be considered bad practise.
-
-# Supported auth methods
+Supported auth methods (to date):
 
 - GitHub
 - Discord
 
+Also it won't support passwords ever since it should be considered a bad practise.
+
 # How to use the auth service
+
+See the architecture you need, the configuration and tutorials to set up auth providers (GitHub, Discord...).
+
+## Architecture
+
+You have 2 choices of architecture to use it:
+
+## host on the same domain:
+
+```
+                       +----------+  
+           +-----------> AEGIS    |  
+           |           | :5666    |  
+           |           +----------+  
+    +------+---+      domain.com/auth
+    | NGINX    |                     
+    | :80      |                     
+    +----------+                     
+     domain.com        +----------+  
+           |           | CORE     |  
+           +-----------> :8000    |  
+                       +----------+  
+```
+
+## host on subdomains:
+
+```
+                       +----------+  
+           +-----------> AEGIS    |  
+           |           | :5666    |  
+           |           +----------+  
+    +------+---+      domain.com/auth
+    | NGINX    |                     
+    | :80      |                     
+    +----------+                     
+     domain.com        +----------+  
+           |           | CORE     |  
+           +-----------> :8000    |  
+                       +----------+  
+```
+
+## Setup
 
 In your project, just drop 2 files:
 
@@ -41,14 +83,14 @@ auth
 |--- config.json
 ```
 
-## 1. Dockerfile
+### Dockerfile
 
 ```Dockerfile
 FROM ezrafayet/aegix:v0.6.0
 COPY ./config.json /app/config.json
 ```
 
-## 2. config.json
+### config.json
 
 ```json
 {
@@ -112,19 +154,14 @@ COPY ./config.json /app/config.json
 }
 ```
 
-# Should be implemented
-- Server 2 server checks
-- creation of api tokens
-- adding metadata
-- More providers!
-- A dashboard
+## Tutorials
 
-# Doc to write
-- How to get started under the same domain <= tested and works
-- How to get started on different subdomains
-- How to use it from client (Next.js etc) or server (Node.js, Python, Go...)
+- Setup GitHub auth (to come)
+- Setup Discord auth (to come)
 
 # Security
+
+If you need a bullet-proof, battle-tested auth for production, do not use this service. Use Auth0, NextAuth, Supabase, Firebase, Work.os, but not this service.
 
 ## Implemented
 
@@ -196,9 +233,6 @@ COPY ./config.json /app/config.json
 - **Secret validation**: Ensure JWT secrets are at least 32 characters
 - **Entropy checking**: Validate secret randomness
 
-# Publish a new version on Docker Hub
+# Contributing
 
-```
-sudo docker build -t ezrafayet/aegis:v0.3.0 .
-sudo docker push ezrafayet/aegis:v0.3.0
-```
+Contibuting is more than welcome. See CONTRIBUTING.md

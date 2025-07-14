@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 )
 
 type OAuthDiscordRepository providers.OAuthRepository
@@ -44,12 +45,16 @@ func (p OAuthDiscordRepository) IsEnabled() bool {
 }
 
 func (p OAuthDiscordRepository) GetOauthRedirectURL(state string) string {
-	return fmt.Sprintf(
-		"https://discord.com/api/oauth2/authorize?client_id=%s&redirect_uri=%s&response_type=code&scope=identify%%20email&state=%s",
-		p.ClientID,
-		p.RedirectURL,
-		state,
-	)
+	baseURL := "https://discord.com/api/oauth2/authorize"
+
+	params := url.Values{}
+	params.Set("client_id", p.ClientID)
+	params.Set("redirect_uri", p.RedirectURL)
+	params.Set("response_type", "code")
+	params.Set("scope", "identify email")
+	params.Set("state", state)
+
+	return baseURL + "?" + params.Encode()
 }
 
 func (p OAuthDiscordRepository) GetName() string {

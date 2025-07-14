@@ -67,6 +67,10 @@ v0.x.x (needs to be injected)
 	group.GET("/logout", r.Handlers.Logout)
 	group.GET("/health", r.Handlers.DoNothing)
 
+	if c.LoginPage.Enabled {
+		e.GET(c.LoginPage.FullPath, r.Handlers.ServeLoginPage)
+	}
+
 	for _, provider := range r.Providers {
 		group.GET(fmt.Sprintf("/%s", provider.Name), provider.Handlers.GetAuthURL, provider.Middlewares.CheckAuthEnabled)
 		group.GET(fmt.Sprintf("/%s/callback", provider.Name), provider.Handlers.ExchangeCode, provider.Middlewares.CheckAuthEnabled)

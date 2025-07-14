@@ -5,16 +5,22 @@ import (
 	"aegis/internal/domain/ports/primary"
 	"aegis/pkg/apperrors"
 	"aegis/pkg/cookies"
+	"embed"
 	"errors"
+	"html/template"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
 
+//go:embed templates/login.html
+var templates embed.FS
+
 type HandlersInterface interface {
 	GetSession(c echo.Context) error
 	Logout(c echo.Context) error
 	DoNothing(c echo.Context) error
+	ServeLoginPage(c echo.Context) error
 }
 
 type Handlers struct {
@@ -73,4 +79,26 @@ func (h Handlers) Logout(c echo.Context) error {
 
 func (h Handlers) DoNothing(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
+}
+
+func (h Handlers) ServeLoginPage(c echo.Context) error {
+	// check if page is enabled
+	// check access token, if valid => redirect to success login
+	tmpl, err := template.ParseFS(templates, "templates/login.html")
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Error loading template")
+	}
+
+	// Prepare template data
+	data := struct {
+		AppName        string
+		GitHubEnabled  bool
+		DiscordEnabled bool
+	}{
+		AppName:        h.Config.App.Name,
+		GitHubEnabled:  h.Config.Auth.Providers.GitHub.Enabled,
+		DiscordEnabled: h.Config.Auth.Providers.Discord.Enabled,
+	}
+
+	return tmpl.Execute(c.Response().Writer, data)
 }

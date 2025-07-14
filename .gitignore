@@ -36,3 +36,9 @@ config.json
 main
 
 .idea
+out/*
+.out/*
+config.json
+*/**/config.json
+.env
+*/**/.env

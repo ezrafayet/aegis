@@ -82,14 +82,28 @@ func (h Handlers) DoNothing(c echo.Context) error {
 }
 
 func (h Handlers) ServeLoginPage(c echo.Context) error {
-	// check if page is enabled
-	// check access token, if valid => redirect to success login
+	accessTokenValue := ""
+	if accessToken, err := c.Cookie("access_token"); err == nil {
+		accessTokenValue = accessToken.Value
+	}
+	refreshTokenValue := ""
+	if refreshToken, err := c.Cookie("refresh_token"); err == nil {
+		refreshTokenValue = refreshToken.Value
+	}
+	tokensPair, err := h.Service.CheckAndRefreshToken(accessTokenValue, refreshTokenValue, false)
+	if tokensPair != nil {
+		accessCookie := cookies.NewAccessCookie(tokensPair.AccessToken, tokensPair.AccessTokenExpiresAt.Unix(), h.Config)
+		refreshCookie := cookies.NewRefreshCookie(tokensPair.RefreshToken, tokensPair.RefreshTokenExpiresAt.Unix(), h.Config)
+		c.SetCookie(&accessCookie)
+		c.SetCookie(&refreshCookie)
+	}
+	if err == nil {
+		return c.Redirect(http.StatusFound, h.Config.App.RedirectAfterSuccess)
+	}
 	tmpl, err := template.ParseFS(templates, "templates/login.html")
 	if err != nil {
-		return c.String(http.StatusInternalServerError, "Error loading template")
+		return c.String(http.StatusInternalServerError, apperrors.ErrGeneric.Error())
 	}
-
-	// Prepare template data
 	data := struct {
 		AppName        string
 		GitHubEnabled  bool
@@ -99,6 +113,5 @@ func (h Handlers) ServeLoginPage(c echo.Context) error {
 		GitHubEnabled:  h.Config.Auth.Providers.GitHub.Enabled,
 		DiscordEnabled: h.Config.Auth.Providers.Discord.Enabled,
 	}
-
 	return tmpl.Execute(c.Response().Writer, data)
 }

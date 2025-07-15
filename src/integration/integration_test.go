@@ -7,8 +7,8 @@ import (
 
 func TestIntegration(t *testing.T) {
 	t.Run("calling GET /login", func(t *testing.T) {
-		t.Run("returns 200 when enabled", integration_test_cases.Login_Returns200)
-		// valid token gets redirected to /login-success
+		t.Run("returns 200 and shows login page when enabled", integration_test_cases.Login_NoATOrRT_Returns200AndShowsLoginPage)
+		t.Run("valid token gets redirected to /login-success", integration_test_cases.Login_ValidAT_RedirectsToSuccessPage)
 		t.Run("returns 404 when disabled", integration_test_cases.Login_DisabledReturns404)
 	})
 	t.Run("calling GET /health", func(t *testing.T) {

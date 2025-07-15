@@ -11,7 +11,6 @@ import (
 
 func Login_Returns200(t *testing.T) {
 	config := integration_testkit.GetBaseConfig()
-	config.LoginPage.Enabled = true
 
 	suite := integration_testkit.SetupTestSuite(t, config)
 	defer suite.Teardown()

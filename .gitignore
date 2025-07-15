@@ -43,3 +43,4 @@ config.json
 */**/config.json
 .env
 */**/.env
+steps.md

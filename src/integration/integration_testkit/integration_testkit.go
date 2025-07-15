@@ -102,6 +102,10 @@ func GetBaseConfig() entities.Config {
 	config.JWT.AccessTokenExpirationMin = 15
 	config.JWT.RefreshTokenExpirationDays = 7
 
+	// Login page configuration
+	config.LoginPage.Enabled = true
+	config.LoginPage.FullPath = "/auth/login"
+
 	// Auth providers configuration
 	config.Auth.Providers.GitHub.Enabled = true
 	config.Auth.Providers.GitHub.AppName = "TestApp"
@@ -139,6 +143,9 @@ func (s *TestSuite) setupTestServer() {
 	group.GET("/refresh", r.Handlers.DoNothing, r.Middlewares.CheckAndForceRefreshToken)
 	group.GET("/logout", r.Handlers.Logout)
 	group.GET("/health", r.Handlers.DoNothing)
+	if s.Config.LoginPage.Enabled {
+		group.GET("/login", r.Handlers.ServeLoginPage)
+	}
 	for _, provider := range r.Providers {
 		group.GET(fmt.Sprintf("/%s", provider.Name), provider.Handlers.GetAuthURL, provider.Middlewares.CheckAuthEnabled)
 		group.GET(fmt.Sprintf("/%s/callback", provider.Name), provider.Handlers.ExchangeCode, provider.Middlewares.CheckAuthEnabled)

@@ -1,14 +1,13 @@
 package registry
 
 import (
-	"aegis/internal/application/use_cases"
+	usecases "aegis/internal/application/use_cases"
 	"aegis/internal/domain/entities"
 	"aegis/internal/infrastructure/handlers"
 	"aegis/internal/infrastructure/middlewares"
 	"aegis/internal/infrastructure/repositories"
 	"aegis/pkg/plugins/providers/discord"
 	"aegis/pkg/plugins/providers/github"
-	"aegis/pkg/urlbuilder"
 	"fmt"
 
 	"gorm.io/gorm"
@@ -29,18 +28,13 @@ func NewRegistry(c entities.Config, db *gorm.DB) (Registry, error) {
 	authHandlers := handlers.NewHandlers(c, authService)
 	authMiddlewares := middlewares.NewAuthMiddleware(c, authService)
 
-	redirectURLBase, err := urlbuilder.Build(c.App.URL, "/auth/%s/callback", map[string]string{})
-	if err != nil {
-		return Registry{}, err
-	}
-
 	providers := []Provider{
 		NewProvider(
 			c, github.NewOAuthGithubRepository(
 				c.Auth.Providers.GitHub.Enabled,
 				c.Auth.Providers.GitHub.ClientID,
 				c.Auth.Providers.GitHub.ClientSecret,
-				fmt.Sprintf(redirectURLBase, "github")),
+				fmt.Sprintf("%s/auth/github/callback", c.App.URL)),
 			userRepository,
 			refreshTokenRepository,
 			stateRepository),
@@ -49,7 +43,7 @@ func NewRegistry(c entities.Config, db *gorm.DB) (Registry, error) {
 				c.Auth.Providers.Discord.Enabled,
 				c.Auth.Providers.Discord.ClientID,
 				c.Auth.Providers.Discord.ClientSecret,
-				fmt.Sprintf(redirectURLBase, "discord")),
+				fmt.Sprintf("%s/auth/discord/callback", c.App.URL)),
 			userRepository,
 			refreshTokenRepository,
 			stateRepository),

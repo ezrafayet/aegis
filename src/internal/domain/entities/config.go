@@ -20,6 +20,13 @@ type Config struct {
 		Port int `json:"port"`
 	} `json:"app"`
 
+	LoginPage struct {
+		// If true, the login page will be enabled
+		Enabled bool `json:"enabled"`
+		// Full path to the login page (ex: "/login")
+		FullPath string `json:"full_path"`
+	} `json:"login_page"`
+
 	DB struct {
 		// DB connection string (ex: "postgres://user:password@localhost:5432/auth")
 		PostgresURL string `json:"postgres_url"`

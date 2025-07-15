@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  nginx-dev:
+    build:
+      context: ./dev
+      dockerfile: Dockerfile
+    ports:
+      - "5000:80"
+    depends_on:
+      - aegis-dev
+    # volumes:
+      # Optional: Mount HTML files for development (uncomment for live reload)
+      # - ./login-success.html:/usr/share/nginx/html/login-success.html:ro
+      # - ./login-error.html:/usr/share/nginx/html/login-error.html:ro
+
+  aegis-dev:
+    build:
+      context: ./src
+      dockerfile: Dockerfile-dev
+    ports:
+      - "5666:5666"
+    environment:
+      - PORT=5666
+    # volumes:
+      # Optional: Mount config for development (uncomment for live config changes)
+      # - ./src/config.json:/app/config.json:ro

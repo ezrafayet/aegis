@@ -34,5 +34,13 @@ go.work.sum
 config.json
 
 main
+*/**/main
 
 .idea
+out/*
+.out/*
+config.json
+*/**/config.json
+.env
+*/**/.env
+steps.md

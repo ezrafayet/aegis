@@ -105,6 +105,9 @@ COPY ./config.json /app/config.json
         "endpoints_prefix": "/auth",
         "port": 5666
     },
+    "rate-limiting": {
+        "enabled": true
+    },
     "statistics": {
         "enabled": true,
         "retention_months": 24

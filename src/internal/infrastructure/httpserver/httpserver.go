@@ -12,6 +12,8 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
+var Version = "dev"
+
 func Start() error {
 	fmt.Println(`
  █████╗ ███████╗ ██████╗ ██╗███████╗
@@ -21,7 +23,7 @@ func Start() error {
 ██║  ██║███████╗╚██████╔╝██║███████║
 ╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═╝╚══════╝
 Drop-in auth service - no SaaS, no lock-in
-v0.x.x (needs to be injected)
+` + Version + `
 	`)
 	c, err := config.Read("config.json")
 	if err != nil {

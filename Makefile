@@ -4,9 +4,11 @@ SHELL := /bin/bash
 # Set working directory to src
 .PHONY: build fmt fmt-ci vet test test-unit test-integration
 
+VERSION := $(shell git describe --tags)
+
 build:
 	cd src
-	go build -o main cmd/httpserver/main.go
+	go build -ldflags="-X 'aegis/internal/infrastructure/httpserver.Version=$(VERSION)'" -o main cmd/httpserver/main.go
 
 fmt:
 	cd src

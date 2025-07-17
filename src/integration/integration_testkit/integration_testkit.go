@@ -146,6 +146,7 @@ func (s *TestSuite) setupTestServer() {
 	if s.Config.LoginPage.Enabled {
 		group.GET("/login", r.Handlers.ServeLoginPage)
 	}
+	group.POST("/authorize-access-token", r.Handlers.Authorize)
 	for _, provider := range r.Providers {
 		group.GET(fmt.Sprintf("/%s", provider.Name), provider.Handlers.GetAuthURL, provider.Middlewares.CheckAuthEnabled)
 		group.GET(fmt.Sprintf("/%s/callback", provider.Name), provider.Handlers.ExchangeCode, provider.Middlewares.CheckAuthEnabled)

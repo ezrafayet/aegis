@@ -7,6 +7,8 @@ import (
 	"aegis/internal/domain/services"
 	"aegis/pkg/apperrors"
 	"aegis/pkg/jwtgen"
+	"slices"
+	"strings"
 	"time"
 )
 
@@ -109,4 +111,28 @@ func (s UseCases) CheckAndRefreshToken(accessToken, refreshToken string, forceRe
 		RefreshToken:          newRefreshToken,
 		RefreshTokenExpiresAt: time.Unix(rtExpiresAt, 0),
 	}, nil
+}
+
+func (s UseCases) Authorize(accessToken string, authorizedRoles []string) error {
+	if len(authorizedRoles) == 0 {
+		return apperrors.ErrNoRoles
+	}
+	ccMap, err := jwtgen.ReadClaims(accessToken, s.Config.JWT.Secret)
+	if err != nil {
+		return err
+	}
+	if slices.Contains(authorizedRoles, "any") {
+		return nil
+	}
+	authorized := false
+	for _, authorizedRole := range authorizedRoles {
+		if ccMap["roles"] != nil && strings.Contains(ccMap["roles"].(string), authorizedRole) {
+			authorized = true
+			break
+		}
+	}
+	if !authorized {
+		return apperrors.ErrUnauthorizedRole
+	}
+	return nil
 }

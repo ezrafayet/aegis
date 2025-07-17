@@ -177,3 +177,150 @@ func TestCheckAndRefreshToken(t *testing.T) {
 		}
 	})
 }
+
+func TestAuthorize(t *testing.T) {
+	baseConfig := entities.Config{
+		JWT: entities.JWTConfig{
+			Secret:                     "some-secret",
+			AccessTokenExpirationMin:   1,
+			RefreshTokenExpirationDays: 1,
+		},
+	}
+	prepare := func(t *testing.T) (*UseCases, secondary.UserRepository, secondary.RefreshTokenRepository, *gorm.DB) {
+		db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		db.AutoMigrate(&entities.User{}, &entities.RefreshToken{}, &entities.Role{})
+		refreshTokenRepository := repositories.NewRefreshTokenRepository(db)
+		userRepository := repositories.NewUserRepository(db)
+		authService := NewService(baseConfig, refreshTokenRepository, userRepository)
+		return authService, userRepository, refreshTokenRepository, db
+	}
+
+	t.Run("token", func(t *testing.T) {
+		authService, _, _, _ := prepare(t)
+
+		t.Run("no token returns an error", func(t *testing.T) {
+			err := authService.Authorize("", []string{"user"})
+			if err == nil {
+				t.Fatal("expected error for empty token")
+			}
+			if err.Error() != "token_invalid" {
+				t.Fatal("expected error for invalid token", err.Error())
+			}
+		})
+
+		t.Run("expired token returns an error", func(t *testing.T) {
+			// Create a user and generate an expired token
+			newUser, err := entities.NewUser("some-name", "some-avatar", "some-email", "github")
+			if err != nil {
+				t.Fatal("expected no error", err)
+			}
+			newUser.Roles = []entities.Role{
+				{UserID: newUser.ID, Value: "user"},
+			}
+			cc, err := entities.NewCustomClaimsFromValues(newUser.ID, newUser.EarlyAdopter, newUser.Roles, newUser.Metadata)
+			if err != nil {
+				t.Fatal("expected no error", err)
+			}
+			// Generate token with past expiration
+			expiredToken, _, err := jwtgen.Generate(cc.ToMap(), time.Now().Add(-time.Hour*24), baseConfig.JWT.AccessTokenExpirationMin, baseConfig.App.Name, baseConfig.JWT.Secret)
+			if err != nil {
+				t.Fatal("expected no error", err)
+			}
+			err = authService.Authorize(expiredToken, []string{"user"})
+			if err == nil {
+				t.Fatal("expected error for expired token")
+			}
+			if err.Error() != "token_expired" {
+				t.Fatal("expected error for expired token", err.Error())
+			}
+		})
+
+		t.Run("malformed token returns an error", func(t *testing.T) {
+			err := authService.Authorize("invalid.token.here", []string{"user"})
+			if err == nil {
+				t.Fatal("expected error for malformed token")
+			}
+			if err.Error() != "token_invalid" {
+				t.Fatal("expected error for malformed token", err.Error())
+			}
+		})
+	})
+
+	t.Run("roles", func(t *testing.T) {
+		authService, _, _, _ := prepare(t)
+
+		t.Run("no roles returns error", func(t *testing.T) {
+			newUser, err := entities.NewUser("some-name", "some-avatar", "some-email", "github")
+			if err != nil {
+				t.Fatal("expected no error", err)
+			}
+			newUser.Roles = []entities.Role{
+				{UserID: newUser.ID, Value: "user"},
+			}
+			cc, err := entities.NewCustomClaimsFromValues(newUser.ID, newUser.EarlyAdopter, newUser.Roles, newUser.Metadata)
+			if err != nil {
+				t.Fatal("expected no error", err)
+			}
+			validToken, _, err := jwtgen.Generate(cc.ToMap(), time.Now(), baseConfig.JWT.AccessTokenExpirationMin, baseConfig.App.Name, baseConfig.JWT.Secret)
+			if err != nil {
+				t.Fatal("expected no error", err)
+			}
+			err = authService.Authorize(validToken, []string{})
+			if err.Error() != apperrors.ErrNoRoles.Error() {
+				t.Fatal("expected error ErrNoRoles", err)
+			}
+		})
+
+		t.Run("any role returns true even if no roles are present on user", func(t *testing.T) {
+			newUser, err := entities.NewUser("some-name", "some-avatar", "some-email", "github")
+			if err != nil {
+				t.Fatal("expected no error", err)
+			}
+			newUser.Roles = []entities.Role{
+				{UserID: newUser.ID, Value: "user"},
+			}
+			cc, err := entities.NewCustomClaimsFromValues(newUser.ID, newUser.EarlyAdopter, newUser.Roles, newUser.Metadata)
+			if err != nil {
+				t.Fatal("expected no error", err)
+			}
+			validToken, _, err := jwtgen.Generate(cc.ToMap(), time.Now(), baseConfig.JWT.AccessTokenExpirationMin, baseConfig.App.Name, baseConfig.JWT.Secret)
+			if err != nil {
+				t.Fatal("expected no error", err)
+			}
+			err = authService.Authorize(validToken, []string{"any"})
+			if err != nil {
+				t.Fatal("expected no error for 'any' role", err)
+			}
+		})
+	})
+
+	t.Run("authorized role returns no error", func(t *testing.T) {
+		authService, _, _, _ := prepare(t)
+		newUser, err := entities.NewUser("some-name", "some-avatar", "some-email", "github")
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		newUser.Roles = []entities.Role{
+			{UserID: newUser.ID, Value: "payments"},
+		}
+		cc, err := entities.NewCustomClaimsFromValues(newUser.ID, newUser.EarlyAdopter, newUser.Roles, newUser.Metadata)
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		validToken, _, err := jwtgen.Generate(cc.ToMap(), time.Now(), baseConfig.JWT.AccessTokenExpirationMin, baseConfig.App.Name, baseConfig.JWT.Secret)
+		if err != nil {
+			t.Fatal("expected no error", err)
+		}
+		err = authService.Authorize(validToken, []string{"admin", "user", "payments"})
+		if err != nil {
+			t.Fatal("expected no error for authorized role", err)
+		}
+		err = authService.Authorize(validToken, []string{"user"})
+		if err.Error() != apperrors.ErrUnauthorizedRole.Error() {
+			t.Fatal("expected error ErrUnauthorizedRole", err)
+		}
+	})
+}

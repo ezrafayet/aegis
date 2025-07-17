@@ -35,44 +35,6 @@ Also it won't support passwords ever since it should be considered a bad practis
 
 See the architecture you need, the configuration and tutorials to set up auth providers (GitHub, Discord...).
 
-## Architecture
-
-You have 2 choices of architecture to use it:
-
-## host on the same domain:
-
-```
-                       +----------+  
-           +-----------> AEGIS    |  
-           |           | :5666    |  
-           |           +----------+  
-    +------+---+      domain.com/auth
-    | NGINX    |                     
-    | :80      |                     
-    +----------+                     
-     domain.com        +----------+  
-           |           | CORE     |  
-           +-----------> :8000    |  
-                       +----------+  
-```
-
-## host on subdomains:
-
-```
-                       +----------+  
-           +-----------> AEGIS    |  
-           |           | :5666    |  
-           |           +----------+  
-    +------+---+      domain.com/auth
-    | NGINX    |                     
-    | :80      |                     
-    +----------+                     
-     domain.com        +----------+  
-           |           | CORE     |  
-           +-----------> :8000    |  
-                       +----------+  
-```
-
 ## Setup
 
 In your project, just drop 2 files:
@@ -86,7 +48,7 @@ auth
 ### Dockerfile
 
 ```Dockerfile
-FROM ezrafayet/aegix:v0.6.0
+FROM ezrafayet/aegix:v0.7.0
 COPY ./config.json /app/config.json
 ```
 
@@ -155,6 +117,44 @@ COPY ./config.json /app/config.json
         "roles": ["platform_admin", "user"]
     }
 }
+```
+
+## Architecture
+
+You have 2 choices of architecture to use it:
+
+## host on the same domain:
+
+```
+                       +----------+  
+           +-----------> AEGIS    |  
+           |           | :5666    |  
+           |           +----------+  
+    +------+---+      domain.com/auth
+    | NGINX    |                     
+    | :80      |                     
+    +----------+                     
+     domain.com        +----------+  
+           |           | CORE     |  
+           +-----------> :8000    |  
+                       +----------+  
+```
+
+## host on subdomains:
+
+```
+                       +----------+  
+           +-----------> AEGIS    |  
+           |           | :5666    |  
+           |           +----------+  
+    +------+---+      domain.com/auth
+    | NGINX    |                     
+    | :80      |                     
+    +----------+                     
+     domain.com        +----------+  
+           |           | CORE/    |  
+           +-----------> :8000    |  
+                       +----------+  
 ```
 
 ## Tutorials

@@ -66,6 +66,7 @@ v0.x.x (needs to be injected)
 	group.GET("/refresh", r.Handlers.DoNothing, r.Middlewares.CheckAndForceRefreshToken)
 	group.GET("/logout", r.Handlers.Logout)
 	group.GET("/health", r.Handlers.DoNothing)
+	group.POST("/authorize-access-token", r.Handlers.Authorize)
 
 	if c.LoginPage.Enabled {
 		e.GET(c.LoginPage.FullPath, r.Handlers.ServeLoginPage)

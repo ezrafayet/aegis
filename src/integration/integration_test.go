@@ -98,4 +98,18 @@ func TestIntegration(t *testing.T) {
 		})
 		t.Run("rate limiting", func(t *testing.T) { /*todo*/ })
 	})
+	t.Run("calling POST /authorize-access-token", func(t *testing.T) {
+		t.Run("token", func(t *testing.T) {
+			t.Run("returns 401 if no token is provided", integration_test_cases.Authorize_EmptyTokenReturns401)
+			t.Run("returns 401 if the token is expired", integration_test_cases.Authorize_ExpiredTokenReturns401)
+			t.Run("returns 401 if the token is malformed", integration_test_cases.Authorize_MalformedTokenReturns401)
+		})
+		t.Run("roles", func(t *testing.T) {
+			t.Run("returns 401 if no roles are provided", integration_test_cases.Authorize_NoRolesReturns401)
+			t.Run("returns 401 if the user does not have the required role", integration_test_cases.Authorize_UserDoesNotHaveRequiredRoleReturns401)
+			t.Run("returns 200 if the user has the required role", integration_test_cases.Authorize_UserHasRequiredRoleReturns200)
+			t.Run("returns 200 if the user has any role", integration_test_cases.Authorize_UserHasAnyRoleReturns200)
+		})
+		t.Run("rate limiting", func(t *testing.T) { /*todo*/ })
+	})
 }

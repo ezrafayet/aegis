@@ -21,6 +21,7 @@ type HandlersInterface interface {
 	Logout(c echo.Context) error
 	DoNothing(c echo.Context) error
 	ServeLoginPage(c echo.Context) error
+	Authorize(c echo.Context) error
 }
 
 type Handlers struct {
@@ -114,4 +115,53 @@ func (h Handlers) ServeLoginPage(c echo.Context) error {
 		DiscordEnabled: h.Config.Auth.Providers.Discord.Enabled,
 	}
 	return tmpl.Execute(c.Response().Writer, data)
+}
+
+func (h Handlers) Authorize(c echo.Context) error {
+	type Body struct {
+		AccessToken string   `json:"access_token"`
+		Roles       []string `json:"authorized_roles"`
+	}
+	body := Body{}
+	if err := c.Bind(&body); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": apperrors.ErrGeneric.Error()})
+	}
+	err := h.Service.Authorize(body.AccessToken, body.Roles)
+	if err != nil {
+		if errors.Is(err, apperrors.ErrAccessTokenExpired) {
+			return c.JSON(http.StatusUnauthorized, map[string]any{
+				"error":      apperrors.ErrAccessTokenExpired.Error(),
+				"authorized": false,
+			})
+		}
+		if errors.Is(err, apperrors.ErrAccessTokenInvalid) {
+			return c.JSON(http.StatusUnauthorized, map[string]any{
+				"error":      apperrors.ErrAccessTokenInvalid.Error(),
+				"authorized": false,
+			})
+		}
+		if errors.Is(err, apperrors.ErrNoRefreshToken) {
+			return c.JSON(http.StatusUnauthorized, map[string]any{
+				"error":      apperrors.ErrAccessTokenInvalid.Error(),
+				"authorized": false,
+			})
+		}
+		if errors.Is(err, apperrors.ErrNoRoles) {
+			return c.JSON(http.StatusUnauthorized, map[string]any{
+				"error":      apperrors.ErrNoRoles.Error(),
+				"authorized": false,
+			})
+		}
+		if errors.Is(err, apperrors.ErrUnauthorizedRole) {
+			return c.JSON(http.StatusUnauthorized, map[string]any{
+				"error":      apperrors.ErrUnauthorizedRole.Error(),
+				"authorized": false,
+			})
+		}
+		if errors.Is(err, apperrors.ErrAccessTokenInvalid) {
+			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrAccessTokenInvalid.Error()})
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": apperrors.ErrGeneric.Error()})
+	}
+	return c.JSON(http.StatusOK, map[string]bool{"authorized": true})
 }

@@ -35,8 +35,8 @@ func TestCheckAndRefreshToken(t *testing.T) {
 	t.Run("invalid access token gets rejected", func(t *testing.T) {
 		authService, _, _, _ := prepare(t)
 		_, err := authService.CheckAndRefreshToken("invalid", "invalid", false)
-		if err.Error() != apperrors.ErrNoRefreshToken.Error() {
-			t.Fatal("expected error ErrNoRefreshToken", err)
+		if err.Error() != apperrors.ErrRefreshTokenInvalid.Error() {
+			t.Fatal("expected error ErrRefreshTokenInvalid", err)
 		}
 	})
 	t.Run("expired access token and expired refresh token gets rejected", func(t *testing.T) {
@@ -206,7 +206,7 @@ func TestAuthorize(t *testing.T) {
 			if err == nil {
 				t.Fatal("expected error for empty token")
 			}
-			if err.Error() != "token_invalid" {
+			if err.Error() != apperrors.ErrAccessTokenInvalid.Error() {
 				t.Fatal("expected error for invalid token", err.Error())
 			}
 		})
@@ -233,7 +233,7 @@ func TestAuthorize(t *testing.T) {
 			if err == nil {
 				t.Fatal("expected error for expired token")
 			}
-			if err.Error() != "token_expired" {
+			if err.Error() != apperrors.ErrAccessTokenExpired.Error() {
 				t.Fatal("expected error for expired token", err.Error())
 			}
 		})
@@ -243,7 +243,7 @@ func TestAuthorize(t *testing.T) {
 			if err == nil {
 				t.Fatal("expected error for malformed token")
 			}
-			if err.Error() != "token_invalid" {
+			if err.Error() != apperrors.ErrAccessTokenInvalid.Error() {
 				t.Fatal("expected error for malformed token", err.Error())
 			}
 		})

@@ -2,6 +2,7 @@ package integration_test_cases
 
 import (
 	"aegis/internal/domain/entities"
+	"aegis/pkg/apperrors"
 	"aegis/pkg/jwtgen"
 	"bytes"
 	"encoding/json"
@@ -39,7 +40,7 @@ func Authorize_EmptyTokenReturns401(t *testing.T) {
 	body := map[string]interface{}{}
 	err = json.NewDecoder(resp.Body).Decode(&body)
 	require.NoError(t, err)
-	assert.Equal(t, "token_invalid", body["error"])
+	assert.Equal(t, apperrors.ErrAccessTokenInvalid.Error(), body["error"])
 	assert.Equal(t, false, body["authorized"])
 }
 
@@ -72,7 +73,7 @@ func Authorize_ExpiredTokenReturns401(t *testing.T) {
 	body := map[string]interface{}{}
 	err = json.NewDecoder(resp.Body).Decode(&body)
 	require.NoError(t, err)
-	assert.Equal(t, "token_expired", body["error"])
+	assert.Equal(t, apperrors.ErrAccessTokenExpired.Error(), body["error"])
 	assert.Equal(t, false, body["authorized"])
 }
 
@@ -94,7 +95,7 @@ func Authorize_MalformedTokenReturns401(t *testing.T) {
 	body := map[string]interface{}{}
 	err = json.NewDecoder(resp.Body).Decode(&body)
 	require.NoError(t, err)
-	assert.Equal(t, "token_invalid", body["error"])
+	assert.Equal(t, apperrors.ErrAccessTokenInvalid.Error(), body["error"])
 	assert.Equal(t, false, body["authorized"])
 }
 
@@ -126,7 +127,7 @@ func Authorize_NoRolesReturns401(t *testing.T) {
 	body := map[string]interface{}{}
 	err = json.NewDecoder(resp.Body).Decode(&body)
 	require.NoError(t, err)
-	assert.Equal(t, "no_roles", body["error"])
+	assert.Equal(t, apperrors.ErrNoRoles.Error(), body["error"])
 	assert.Equal(t, false, body["authorized"])
 }
 
@@ -158,7 +159,7 @@ func Authorize_UserDoesNotHaveRequiredRoleReturns401(t *testing.T) {
 	body := map[string]interface{}{}
 	err = json.NewDecoder(resp.Body).Decode(&body)
 	require.NoError(t, err)
-	assert.Equal(t, "unauthorized_role", body["error"])
+	assert.Equal(t, apperrors.ErrUnauthorizedRole.Error(), body["error"])
 	assert.Equal(t, false, body["authorized"])
 }
 

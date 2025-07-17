@@ -140,9 +140,9 @@ func (h Handlers) Authorize(c echo.Context) error {
 				"authorized": false,
 			})
 		}
-		if errors.Is(err, apperrors.ErrNoRefreshToken) {
+		if errors.Is(err, apperrors.ErrRefreshTokenInvalid) {
 			return c.JSON(http.StatusUnauthorized, map[string]any{
-				"error":      apperrors.ErrAccessTokenInvalid.Error(),
+				"error":      apperrors.ErrRefreshTokenInvalid.Error(),
 				"authorized": false,
 			})
 		}

@@ -34,7 +34,7 @@ func (r *RefreshTokenRepository) GetRefreshTokenByToken(token string) (entities.
 		return entities.RefreshToken{}, result.Error
 	}
 	if result.Error == gorm.ErrRecordNotFound {
-		return entities.RefreshToken{}, apperrors.ErrNoRefreshToken
+		return entities.RefreshToken{}, apperrors.ErrRefreshTokenInvalid
 	}
 	return refreshToken, nil
 }

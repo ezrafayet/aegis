@@ -72,10 +72,13 @@ func (s UseCases) CheckAndRefreshToken(accessToken, refreshToken string, forceRe
 		}
 	}
 	if refreshToken == "" {
-		return nil, apperrors.ErrNoRefreshToken
+		return nil, apperrors.ErrRefreshTokenInvalid
 	}
 	refreshTokenObject, err := s.RefreshTokenRepository.GetRefreshTokenByToken(refreshToken)
 	if err != nil {
+		if refreshTokenObject.Token == "" {
+			return nil, apperrors.ErrRefreshTokenInvalid
+		}
 		return nil, err
 	}
 	if refreshTokenObject.IsExpired() {

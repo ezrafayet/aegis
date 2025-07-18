@@ -27,6 +27,13 @@ type Config struct {
 		FullPath string `json:"full_path"`
 	} `json:"login_page"`
 
+	ErrorPage struct {
+		// If true, the error page will be enabled
+		Enabled bool `json:"enabled"`
+		// Full path to the error page (ex: "/login-error")
+		FullPath string `json:"full_path"`
+	} `json:"error_page"`
+
 	DB struct {
 		// DB connection string (ex: "postgres://user:password@localhost:5432/auth")
 		PostgresURL string `json:"postgres_url"`

@@ -13,7 +13,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-//go:embed templates/login.html
+//go:embed templates/*.html
 var templates embed.FS
 
 type HandlersInterface interface {
@@ -21,6 +21,7 @@ type HandlersInterface interface {
 	Logout(c echo.Context) error
 	DoNothing(c echo.Context) error
 	ServeLoginPage(c echo.Context) error
+	ServeErrorPage(c echo.Context) error
 	Authorize(c echo.Context) error
 }
 
@@ -115,6 +116,14 @@ func (h Handlers) ServeLoginPage(c echo.Context) error {
 		DiscordEnabled: h.Config.Auth.Providers.Discord.Enabled,
 	}
 	return tmpl.Execute(c.Response().Writer, data)
+}
+
+func (h Handlers) ServeErrorPage(c echo.Context) error {
+	tmpl, err := template.ParseFS(templates, "templates/error.html")
+	if err != nil {
+		return c.String(http.StatusInternalServerError, apperrors.ErrGeneric.Error())
+	}
+	return tmpl.Execute(c.Response().Writer, nil)
 }
 
 func (h Handlers) Authorize(c echo.Context) error {

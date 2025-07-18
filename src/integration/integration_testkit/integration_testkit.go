@@ -106,6 +106,10 @@ func GetBaseConfig() entities.Config {
 	config.LoginPage.Enabled = true
 	config.LoginPage.FullPath = "/auth/login"
 
+	// Error page configuration
+	config.ErrorPage.Enabled = true
+	config.ErrorPage.FullPath = "/auth/login-error"
+
 	// Auth providers configuration
 	config.Auth.Providers.GitHub.Enabled = true
 	config.Auth.Providers.GitHub.AppName = "TestApp"
@@ -145,6 +149,9 @@ func (s *TestSuite) setupTestServer() {
 	group.GET("/health", r.Handlers.DoNothing)
 	if s.Config.LoginPage.Enabled {
 		group.GET("/login", r.Handlers.ServeLoginPage)
+	}
+	if s.Config.ErrorPage.Enabled {
+		group.GET("/login-error", r.Handlers.ServeErrorPage)
 	}
 	group.POST("/authorize-access-token", r.Handlers.Authorize)
 	for _, provider := range r.Providers {

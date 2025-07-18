@@ -40,10 +40,23 @@ make kill
 
 ## How to add a provider
 
-## Coming tasks
-- creation of api tokens
-- More providers!
-- A dashboard
+## Ideas that may reach master
+
+Pick from them if you want to help
+- First dot = 🟢 low priority / 🔴 high priority
+- Second dot =  🟢 easy (or short) / 🔴 hard (or long)
+
+[🔴🟢] - Add Google provider
+[🔴🟢] - Add Facebook provider
+[🔴🟢] - Support API tokens
+[🔴🟢] - Add proper logs + verbose logs, add a request ID for trace if none
+[🔴🟢] - Add opt-in rate limiting
+[🟢🟢] - Add a built in 404 page
+[🟢🟢] - Add Microsoft provider
+[🟢🟢] - Add Apple provider
+[🟢🟢] - Test the redirects to custom paths from config in integration tests
+[🟢🔴] - Add an admin page
+[🟢🔴] - Improve integration tests by creating containers once
 
 ## Publish a new version on Docker Hub
 

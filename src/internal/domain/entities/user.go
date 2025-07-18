@@ -13,7 +13,7 @@ type User struct {
 	BlockedAt       *time.Time `json:"blocked_at" gorm:"index"`
 	EarlyAdopter    bool       `json:"early_adopter" gorm:"index;default:false"`
 	Name            string     `json:"name" gorm:"type:varchar(100);not null"`
-	NameFingerprint string     `json:"name_fingerprint" gorm:"type:char(32);uniqueIndex;not null"`
+	NameFingerprint string     `json:"name_fingerprint" gorm:"type:char(32);index;not null"` // not unique
 	AvatarURL       string     `json:"avatar_url" gorm:"type:varchar(1024)"`
 	Email           string     `json:"email" gorm:"type:varchar(100);uniqueIndex;not null"`
 	Metadata        string     `json:"metadata" gorm:"type:varchar(1024);not null"`

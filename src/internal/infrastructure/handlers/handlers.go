@@ -123,7 +123,14 @@ func (h Handlers) ServeErrorPage(c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusInternalServerError, apperrors.ErrGeneric.Error())
 	}
-	return tmpl.Execute(c.Response().Writer, nil)
+	data := struct {
+		AppName string
+		Error   string
+	}{
+		AppName: h.Config.App.Name,
+		Error:   c.QueryParam("error"),
+	}
+	return tmpl.Execute(c.Response().Writer, data)
 }
 
 func (h Handlers) Authorize(c echo.Context) error {

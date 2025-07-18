@@ -1,1 +1,208 @@
-this is a great error page
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error | {{.AppName}}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(180deg, #2c2c2c 0%, #0e0e0e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .error-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 500px;
+            margin: 1rem;
+            text-align: center;
+        }
+
+        .logo {
+            margin-bottom: 2rem;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .error-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 1.5rem;
+            background: #fee;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .error-icon svg {
+            width: 32px;
+            height: 32px;
+            color: #c53030;
+        }
+
+        .error-title {
+            font-size: 1.25rem;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .error-message {
+            color: #666;
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 2rem;
+        }
+
+        .error-details {
+            background: #f8f9fa;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .error-details h3 {
+            font-size: 0.9rem;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .error-details p {
+            font-size: 0.85rem;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #333 0%, #1a1a1a 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+            margin-left: 0.75rem;
+        }
+
+        @media (max-width: 480px) {
+            .error-container {
+                margin: 0.5rem;
+                padding: 2rem;
+            }
+            
+            .btn {
+                display: block;
+                margin: 0.5rem 0;
+            }
+            
+            .btn-secondary {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="logo">
+            <h1>{{.AppName}}</h1>
+        </div>
+
+        <div class="error-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+        </div>
+
+        {{$error := .Error}}
+        {{if eq $error "wrong_auth_method"}}
+            <div class="error-title">Authentication Method Error</div>
+            <div class="error-message">
+                You have signed in with a different authentication method than the one you attempted to use.
+            </div>
+            <div class="error-details">
+                <h3>What happened?</h3>
+                <p>Your account is configured to use a different authentication method than the one you attempted to use.</p>
+            </div>
+        {{else if eq $error "early_adopters_only"}}
+            <div class="error-title">Early Access Required</div>
+            <div class="error-message">
+                Only approved users can currently access the platform.
+            </div>
+            <div class="error-details">
+                <h3>What happened?</h3>
+                <p>We are currently in early access mode. Please contact support if you believe you should have access.</p>
+            </div>
+        {{else if eq $error "user_blocked"}}
+            <div class="error-title">Account Blocked</div>
+            <div class="error-message">
+                Your account has been blocked.
+            </div>
+            <div class="error-details">
+                <h3>What happened?</h3>
+                <p>Your account was blocked. Please contact support for assistance.</p>
+            </div>
+        {{else if eq $error "user_deleted"}}
+            <div class="error-title">Account Not Found</div>
+            <div class="error-message">
+                The account you're trying to access no longer exists.
+            </div>
+            <div class="error-details">
+                <h3>What happened?</h3>
+                <p>This account has been deleted or deactivated. You may need to create a new account.</p>
+            </div>
+        {{else}}
+            <div class="error-title">An Error Occurred</div>
+            <div class="error-message">
+                Something went wrong during the authentication process.
+            </div>
+            <div class="error-details">
+                <h3>What happened?</h3>
+                <p>An unexpected error occured while processing your request. Please try again or contact support if the problem persists.</p>
+            </div>
+        {{end}}
+
+        <!-- <div>
+            <a href="/auth/login" class="btn">Try Again</a>
+            <a href="/" class="btn btn-secondary">Go Home</a>
+        </div> -->
+    </div>
+</body>
+</html>

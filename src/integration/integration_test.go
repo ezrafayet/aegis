@@ -11,6 +11,10 @@ func TestIntegration(t *testing.T) {
 		t.Run("valid token gets redirected to /login-success", integration_test_cases.Login_ValidAT_RedirectsToSuccessPage)
 		t.Run("returns 404 when disabled", integration_test_cases.Login_DisabledReturns404)
 	})
+	t.Run("calling GET /login-error", func(t *testing.T) {
+		t.Run("returns 200 when enabled", integration_test_cases.LoginError_EnabledReturns200AndShowsErrorPage)
+		t.Run("returns 404 when disabled", integration_test_cases.LoginError_DisabledReturns404)
+	})
 	t.Run("calling GET /health", func(t *testing.T) {
 		t.Run("returns 200", integration_test_cases.Health_200)
 	})

@@ -6,7 +6,6 @@ RUN apk add --no-cache curl
 
 # Copy the HTML files to nginx's default serving directory
 COPY html/login-success.html /usr/share/nginx/html/
-COPY html/login-error.html /usr/share/nginx/html/
 COPY html/home.html /usr/share/nginx/html/
 COPY html/404.html /usr/share/nginx/html/
 

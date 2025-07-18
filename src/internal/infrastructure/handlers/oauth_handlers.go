@@ -62,6 +62,7 @@ func (h OAuthHandlers) ExchangeCode(c echo.Context) error {
 		} else if errors.Is(err, apperrors.ErrUserDeleted) {
 			errorType = "user_deleted"
 		} else {
+			// invalid state and invalid code are handled here
 			errorType = "unknown_error"
 		}
 		redirectURL, err := urlbuilder.Build(h.Config.App.RedirectAfterError, "", map[string]string{"error": errorType})

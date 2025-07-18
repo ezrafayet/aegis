@@ -62,25 +62,33 @@ COPY ./config.json /app/config.json
         "cors_allowed_origins": ["http://app.localhost:5000"],
         "early_adopters_only": false,
         "redirect_after_success": ["http://app.localhost:5000/login-success"],
-        "redirect_after_error": "http://app.localhost:5000/login-error",
+        "redirect_after_error": "http://app.localhost:5000/auth/login-error",
         "internal_api_keys": ["xxxxxxxxxxxx"],
         "endpoints_prefix": "/auth",
         "port": 5666
     },
-    "rate-limiting": {
+    "rate_limiting": {
         "enabled": true
     },
     "statistics": {
         "enabled": true,
         "retention_months": 24
     },
-    "admin_panel": {
+    "admin_page": {
         "enabled": true,
         "full_path": "/auth/admin"
     },
     "login_page": {
         "enabled": true,
         "full_path": "/auth/login"
+    },
+    "error_page": {
+        "enabled": true,
+        "full_path": "/auth/login-error"
+    },
+    "404_page": {
+        "enabled": true,
+        "redirect_to_url": "redirect_needed_if_false"
     },
     "db": {
         "postgres_url": "xxxxxxxxxxxx"
@@ -106,7 +114,7 @@ COPY ./config.json /app/config.json
             }
         }
     },
-    "cookie": {
+    "cookies": {
         "domain": "app.localhost",
         "secure": false,
         "http_only": true,

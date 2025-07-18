@@ -74,6 +74,10 @@ Drop-in auth service - no SaaS, no lock-in
 		e.GET(c.LoginPage.FullPath, r.Handlers.ServeLoginPage)
 	}
 
+	if c.ErrorPage.Enabled {
+		e.GET(c.ErrorPage.FullPath, r.Handlers.ServeErrorPage)
+	}
+
 	for _, provider := range r.Providers {
 		group.GET(fmt.Sprintf("/%s", provider.Name), provider.Handlers.GetAuthURL, provider.Middlewares.CheckAuthEnabled)
 		group.GET(fmt.Sprintf("/%s/callback", provider.Name), provider.Handlers.ExchangeCode, provider.Middlewares.CheckAuthEnabled)

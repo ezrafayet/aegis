@@ -51,12 +51,30 @@ Pick from them if you want to help
 [🔴🟢] - Support API tokens
 [🔴🟢] - Add proper logs + verbose logs, add a request ID for trace if none
 [🔴🟢] - Add opt-in rate limiting
+[🔴🟢] - Write better doc and tutorials
+[🔴🟢] - Add validation of the config file
+[🔴🟢] - Add env vars support in the config file, probably like {{env:SOME_VAR}}
+[🔴🔴] - Enhance Device Fingerprinting
 [🟢🟢] - Add a built in 404 page
 [🟢🟢] - Add Microsoft provider
 [🟢🟢] - Add Apple provider
 [🟢🟢] - Test the redirects to custom paths from config in integration tests
-[🟢🔴] - Add an admin page
+[🟢🟢] - Remove dependency of package cookies on entities
+[🟢🟢] - Database encoding (add a secret to encode/decode the db)
+[🟢🟢] - Deploy a new version on DockerHub on push of a new tag
+[🟢🔴] - Write SDKs for other languages
+[🟢🔴] - Add an opt-in admin page
+[🟢🔴] - Add opt-in statistics
+[🟢🔴] - Create fake providers for tests
+[🟢🔴] - Use fake providers for tests, and write e2e tests
 [🟢🔴] - Improve integration tests by creating containers once
+[🟢🔴] - Investigate for support of magic links / magic texts
+[🟢🔴] - Investigate support for SAML 2, OpenID
+[🟢🔴] - Investigate support for WebAuthn support
+[🟢🔴] - Investigate support of a fine resource access system
+
+
+
 
 ## Publish a new version on Docker Hub
 

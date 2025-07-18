@@ -40,7 +40,7 @@ test-unit:
 # For dev
 
 start:
-	sudo docker-compose -f docker-compose-dev.yml up --build --force-recreate
+	sudo docker-compose -f docker-compose-dev.yml up --build
 
 kill:
 	sudo docker-compose -f docker-compose-dev.yml down -v

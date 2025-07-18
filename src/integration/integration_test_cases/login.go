@@ -42,7 +42,7 @@ func Login_ValidAT_RedirectsToSuccessPage(t *testing.T) {
 	require.NoError(t, err)
 	user = suite.CreateUser(t, user, []string{"user"})
 
-	cClaims, err := entities.NewCustomClaimsFromValues(user.ID, false, user.Roles, user.Metadata)
+	cClaims, err := entities.NewCustomClaimsFromValues(user.ID, false, user.Roles, user.MetadataPublic)
 	require.NoError(t, err)
 	accessToken, atExp, err := jwtgen.Generate(cClaims.ToMap(), time.Now(), 15, "TestApp", suite.Config.JWT.Secret)
 	require.NoError(t, err)

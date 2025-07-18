@@ -53,7 +53,7 @@ func Authorize_ExpiredTokenReturns401(t *testing.T) {
 	require.NoError(t, err)
 	user = suite.CreateUser(t, user, []string{"user"})
 
-	cClaims, err := entities.NewCustomClaimsFromValues(user.ID, false, user.Roles, user.Metadata)
+	cClaims, err := entities.NewCustomClaimsFromValues(user.ID, false, user.Roles, user.MetadataPublic)
 	require.NoError(t, err)
 	// Generate token with past expiration
 	expiredToken, _, err := jwtgen.Generate(cClaims.ToMap(), time.Now().Add(-time.Hour*24), 15, "TestApp", suite.Config.JWT.Secret)
@@ -108,7 +108,7 @@ func Authorize_NoRolesReturns401(t *testing.T) {
 	require.NoError(t, err)
 	user = suite.CreateUser(t, user, []string{"user"})
 
-	cClaims, err := entities.NewCustomClaimsFromValues(user.ID, false, user.Roles, user.Metadata)
+	cClaims, err := entities.NewCustomClaimsFromValues(user.ID, false, user.Roles, user.MetadataPublic)
 	require.NoError(t, err)
 	validToken, _, err := jwtgen.Generate(cClaims.ToMap(), time.Now(), 15, "TestApp", suite.Config.JWT.Secret)
 	require.NoError(t, err)
@@ -140,7 +140,7 @@ func Authorize_UserDoesNotHaveRequiredRoleReturns401(t *testing.T) {
 	require.NoError(t, err)
 	user = suite.CreateUser(t, user, []string{"user"})
 
-	cClaims, err := entities.NewCustomClaimsFromValues(user.ID, false, user.Roles, user.Metadata)
+	cClaims, err := entities.NewCustomClaimsFromValues(user.ID, false, user.Roles, user.MetadataPublic)
 	require.NoError(t, err)
 	validToken, _, err := jwtgen.Generate(cClaims.ToMap(), time.Now(), 15, "TestApp", suite.Config.JWT.Secret)
 	require.NoError(t, err)
@@ -172,7 +172,7 @@ func Authorize_UserHasRequiredRoleReturns200(t *testing.T) {
 	require.NoError(t, err)
 	user = suite.CreateUser(t, user, []string{"user"})
 
-	cClaims, err := entities.NewCustomClaimsFromValues(user.ID, false, user.Roles, user.Metadata)
+	cClaims, err := entities.NewCustomClaimsFromValues(user.ID, false, user.Roles, user.MetadataPublic)
 	require.NoError(t, err)
 	validToken, _, err := jwtgen.Generate(cClaims.ToMap(), time.Now(), 15, "TestApp", suite.Config.JWT.Secret)
 	require.NoError(t, err)
@@ -207,7 +207,7 @@ func Authorize_UserHasAnyRoleReturns200(t *testing.T) {
 	require.NoError(t, err)
 	user = suite.CreateUser(t, user, []string{"user"})
 
-	cClaims, err := entities.NewCustomClaimsFromValues(user.ID, false, user.Roles, user.Metadata)
+	cClaims, err := entities.NewCustomClaimsFromValues(user.ID, false, user.Roles, user.MetadataPublic)
 	require.NoError(t, err)
 	validToken, _, err := jwtgen.Generate(cClaims.ToMap(), time.Now(), 15, "TestApp", suite.Config.JWT.Secret)
 	require.NoError(t, err)

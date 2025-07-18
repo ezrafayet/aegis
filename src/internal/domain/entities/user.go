@@ -16,7 +16,7 @@ type User struct {
 	NameFingerprint string     `json:"name_fingerprint" gorm:"type:char(32);index;not null"` // not unique
 	AvatarURL       string     `json:"avatar_url" gorm:"type:varchar(1024)"`
 	Email           string     `json:"email" gorm:"type:varchar(100);uniqueIndex;not null"`
-	Metadata        string     `json:"metadata" gorm:"type:varchar(1024);not null"`
+	MetadataPublic  string     `json:"metadata_public" gorm:"type:varchar(1024);not null"`
 	AuthMethod      string     `json:"auth_method" gorm:"type:varchar(16);not null"`
 	// relations
 	Roles         []Role         `json:"roles" gorm:"foreignKey:UserID;references:ID"`
@@ -50,7 +50,7 @@ func NewUser(name, avatar, email string, authMethod string) (User, error) {
 		NameFingerprint: nameFingerprint,
 		AvatarURL:       avatar,
 		Email:           email,
-		Metadata:        "{}",
+		MetadataPublic:  "{}",
 		AuthMethod:      authMethod,
 	}, nil
 }

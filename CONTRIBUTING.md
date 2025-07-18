@@ -41,9 +41,7 @@ make kill
 ## How to add a provider
 
 ## Coming tasks
-- Server 2 server checks
 - creation of api tokens
-- adding metadata
 - More providers!
 - A dashboard
 

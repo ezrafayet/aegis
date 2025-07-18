@@ -31,7 +31,7 @@ func Me_WithSessionReturns200(t *testing.T) {
 	require.NoError(t, err)
 	user = suite.CreateUser(t, user, []string{"user"})
 	require.NoError(t, err)
-	cClaims, err := entities.NewCustomClaimsFromValues(user.ID, false, user.Roles, user.Metadata)
+	cClaims, err := entities.NewCustomClaimsFromValues(user.ID, false, user.Roles, user.MetadataPublic)
 	require.NoError(t, err)
 	accessToken, atExp, err := jwtgen.Generate(cClaims.ToMap(), time.Now(), 10, "MyApp", suite.Config.JWT.Secret)
 	require.NoError(t, err)
@@ -49,6 +49,6 @@ func Me_WithSessionReturns200(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, user.ID, sessionResponse.UserID)
 	assert.Equal(t, "user", sessionResponse.Roles)
-	assert.Equal(t, "{}", sessionResponse.Metadata)
+	assert.Equal(t, "{}", sessionResponse.MetadataPublic)
 	assert.Equal(t, user.EarlyAdopter, sessionResponse.EarlyAdopter)
 }

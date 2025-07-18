@@ -26,7 +26,7 @@ func HardRefresh_MustRefresh_ValidTokens(t *testing.T) {
 	user = suite.CreateUser(t, user, []string{"user"})
 
 	// Create valid access token
-	cClaims, err := entities.NewCustomClaimsFromValues(user.ID, false, user.Roles, user.Metadata)
+	cClaims, err := entities.NewCustomClaimsFromValues(user.ID, false, user.Roles, user.MetadataPublic)
 	require.NoError(t, err)
 	accessToken, atExp, err := jwtgen.Generate(cClaims.ToMap(), time.Now().Add(-10*time.Second), 15, "TestApp", suite.Config.JWT.Secret)
 	require.NoError(t, err)
@@ -137,7 +137,7 @@ func HardRefresh_MustRefresh_ExpiredAT(t *testing.T) {
 	user = suite.CreateUser(t, user, []string{"user"})
 
 	// Create expired access token (1 minute expiration, created 2 minutes ago)
-	cClaims, err := entities.NewCustomClaimsFromValues(user.ID, false, user.Roles, user.Metadata)
+	cClaims, err := entities.NewCustomClaimsFromValues(user.ID, false, user.Roles, user.MetadataPublic)
 	require.NoError(t, err)
 	accessToken, atExp, err := jwtgen.Generate(cClaims.ToMap(), time.Now().Add(-2*time.Minute), 1, "TestApp", suite.Config.JWT.Secret)
 	require.NoError(t, err)

@@ -60,7 +60,7 @@ func (s *TokenService) GenerateTokensForUser(user entities.User, deviceID string
 	}
 
 	// Generate access token
-	cc, err := entities.NewCustomClaimsFromValues(user.ID, user.EarlyAdopter, user.Roles, user.Metadata)
+	cc, err := entities.NewCustomClaimsFromValues(user.ID, user.EarlyAdopter, user.Roles, user.MetadataPublic)
 	if err != nil {
 		return "", -1, "", -1, err
 	}

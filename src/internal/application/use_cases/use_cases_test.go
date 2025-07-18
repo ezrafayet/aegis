@@ -57,7 +57,7 @@ func TestCheckAndRefreshToken(t *testing.T) {
 			{UserID: newUser.ID, Value: "user"},
 		}
 		db.Save(&newUser)
-		cc, err := entities.NewCustomClaimsFromValues(newUser.ID, newUser.EarlyAdopter, newUser.Roles, newUser.Metadata)
+		cc, err := entities.NewCustomClaimsFromValues(newUser.ID, newUser.EarlyAdopter, newUser.Roles, newUser.MetadataPublic)
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
@@ -86,7 +86,7 @@ func TestCheckAndRefreshToken(t *testing.T) {
 			{UserID: newUser.ID, Value: "user"},
 		}
 		db.Save(&newUser)
-		cc, err := entities.NewCustomClaimsFromValues(newUser.ID, newUser.EarlyAdopter, newUser.Roles, newUser.Metadata)
+		cc, err := entities.NewCustomClaimsFromValues(newUser.ID, newUser.EarlyAdopter, newUser.Roles, newUser.MetadataPublic)
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
@@ -123,7 +123,7 @@ func TestCheckAndRefreshToken(t *testing.T) {
 			{UserID: newUser.ID, Value: "user"},
 		}
 		db.Save(&newUser)
-		cc, err := entities.NewCustomClaimsFromValues(newUser.ID, newUser.EarlyAdopter, newUser.Roles, newUser.Metadata)
+		cc, err := entities.NewCustomClaimsFromValues(newUser.ID, newUser.EarlyAdopter, newUser.Roles, newUser.MetadataPublic)
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
@@ -158,7 +158,7 @@ func TestCheckAndRefreshToken(t *testing.T) {
 			{UserID: newUser.ID, Value: "user"},
 		}
 		db.Save(&newUser)
-		cc, err := entities.NewCustomClaimsFromValues(newUser.ID, newUser.EarlyAdopter, newUser.Roles, newUser.Metadata)
+		cc, err := entities.NewCustomClaimsFromValues(newUser.ID, newUser.EarlyAdopter, newUser.Roles, newUser.MetadataPublic)
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
@@ -220,7 +220,7 @@ func TestAuthorize(t *testing.T) {
 			newUser.Roles = []entities.Role{
 				{UserID: newUser.ID, Value: "user"},
 			}
-			cc, err := entities.NewCustomClaimsFromValues(newUser.ID, newUser.EarlyAdopter, newUser.Roles, newUser.Metadata)
+			cc, err := entities.NewCustomClaimsFromValues(newUser.ID, newUser.EarlyAdopter, newUser.Roles, newUser.MetadataPublic)
 			if err != nil {
 				t.Fatal("expected no error", err)
 			}
@@ -260,7 +260,7 @@ func TestAuthorize(t *testing.T) {
 			newUser.Roles = []entities.Role{
 				{UserID: newUser.ID, Value: "user"},
 			}
-			cc, err := entities.NewCustomClaimsFromValues(newUser.ID, newUser.EarlyAdopter, newUser.Roles, newUser.Metadata)
+			cc, err := entities.NewCustomClaimsFromValues(newUser.ID, newUser.EarlyAdopter, newUser.Roles, newUser.MetadataPublic)
 			if err != nil {
 				t.Fatal("expected no error", err)
 			}
@@ -282,7 +282,7 @@ func TestAuthorize(t *testing.T) {
 			newUser.Roles = []entities.Role{
 				{UserID: newUser.ID, Value: "user"},
 			}
-			cc, err := entities.NewCustomClaimsFromValues(newUser.ID, newUser.EarlyAdopter, newUser.Roles, newUser.Metadata)
+			cc, err := entities.NewCustomClaimsFromValues(newUser.ID, newUser.EarlyAdopter, newUser.Roles, newUser.MetadataPublic)
 			if err != nil {
 				t.Fatal("expected no error", err)
 			}
@@ -306,7 +306,7 @@ func TestAuthorize(t *testing.T) {
 		newUser.Roles = []entities.Role{
 			{UserID: newUser.ID, Value: "payments"},
 		}
-		cc, err := entities.NewCustomClaimsFromValues(newUser.ID, newUser.EarlyAdopter, newUser.Roles, newUser.Metadata)
+		cc, err := entities.NewCustomClaimsFromValues(newUser.ID, newUser.EarlyAdopter, newUser.Roles, newUser.MetadataPublic)
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}

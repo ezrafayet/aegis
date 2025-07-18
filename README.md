@@ -106,7 +106,7 @@ COPY ./config.json /app/config.json
             }
         }
     },
-    "cookie": {
+    "cookies": {
         "domain": "app.localhost",
         "secure": false,
         "http_only": true,

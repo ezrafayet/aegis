@@ -59,7 +59,7 @@ type Config struct {
 		// SameSite cookie attribute: 1 = default, 2 = lax, 3 = strict, 4 = none
 		SameSite int    `json:"same_site"`
 		Path     string `json:"path"`
-	} `json:"cookie"`
+	} `json:"cookies"`
 
 	User struct {
 		// Roles for a user. Mandatory roles are: "user" and "platform_admin"

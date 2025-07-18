@@ -62,7 +62,7 @@ Pick from them if you want to help
 [🟢🟢] - Remove dependency of package cookies on entities
 [🟢🟢] - Database encoding (add a secret to encode/decode the db)
 [🟢🟢] - Deploy a new version on DockerHub on push of a new tag
-[🟢🟢] - Add support for external plugins
+[🟢🔴] - Add support for external plugins
 [🟢🔴] - Write SDKs for other languages
 [🟢🔴] - Add an opt-in admin page
 [🟢🔴] - Add opt-in statistics

@@ -88,39 +88,40 @@ func TestUserRepository(t *testing.T) {
 		}
 	})
 
-// Now authorized
-// 	t.Run("Forbid name collision", func(t *testing.T) {
-// 		db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
-// 		if err != nil {
-// 			t.Fatal(err)
-// 		}
-// 		db.AutoMigrate(&entities.User{}, &entities.Role{})
-// 		userRepository := NewUserRepository(db)
-// 		err = userRepository.CreateUser(entities.User{
-// 			ID:              "123",
-// 			CreatedAt:       time.Now(),
-// 			Name:            "Test User1",
-// 			NameFingerprint: "test_fingerprint1",
-// 			Email:           "test1@test.com",
-// 			MetadataPublic:  "{}",
-// 			AuthMethod:      "test",
-// 		}, []entities.Role{entities.NewRole("123", "user")})
-// 		if err != nil {
-// 			t.Fatal(err)
-// 		}
-// 		err = userRepository.CreateUser(entities.User{
-// 			ID:              "456",
-// 			CreatedAt:       time.Now(),
-// 			Name:            "Test User1",
-// 			NameFingerprint: "test_fingerprint1",
-// 			Email:           "test2@test.com",
-// 			MetadataPublic:  "{}",
-// 			AuthMethod:      "test",
-// 		}, []entities.Role{entities.NewRole("456", "user")})
-// 		if err == nil {
-// 			t.Fatal(err)
-// 		}
-// 	})
+	// Now authorized
+	//
+	//	t.Run("Forbid name collision", func(t *testing.T) {
+	//		db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
+	//		if err != nil {
+	//			t.Fatal(err)
+	//		}
+	//		db.AutoMigrate(&entities.User{}, &entities.Role{})
+	//		userRepository := NewUserRepository(db)
+	//		err = userRepository.CreateUser(entities.User{
+	//			ID:              "123",
+	//			CreatedAt:       time.Now(),
+	//			Name:            "Test User1",
+	//			NameFingerprint: "test_fingerprint1",
+	//			Email:           "test1@test.com",
+	//			MetadataPublic:  "{}",
+	//			AuthMethod:      "test",
+	//		}, []entities.Role{entities.NewRole("123", "user")})
+	//		if err != nil {
+	//			t.Fatal(err)
+	//		}
+	//		err = userRepository.CreateUser(entities.User{
+	//			ID:              "456",
+	//			CreatedAt:       time.Now(),
+	//			Name:            "Test User1",
+	//			NameFingerprint: "test_fingerprint1",
+	//			Email:           "test2@test.com",
+	//			MetadataPublic:  "{}",
+	//			AuthMethod:      "test",
+	//		}, []entities.Role{entities.NewRole("456", "user")})
+	//		if err == nil {
+	//			t.Fatal(err)
+	//		}
+	//	})
 }
 
 func TestUserRepository_Roles(t *testing.T) {

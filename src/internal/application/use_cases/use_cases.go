@@ -153,4 +153,3 @@ func (s UseCases) AuthorizeInternalAPICall(key string) error {
 	}
 	return apperrors.ErrInternalAPIKeyInvalid
 }
-	

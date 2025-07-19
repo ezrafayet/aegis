@@ -196,6 +196,11 @@ func Authorize_UserHasRequiredRoleReturns200(t *testing.T) {
 	err = json.Unmarshal(body, &response)
 	require.NoError(t, err)
 	assert.True(t, response["authorized"].(bool))
+
+	ccMap := response["data"].(map[string]any)
+	require.Equal(t, user.ID, ccMap["user_id"])
+	require.Equal(t, "user", ccMap["roles"])
+	require.Equal(t, user.MetadataPublic, ccMap["metadata_public"])
 }
 
 func Authorize_UserHasAnyRoleReturns200(t *testing.T) {
@@ -231,4 +236,9 @@ func Authorize_UserHasAnyRoleReturns200(t *testing.T) {
 	err = json.Unmarshal(body, &response)
 	require.NoError(t, err)
 	assert.True(t, response["authorized"].(bool))
+
+	ccMap := response["data"].(map[string]any)
+	require.Equal(t, user.ID, ccMap["user_id"])
+	require.Equal(t, "user", ccMap["roles"])
+	require.Equal(t, user.MetadataPublic, ccMap["metadata_public"])
 }

@@ -22,7 +22,7 @@ func Start() error {
 ██╔══██║██╔══╝  ██║   ██║██║╚════██║
 ██║  ██║███████╗╚██████╔╝██║███████║
 ╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═╝╚══════╝
-Drop-in auth service - no SaaS, no lock-in
+Drop-in auth service - no SaaS, no lock-in, just the banana.
 ` + Version + `
 	`)
 	c, err := config.Read("config.json")

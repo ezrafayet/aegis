@@ -5,39 +5,14 @@
 ██╔══██║██╔══╝  ██║   ██║██║╚════██║
 ██║  ██║███████╗╚██████╔╝██║███████║
 ╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═╝╚══════╝
-Drop-in auth service - no SaaS, no lock-in
+Drop-in auth service - no SaaS, no lock-in, just the banana.
 ```
 
 # Introduction
 
-I found myself either rewriting an authorization service each and every time on every project, or constantly re-using the same platforms and tools (Auth0, Supabase, Firebase, Pocket Base), which comes with heavy vendor lock-in, way too many features, big ecosystems and a pretty significant cost. I don't want the Gorilla and the whole universe.
+I found myself rewriting authorization services on each and every side-project, or always re-using the same 3rd parties that come with heavy vendor lock-in, way too many features, big ecosystems and a pretty significant cost (Auth0, Supabase, Firebase, Pocket Base). This is very time consuming, and I don't want the Gorilla and the whole universe. Just the bannana.
 
-I want to have just this: a simple DROP-IN auth service that I can just use in a docker for any project, with a single config file... Pretty much as one would use Nginx.
-
-```
-auth
-|--- Dockerfile
-|--- config.json
-```
-
-Let's see if I can do that over night...  
-Spoiler alert: I did code it over night.  
-Another spoiler alert: I've been improving it since then
-
-Supported auth methods (to date):
-
-- GitHub
-- Discord
-
-Also it won't support passwords ever since it should be considered a bad practise.
-
-# How to use the auth service
-
-See the architecture you need, the configuration and tutorials to set up auth providers (GitHub, Discord...).
-
-## Setup
-
-In your project, just drop 2 files:
+I want just this: a simple DROP-IN auth service that I can just use  with a single config file... Pretty much like one would use Nginx:
 
 ```
 auth
@@ -45,38 +20,34 @@ auth
 |--- config.json
 ```
 
-### Dockerfile
+This was a one night POC, became a project. Contibuting is more than welcome. See [CONTRIBUTING.md](./CONTRIBUTING.md)
+
+Also it won't support passwords ever since they are a bad practise.
+
+# The configuration files
+
+In your project, create an 'auth' folder for the service and just create 2 files:
+
+## Dockerfile
 
 ```Dockerfile
-FROM ezrafayet/aegix:v0.7.0
+FROM ezrafayet/aegix:v0.10.0
 COPY ./config.json /app/config.json
 ```
 
-### config.json
+## And the config.json
 
 ```json
 {
     "app": {
         "name": "MyApp",
-        "url": "http://app.localhost:5000",
-        "cors_allowed_origins": ["http://app.localhost:5000"],
+        "url": "http://localhost:5000",
+        "cors_allowed_origins": ["http://localhost:5000"],
         "early_adopters_only": false,
-        "redirect_after_success": ["http://app.localhost:5000/login-success"],
-        "redirect_after_error": "http://app.localhost:5000/auth/login-error",
+        "redirect_after_success": ["http://localhost:5000/login-success"],
+        "redirect_after_error": "http://localhost:5000/auth/login-error",
         "internal_api_keys": ["xxxxxxxxxxxx"],
-        "endpoints_prefix": "/auth",
         "port": 5666
-    },
-    "rate_limiting": {
-        "enabled": true
-    },
-    "statistics": {
-        "enabled": true,
-        "retention_months": 24
-    },
-    "admin_page": {
-        "enabled": true,
-        "full_path": "/auth/admin"
     },
     "login_page": {
         "enabled": true,
@@ -85,10 +56,6 @@ COPY ./config.json /app/config.json
     "error_page": {
         "enabled": true,
         "full_path": "/auth/login-error"
-    },
-    "404_page": {
-        "enabled": true,
-        "redirect_to_url": "redirect_needed_if_false"
     },
     "db": {
         "postgres_url": "xxxxxxxxxxxx"
@@ -104,30 +71,31 @@ COPY ./config.json /app/config.json
                 "enabled": true,
                 "app_name": "MyApp",
                 "client_id": "xxxxxxxxxxxx",
-                "client_secret": "xxxxxxxxxxxx"
+                "client_secret": "xxxxxxxxxxxx",
+                "redirect_url": "http://localhost:5000/auth/github/callback"
             },
             "discord": {
                 "enabled": true,
                 "app_name": "MyApp",
                 "client_id": "xxxxxxxxxxxx",
-                "client_secret": "xxxxxxxxxxxx"
+                "client_secret": "xxxxxxxxxxxx",
+                "redirect_url": "http://localhost:5000/auth/discord/callback"
             }
         }
     },
     "cookies": {
-        "domain": "app.localhost",
+        "domain": "localhost",
         "secure": false,
         "http_only": true,
         "same_site": 1,
         "path": "/"
-    },
-    "user": {
-        "roles": ["platform_admin", "user"]
     }
 }
 ```
 
-## Architecture
+And now you have authentication & authorization.
+
+# Architecture
 
 You have 2 choices of architecture to use it:
 
@@ -148,6 +116,17 @@ You have 2 choices of architecture to use it:
                        +----------+  
 ```
 
+The cookies configuration for it:
+```json
+{
+    "domain": "localhost",
+    "secure": false,
+    "http_only": true,
+    "same_site": 1,
+    "path": "/"
+}
+```
+
 ## host on subdomains:
 
 ```
@@ -165,7 +144,20 @@ You have 2 choices of architecture to use it:
                        +----------+  
 ```
 
-## Tutorials
+The cookies configuration for it:
+```
+Not tested yet
+```
+
+# Providers
+
+In order to have authentication (so the user can login with a provider), you need to have an app on those providers.
+
+Currently, the supported providers are:
+- Discord
+- GitHub
+
+Tutorials (to come):
 
 - Setup GitHub auth (to come)
 - Setup Discord auth (to come)
@@ -243,7 +235,3 @@ If you need a bullet-proof, battle-tested auth for production, do not use this s
 **Prevention Needed**:
 - **Secret validation**: Ensure JWT secrets are at least 32 characters
 - **Entropy checking**: Validate secret randomness
-
-# Contributing
-
-Contibuting is more than welcome. See CONTRIBUTING.md

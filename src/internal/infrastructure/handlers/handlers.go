@@ -142,7 +142,7 @@ func (h Handlers) Authorize(c echo.Context) error {
 	if err := c.Bind(&body); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": apperrors.ErrGeneric.Error()})
 	}
-	err := h.Service.Authorize(body.AccessToken, body.Roles)
+	cc, err := h.Service.Authorize(body.AccessToken, body.Roles)
 	if err != nil {
 		if errors.Is(err, apperrors.ErrAccessTokenExpired) {
 			return c.JSON(http.StatusUnauthorized, map[string]any{
@@ -175,9 +175,18 @@ func (h Handlers) Authorize(c echo.Context) error {
 			})
 		}
 		if errors.Is(err, apperrors.ErrAccessTokenInvalid) {
-			return c.JSON(http.StatusUnauthorized, map[string]string{"error": apperrors.ErrAccessTokenInvalid.Error()})
+			return c.JSON(http.StatusUnauthorized, map[string]any{
+				"error":      apperrors.ErrAccessTokenInvalid.Error(),
+				"authorized": false,
+			})
 		}
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": apperrors.ErrGeneric.Error()})
+		return c.JSON(http.StatusInternalServerError, map[string]any{
+			"error":      apperrors.ErrGeneric.Error(),
+			"authorized": false,
+		})
 	}
-	return c.JSON(http.StatusOK, map[string]bool{"authorized": true})
+	return c.JSON(http.StatusOK, map[string]any{
+		"authorized": true,
+		"data":       cc,
+	})
 }

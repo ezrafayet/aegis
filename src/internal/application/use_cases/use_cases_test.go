@@ -202,7 +202,7 @@ func TestAuthorize(t *testing.T) {
 		authService, _, _, _ := prepare(t)
 
 		t.Run("no token returns an error", func(t *testing.T) {
-			err := authService.Authorize("", []string{"user"})
+			_, err := authService.Authorize("", []string{"user"})
 			if err == nil {
 				t.Fatal("expected error for empty token")
 			}
@@ -229,7 +229,7 @@ func TestAuthorize(t *testing.T) {
 			if err != nil {
 				t.Fatal("expected no error", err)
 			}
-			err = authService.Authorize(expiredToken, []string{"user"})
+			_, err = authService.Authorize(expiredToken, []string{"user"})
 			if err == nil {
 				t.Fatal("expected error for expired token")
 			}
@@ -239,7 +239,7 @@ func TestAuthorize(t *testing.T) {
 		})
 
 		t.Run("malformed token returns an error", func(t *testing.T) {
-			err := authService.Authorize("invalid.token.here", []string{"user"})
+			_, err := authService.Authorize("invalid.token.here", []string{"user"})
 			if err == nil {
 				t.Fatal("expected error for malformed token")
 			}
@@ -268,7 +268,7 @@ func TestAuthorize(t *testing.T) {
 			if err != nil {
 				t.Fatal("expected no error", err)
 			}
-			err = authService.Authorize(validToken, []string{})
+			_, err = authService.Authorize(validToken, []string{})
 			if err.Error() != apperrors.ErrNoRoles.Error() {
 				t.Fatal("expected error ErrNoRoles", err)
 			}
@@ -290,7 +290,7 @@ func TestAuthorize(t *testing.T) {
 			if err != nil {
 				t.Fatal("expected no error", err)
 			}
-			err = authService.Authorize(validToken, []string{"any"})
+			_, err = authService.Authorize(validToken, []string{"any"})
 			if err != nil {
 				t.Fatal("expected no error for 'any' role", err)
 			}
@@ -314,11 +314,11 @@ func TestAuthorize(t *testing.T) {
 		if err != nil {
 			t.Fatal("expected no error", err)
 		}
-		err = authService.Authorize(validToken, []string{"admin", "user", "payments"})
+		_, err = authService.Authorize(validToken, []string{"admin", "user", "payments"})
 		if err != nil {
 			t.Fatal("expected no error for authorized role", err)
 		}
-		err = authService.Authorize(validToken, []string{"user"})
+		_, err = authService.Authorize(validToken, []string{"user"})
 		if err.Error() != apperrors.ErrUnauthorizedRole.Error() {
 			t.Fatal("expected error ErrUnauthorizedRole", err)
 		}

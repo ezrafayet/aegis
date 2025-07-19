@@ -192,10 +192,10 @@ func Authorize_UserHasRequiredRoleReturns200(t *testing.T) {
 	// Verify response body
 	body, err := io.ReadAll(resp.Body)
 	require.NoError(t, err)
-	var response map[string]bool
+	var response map[string]any
 	err = json.Unmarshal(body, &response)
 	require.NoError(t, err)
-	assert.True(t, response["authorized"])
+	assert.True(t, response["authorized"].(bool))
 }
 
 func Authorize_UserHasAnyRoleReturns200(t *testing.T) {
@@ -227,8 +227,8 @@ func Authorize_UserHasAnyRoleReturns200(t *testing.T) {
 	// Verify response body
 	body, err := io.ReadAll(resp.Body)
 	require.NoError(t, err)
-	var response map[string]bool
+	var response map[string]any
 	err = json.Unmarshal(body, &response)
 	require.NoError(t, err)
-	assert.True(t, response["authorized"])
+	assert.True(t, response["authorized"].(bool))
 }

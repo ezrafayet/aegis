@@ -5,7 +5,7 @@ import "aegis/internal/domain/entities"
 type UseCasesForHandlers interface {
 	GetSession(accessToken string) (entities.Session, error)
 	Logout(refreshToken string) (*entities.TokenPair, error)
-	Authorize(accessToken string, authorizedRoles []string) error
+	Authorize(accessToken string, authorizedRoles []string) (*entities.CustomClaims, error)
 }
 
 type UseCasesForMiddlewares interface {

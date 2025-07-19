@@ -116,16 +116,20 @@ func (s UseCases) CheckAndRefreshToken(accessToken, refreshToken string, forceRe
 	}, nil
 }
 
-func (s UseCases) Authorize(accessToken string, authorizedRoles []string) error {
+func (s UseCases) Authorize(accessToken string, authorizedRoles []string) (*entities.CustomClaims, error) {
 	if len(authorizedRoles) == 0 {
-		return apperrors.ErrNoRoles
+		return nil, apperrors.ErrNoRoles
 	}
 	ccMap, err := jwtgen.ReadClaims(accessToken, s.Config.JWT.Secret)
 	if err != nil {
-		return err
+		return nil, err
+	}
+	cc, err := entities.NewCusomClaimsFromMap(ccMap)
+	if err != nil {
+		return nil, err
 	}
 	if slices.Contains(authorizedRoles, "any") {
-		return nil
+		return cc, nil
 	}
 	authorized := false
 	for _, authorizedRole := range authorizedRoles {
@@ -135,7 +139,7 @@ func (s UseCases) Authorize(accessToken string, authorizedRoles []string) error 
 		}
 	}
 	if !authorized {
-		return apperrors.ErrUnauthorizedRole
+		return nil, apperrors.ErrUnauthorizedRole
 	}
-	return nil
+	return cc, nil
 }

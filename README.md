@@ -31,7 +31,7 @@ In your project, create an 'auth' folder for the service and just create 2 files
 ## Dockerfile
 
 ```Dockerfile
-FROM ezrafayet/aegix:v0.10.0
+FROM ezrafayet/aegix:v0.11.0
 COPY ./config.json /app/config.json
 ```
 

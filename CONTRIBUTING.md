@@ -12,13 +12,13 @@ Feel free to pick something from the list below or to come up with your own.
 - Second dot =  🟢 easy (or short) / 🔴 hard (or long)
 
 [🔴🟢] - Add Google provider  
-[🔴🟢] - Add Facebook provider  
-[🔴🟢] - Support API tokens  
+[🔴🟢] - Add Facebook provider
 [🔴🟢] - Add proper logs + verbose logs, add a request ID for trace if none  
 [🔴🟢] - Add opt-in rate limiting  
-[🔴🟢] - Write better doc and tutorials  
+[🔴🟢] - Support API tokens 
 [🔴🟢] - Add validation of the config file  
 [🔴🟢] - Add env vars support in the config file, probably like {{env:SOME_VAR}}  
+[🔴🟢] - Write better doc and tutorials  
 [🔴🔴] - Enhance Device Fingerprinting  
 [🟢🟢] - Add a built in 404 page  
 [🟢🟢] - Add Microsoft provider  

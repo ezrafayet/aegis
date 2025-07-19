@@ -10,6 +10,7 @@ type UseCasesForHandlers interface {
 
 type UseCasesForMiddlewares interface {
 	CheckAndRefreshToken(accessToken, refreshToken string, forceRefresh bool) (*entities.TokenPair, error)
+	AuthorizeInternalAPICall(key string) error
 }
 
 type UseCasesInterface interface {

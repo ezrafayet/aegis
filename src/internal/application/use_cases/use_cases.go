@@ -143,3 +143,14 @@ func (s UseCases) Authorize(accessToken string, authorizedRoles []string) (*enti
 	}
 	return cc, nil
 }
+
+func (s UseCases) AuthorizeInternalAPICall(key string) error {
+	key = strings.TrimPrefix(key, "Bearer ")
+	for _, k := range s.Config.App.InternalAPIKeys {
+		if k == key {
+			return nil
+		}
+	}
+	return apperrors.ErrInternalAPIKeyInvalid
+}
+	

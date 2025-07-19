@@ -31,3 +31,7 @@ var (
 	ErrAuthMethodNotEnabled = errors.New("auth_method_not_enabled")
 	ErrInvalidState         = errors.New("invalid_state")
 )
+
+var (
+	ErrInternalAPIKeyInvalid = errors.New("internal_api_key_invalid")
+)

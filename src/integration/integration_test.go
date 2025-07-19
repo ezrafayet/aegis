@@ -63,5 +63,7 @@ func TestIntegration(t *testing.T) {
 		t.Run("soft refresh: must refresh the user if no access_token but refresh_token is valid", integration_test_cases.SoftRefresh_MustRefresh_EmptyAT)
 		t.Run("soft refresh: must refresh the user if expired access_token and refresh_token is valid", integration_test_cases.SoftRefresh_MustRefresh_ExpiredAT)
 		t.Run("soft refresh: must refresh the user if malformed access_token and refresh_token is valid", integration_test_cases.SoftRefresh_MustRefresh_MalformedAT)
+		t.Run("internal API call: must return 401 if no key is provided", integration_test_cases.MiddlewareInternalAPI_NoKeyReturns401)
+		t.Run("internal API call: must return 401 if the key is invalid", integration_test_cases.MiddlewareInternalAPI_InvalidKeyReturns401)
 	})
 }

@@ -33,7 +33,13 @@ func Authorize_EmptyTokenReturns401(t *testing.T) {
 	jsonBody, err := json.Marshal(reqBody)
 	require.NoError(t, err)
 
-	resp, err := http.Post(suite.Server.URL+"/auth/authorize-access-token", "application/json", bytes.NewBuffer(jsonBody))
+	req, err := http.NewRequest("POST", suite.Server.URL+"/auth/authorize-access-token", bytes.NewBuffer(jsonBody))
+	require.NoError(t, err)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Authorize", "Bearer test-api-key")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	require.NoError(t, err)
 	defer resp.Body.Close()
 	assert.Equal(t, 401, resp.StatusCode)
@@ -66,7 +72,13 @@ func Authorize_ExpiredTokenReturns401(t *testing.T) {
 	jsonBody, err := json.Marshal(reqBody)
 	require.NoError(t, err)
 
-	resp, err := http.Post(suite.Server.URL+"/auth/authorize-access-token", "application/json", bytes.NewBuffer(jsonBody))
+	req, err := http.NewRequest("POST", suite.Server.URL+"/auth/authorize-access-token", bytes.NewBuffer(jsonBody))
+	require.NoError(t, err)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Authorize", "Bearer test-api-key")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	require.NoError(t, err)
 	defer resp.Body.Close()
 	assert.Equal(t, http.StatusUnauthorized, resp.StatusCode)
@@ -88,7 +100,13 @@ func Authorize_MalformedTokenReturns401(t *testing.T) {
 	jsonBody, err := json.Marshal(reqBody)
 	require.NoError(t, err)
 
-	resp, err := http.Post(suite.Server.URL+"/auth/authorize-access-token", "application/json", bytes.NewBuffer(jsonBody))
+	req, err := http.NewRequest("POST", suite.Server.URL+"/auth/authorize-access-token", bytes.NewBuffer(jsonBody))
+	require.NoError(t, err)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Authorize", "Bearer test-api-key")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	require.NoError(t, err)
 	defer resp.Body.Close()
 	assert.Equal(t, http.StatusUnauthorized, resp.StatusCode)
@@ -120,7 +138,13 @@ func Authorize_NoRolesReturns401(t *testing.T) {
 	jsonBody, err := json.Marshal(reqBody)
 	require.NoError(t, err)
 
-	resp, err := http.Post(suite.Server.URL+"/auth/authorize-access-token", "application/json", bytes.NewBuffer(jsonBody))
+	req, err := http.NewRequest("POST", suite.Server.URL+"/auth/authorize-access-token", bytes.NewBuffer(jsonBody))
+	require.NoError(t, err)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Authorize", "Bearer test-api-key")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	require.NoError(t, err)
 	defer resp.Body.Close()
 	assert.Equal(t, http.StatusUnauthorized, resp.StatusCode)
@@ -152,7 +176,13 @@ func Authorize_UserDoesNotHaveRequiredRoleReturns401(t *testing.T) {
 	jsonBody, err := json.Marshal(reqBody)
 	require.NoError(t, err)
 
-	resp, err := http.Post(suite.Server.URL+"/auth/authorize-access-token", "application/json", bytes.NewBuffer(jsonBody))
+	req, err := http.NewRequest("POST", suite.Server.URL+"/auth/authorize-access-token", bytes.NewBuffer(jsonBody))
+	require.NoError(t, err)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Authorize", "Bearer test-api-key")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	require.NoError(t, err)
 	defer resp.Body.Close()
 	assert.Equal(t, http.StatusUnauthorized, resp.StatusCode)
@@ -184,7 +214,13 @@ func Authorize_UserHasRequiredRoleReturns200(t *testing.T) {
 	jsonBody, err := json.Marshal(reqBody)
 	require.NoError(t, err)
 
-	resp, err := http.Post(suite.Server.URL+"/auth/authorize-access-token", "application/json", bytes.NewBuffer(jsonBody))
+	req, err := http.NewRequest("POST", suite.Server.URL+"/auth/authorize-access-token", bytes.NewBuffer(jsonBody))
+	require.NoError(t, err)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Authorize", "Bearer test-api-key")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	require.NoError(t, err)
 	defer resp.Body.Close()
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
@@ -224,7 +260,13 @@ func Authorize_UserHasAnyRoleReturns200(t *testing.T) {
 	jsonBody, err := json.Marshal(reqBody)
 	require.NoError(t, err)
 
-	resp, err := http.Post(suite.Server.URL+"/auth/authorize-access-token", "application/json", bytes.NewBuffer(jsonBody))
+	req, err := http.NewRequest("POST", suite.Server.URL+"/auth/authorize-access-token", bytes.NewBuffer(jsonBody))
+	require.NoError(t, err)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Authorize", "Bearer test-api-key")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	require.NoError(t, err)
 	defer resp.Body.Close()
 	assert.Equal(t, http.StatusOK, resp.StatusCode)

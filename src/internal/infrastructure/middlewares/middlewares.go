@@ -16,6 +16,7 @@ type AuthMiddlewareInterface interface {
 	CheckToken(next echo.HandlerFunc) echo.HandlerFunc
 	CheckAndRefreshToken(next echo.HandlerFunc) echo.HandlerFunc
 	CheckAndForceRefreshToken(next echo.HandlerFunc) echo.HandlerFunc
+	CheckInternalAPICall(next echo.HandlerFunc) echo.HandlerFunc
 }
 
 type AuthMiddleware struct {
@@ -112,5 +113,16 @@ func (m AuthMiddleware) CheckAndForceRefreshToken(next echo.HandlerFunc) echo.Ha
 func (m AuthMiddleware) CheckToken(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		return errors.New("not_implemented")
+	}
+}
+
+func (m AuthMiddleware) CheckInternalAPICall(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		apiKey := c.Request().Header.Get("X-Authorize")
+		err := m.Service.AuthorizeInternalAPICall(apiKey)
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, map[string]string{"error": err.Error()})
+		}
+		return next(c)
 	}
 }

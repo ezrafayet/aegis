@@ -153,7 +153,7 @@ func (s *TestSuite) setupTestServer() {
 	if s.Config.ErrorPage.Enabled {
 		group.GET("/login-error", r.Handlers.ServeErrorPage)
 	}
-	group.POST("/authorize-access-token", r.Handlers.Authorize)
+	group.POST("/authorize-access-token", r.Handlers.Authorize, r.Middlewares.CheckInternalAPICall)
 	for _, provider := range r.Providers {
 		group.GET(fmt.Sprintf("/%s", provider.Name), provider.Handlers.GetAuthURL, provider.Middlewares.CheckAuthEnabled)
 		group.GET(fmt.Sprintf("/%s/callback", provider.Name), provider.Handlers.ExchangeCode, provider.Middlewares.CheckAuthEnabled)

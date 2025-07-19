@@ -68,7 +68,7 @@ Drop-in auth service - no SaaS, no lock-in, just the banana.
 	group.GET("/refresh", r.Handlers.DoNothing, r.Middlewares.CheckAndForceRefreshToken)
 	group.GET("/logout", r.Handlers.Logout)
 	group.GET("/health", r.Handlers.DoNothing)
-	group.POST("/authorize-access-token", r.Handlers.Authorize)
+	group.POST("/authorize-access-token", r.Handlers.Authorize, r.Middlewares.CheckInternalAPICall)
 
 	if c.LoginPage.Enabled {
 		e.GET(c.LoginPage.FullPath, r.Handlers.ServeLoginPage)

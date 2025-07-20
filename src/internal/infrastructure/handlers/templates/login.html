@@ -198,10 +198,28 @@
 
     <script>
         let clickedOAuthBtn = false;
+        let isRedirecting = false;
 
         document.addEventListener('DOMContentLoaded', function() {
             resetOAuthButtons();
             hideError();
+            
+            // Handle page visibility changes (when user comes back to the page)
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden && isRedirecting) {
+                    // User came back to the page, reset everything
+                    isRedirecting = false;
+                    resetOAuthButtons();
+                    hideLoader();
+                }
+            });
+            
+            // Handle beforeunload (when user navigates away)
+            window.addEventListener('beforeunload', function() {
+                if (clickedOAuthBtn) {
+                    isRedirecting = true;
+                }
+            });
         });
 
         function resetOAuthButtons() {
@@ -228,17 +246,27 @@
             document.getElementById('error-message').style.display = 'none';
         }
 
+        function showLoader() {
+            const loader = document.getElementById('page-loader');
+            if (loader) {
+                loader.classList.add('show');
+            }
+        }
+
+        function hideLoader() {
+            const loader = document.getElementById('page-loader');
+            if (loader) {
+                loader.classList.remove('show');
+            }
+        }
+
         async function onOAuthBtnClick(provider) {
             if (clickedOAuthBtn) {
                 return;
             }
             disableOAuthButtons();
             hideError();
-            
-            const loader = document.getElementById('page-loader');
-            if (loader) {
-                loader.classList.add('show');
-            }
+            showLoader();
             
             try {
                 const url = `/auth/${provider}`;
@@ -250,18 +278,16 @@
                 if (!redirect_url) {
                     throw new Error('Did not receive a redirect URL from the server. Please try again.');
                 }
-                resetOAuthButtons();
-                if (loader) {
-                    loader.classList.remove('show');
-                }
+                
+                // Don't reset buttons or hide loader - let the redirect happen
+                // The beforeunload event will set isRedirecting = true
+                // If user comes back, visibilitychange will reset everything
                 window.location.href = redirect_url;
             } catch(error) {
                 console.error(error);
                 showError();
                 resetOAuthButtons();
-                if (loader) {
-                    loader.classList.remove('show');
-                }
+                hideLoader();
             }
         }
     </script>

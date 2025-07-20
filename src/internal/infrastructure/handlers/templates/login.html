@@ -103,6 +103,43 @@
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
 
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .page-loader.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .page-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #fff;
+            border-radius: 50%;
+            animation: pageSpin 1s linear infinite;
+        }
+
+        @keyframes pageSpin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
         .oauth-btn--disabled {
             opacity: 0.3;
         }
@@ -125,6 +162,9 @@
     </style>
 </head>
 <body class="body--dark">
+    <div class="page-loader" id="page-loader">
+        <div class="page-spinner"></div>
+    </div>
     <div class="card mb2">
         <header>
             <h1>{{.AppName}}</h1>
@@ -194,6 +234,12 @@
             }
             disableOAuthButtons();
             hideError();
+            
+            const loader = document.getElementById('page-loader');
+            if (loader) {
+                loader.classList.add('show');
+            }
+            
             try {
                 const url = `/auth/${provider}`;
                 const response = await fetch(url);
@@ -205,11 +251,17 @@
                     throw new Error('Did not receive a redirect URL from the server. Please try again.');
                 }
                 resetOAuthButtons();
+                if (loader) {
+                    loader.classList.remove('show');
+                }
                 window.location.href = redirect_url;
             } catch(error) {
                 console.error(error);
                 showError();
                 resetOAuthButtons();
+                if (loader) {
+                    loader.classList.remove('show');
+                }
             }
         }
     </script>

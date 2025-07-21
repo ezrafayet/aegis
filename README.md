@@ -87,7 +87,7 @@ COPY ./config.json /app/config.json
         "domain": "localhost",
         "secure": false,
         "http_only": true,
-        "same_site": 1,
+        "same_site": 3,
         "path": "/"
     }
 }
@@ -97,7 +97,7 @@ And now you have authentication & authorization.
 
 # Architecture
 
-You have 2 choices of architecture to use it:
+You have multiple choices of architecture to use it:
 
 ## host on the same domain:
 
@@ -110,10 +110,11 @@ You have 2 choices of architecture to use it:
     | NGINX    |                     
     | :80      |                     
     +----------+                     
-     domain.com        +----------+  
+           |           +----------+  
            |           | CORE     |  
            +-----------> :8000    |  
                        +----------+  
+                       domain.com
 ```
 
 The cookies configuration for it:
@@ -122,30 +123,60 @@ The cookies configuration for it:
     "domain": "localhost",
     "secure": false,
     "http_only": true,
-    "same_site": 1,
+    "same_site": 3,
     "path": "/"
 }
 ```
 
-## host on subdomains:
+## host everything on the same subdomain:
 
 ```
                        +----------+  
            +-----------> AEGIS    |  
            |           | :5666    |  
            |           +----------+  
-    +------+---+      domain.com/auth
+    +------+---+      app.domain.com/auth
     | NGINX    |                     
     | :80      |                     
     +----------+                     
-     domain.com        +----------+  
+           |           +----------+  
            |           | CORE/    |  
            +-----------> :8000    |  
                        +----------+  
+                       app.domain.com
 ```
 
 The cookies configuration for it:
+```json
+{
+    "domain": "app.localhost",
+    "secure": false,
+    "http_only": true,
+    "same_site": 3,
+    "path": "/"
+}
 ```
+
+## host on different subdomains:
+
+```
+                       +----------+  
+           +-----------> AEGIS    |  
+           |           | :5666    |  
+           |           +----------+  
+    +------+---+      auth.domain.com/auth
+    | NGINX    |                     
+    | :80      |                     
+    +----------+                     
+           |           +----------+  
+           |           | CORE/    |  
+           +-----------> :8000    |  
+                       +----------+  
+                       domain.com
+```
+
+The cookies configuration for it:
+```json
 Not tested yet
 ```
 

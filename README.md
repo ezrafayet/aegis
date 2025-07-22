@@ -46,7 +46,7 @@ COPY ./config.json /app/config.json
         "early_adopters_only": false,
         "redirect_after_success": ["http://localhost:5000/login-success"],
         "redirect_after_error": "http://localhost:5000/auth/login-error",
-        "internal_api_keys": ["xxxxxxxxxxxx"],
+        "internal_api_keys": ["${env:AEGIS_INTERNAL_API_KEY}"],
         "port": 5666
     },
     "login_page": {
@@ -58,10 +58,10 @@ COPY ./config.json /app/config.json
         "full_path": "/auth/login-error"
     },
     "db": {
-        "postgres_url": "xxxxxxxxxxxx"
+        "postgres_url": "${env:AEGIS_DPOSTGRES_URL}"
     },
     "jwt": {
-        "secret": "xxxxxxxxxxxx",
+        "secret": "${env:AEGIS_JWT_SECRET}",
         "access_token_expiration_minutes": 1,
         "refresh_token_expiration_days": 30
     },
@@ -70,15 +70,15 @@ COPY ./config.json /app/config.json
             "github": {
                 "enabled": true,
                 "app_name": "MyApp",
-                "client_id": "xxxxxxxxxxxx",
-                "client_secret": "xxxxxxxxxxxx",
+                "client_id": "${env:AEGIS_GITHUB_CLIENT_ID}",
+                "client_secret": "${env:AEGIS_GITHUB_CLIENT_SECRET}",
                 "redirect_url": "http://localhost:5000/auth/github/callback"
             },
             "discord": {
                 "enabled": true,
                 "app_name": "MyApp",
-                "client_id": "xxxxxxxxxxxx",
-                "client_secret": "xxxxxxxxxxxx",
+                "client_id": "${env:AEGIS_DISCORD_CLIENT_ID}",
+                "client_secret": "${env:AEGIS_DISCORD_CLIENT_SECRET}",
                 "redirect_url": "http://localhost:5000/auth/discord/callback"
             }
         }

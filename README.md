@@ -135,15 +135,15 @@ The cookies configuration for it:
            +-----------> AEGIS    |  
            |           | :5666    |  
            |           +----------+  
-    +------+---+      app.domain.com/auth
-    | NGINX    |                     
-    | :80      |                     
-    +----------+                     
+    +------+?          app.domain.com/auth
+           |     
            |           +----------+  
            |           | CORE/    |  
            +-----------> :8000    |  
                        +----------+  
                        app.domain.com
+
+?: can be nginx or even hosted independently
 ```
 
 The cookies configuration for it:
@@ -164,15 +164,15 @@ The cookies configuration for it:
            +-----------> AEGIS    |  
            |           | :5666    |  
            |           +----------+  
-    +------+---+      auth.domain.com/auth
-    | NGINX    |                     
-    | :80      |                     
-    +----------+                     
+    +------+?      auth.domain.com/auth
+           |          
            |           +----------+  
            |           | CORE/    |  
            +-----------> :8000    |  
                        +----------+  
                        domain.com
+
+?: can be nginx or even hosted independently
 ```
 
 The cookies configuration for it:

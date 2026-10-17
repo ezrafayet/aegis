@@ -8,7 +8,7 @@ VERSION := $(shell git describe --tags)
 
 build:
 	cd src
-	go build -ldflags="-X 'aegis/internal/infrastructure/httpserver.Version=$(VERSION)'" -o main cmd/httpserver/main.go
+	go build -ldflags="-X 'auth302/internal/infrastructure/httpserver.Version=$(VERSION)'" -o main cmd/httpserver/main.go
 
 fmt:
 	cd src

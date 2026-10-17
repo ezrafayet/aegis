@@ -2,7 +2,7 @@
 
 All contributions are welcome, from all forms and all levels.
 
-You can open a GitHub issue [here](https://github.com/ezrafayet/aegis/issues) or [engage on X](https://x.com/nohokthen) to align on what you want to do.
+You can open a GitHub issue [here](https://github.com/ezrafayet/auth302/issues).
 
 Feel free to pick something from the list below or to come up with your own.
 
@@ -70,14 +70,14 @@ Run it with:
 make start
 ```
 
-It runs Aegis as a service and the service under /dev that uses it. Note you will need a config.json in src for it to run.
+It runs Auth302 as a service and the service under /dev that uses it. Note you will need a config.json in src for it to run.
 
 A classic config.json:
 
 ```json
 {
   "app": {
-    "name": "Aegis",
+    "name": "Auth302",
     "url": "http://localhost:5000",
     "cors_allowed_origins": ["http://localhost:5000"],
     "early_adopters_only": true,
@@ -138,13 +138,13 @@ A classic config.json:
 
 # Advices
 
-- Check the behavior of the API in the [integration tests](https://github.com/ezrafayet/aegis/blob/master/src/integration/integration_test.go)
+- Check the behavior of the API in the [integration tests](https://github.com/ezrafayet/auth302/blob/master/src/integration/integration_test.go)
 - Run the dev mode
 - Write something simple first to get to know how it works (example: add a provider)
 
 # How to publish a new version on Docker Hub
 
 ```
-sudo docker build -t ezrafayet/aegis:v0.3.0 .
-sudo docker push ezrafayet/aegis:v0.3.0
+sudo docker build -t ezrafayet/auth302:v0.3.0 .
+sudo docker push ezrafayet/auth302:v0.3.0
 ```

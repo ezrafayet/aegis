@@ -1,0 +1,37 @@
+# VCS and CI
+.git
+.github
+.gitignore
+
+# Editor
+.idea
+.vscode
+
+# Local demo and integration suite
+examples
+integration
+**/*_test.go
+
+# Docs and tooling
+README.md
+CONTRIBUTING.md
+LICENSE
+Makefile
+
+# Local config and secrets
+.env
+*.env
+config.json
+
+# Build artifacts
+bin
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+coverage.*
+*.coverprofile
+profile.cov

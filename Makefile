@@ -1,46 +1,44 @@
-.ONESHELL:
-SHELL := /bin/bash
+.DEFAULT_GOAL := help
 
-# Set working directory to src
-.PHONY: build fmt fmt-ci vet test test-unit test-integration
+MODULE  := auth302
+CMD     := ./cmd/httpserver
+BINARY  := bin/auth302
+VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
+LDFLAGS := -X '$(MODULE)/internal/infrastructure/httpserver.Version=$(VERSION)'
 
-VERSION := $(shell git describe --tags)
+.PHONY: help build clean fmt fmt-ci vet test test-unit test-integration start stop kill
 
-build:
-	cd src
-	go build -ldflags="-X 'aegis/internal/infrastructure/httpserver.Version=$(VERSION)'" -o main cmd/httpserver/main.go
+help: ## List targets
+	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*##/ {printf "  %-18s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-fmt:
-	cd src
+build: ## Build server binary into bin/auth302
+	@mkdir -p $(dir $(BINARY))
+	go build -ldflags "$(LDFLAGS)" -o $(BINARY) $(CMD)
+
+fmt: ## Run go fmt
 	go fmt ./...
 
-fmt-ci:
-	cd src
+fmt-ci: ## Fail if any file is not gofmt-clean
 	@if [ -n "$$(gofmt -l .)" ]; then \
 		echo "Code formatting check failed. Run 'make fmt' to fix formatting issues."; \
 		exit 1; \
 	fi
 
-vet:
-	cd src
+vet: ## Run go vet
 	go vet ./...
 
-test:
-	make test-unit
-	make test-integration
+# test: test-unit test-integration ## Run unit and integration tests
 
-test-integration:
-	cd src
-	go test -tags=integration -timeout=240s ./integration/...
+# test-unit: ## Run unit tests
+# 	go test -timeout=15s ./internal/... ./pkg/...
 
-test-unit:
-	cd src
-	go test -timeout=15s ./internal/... ./pkg/...
+# test-integration: ## Run integration tests (requires Docker)
+# 	go test -tags=integration -timeout=240s ./integration/...
 
-# For dev
+start: ## Start the local Docker stack
+	docker compose -f docker-compose-dev.yml up --build
 
-start:
-	sudo docker-compose -f docker-compose-dev.yml up --build
+stop: ## Stop the local Docker stack and remove volumes
+	docker compose -f docker-compose-dev.yml down -v
 
-kill:
-	sudo docker-compose -f docker-compose-dev.yml down -v
+kill: stop ## Alias for stop

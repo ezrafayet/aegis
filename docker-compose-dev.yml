@@ -8,9 +8,9 @@ services:
     ports:
       - "5000:80"
     depends_on:
-      - aegis-dev
+      - auth302-dev
 
-  aegis-dev:
+  auth302-dev:
     build:
       context: ./src
       dockerfile: Dockerfile-dev

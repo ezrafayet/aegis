@@ -1,11 +1,11 @@
 ```
- █████╗ ███████╗ ██████╗ ██╗███████╗
-██╔══██╗██╔════╝██╔════╝ ██║██╔════╝
-███████║█████╗  ██║  ███╗██║███████╗
-██╔══██║██╔══╝  ██║   ██║██║╚════██║
-██║  ██║███████╗╚██████╔╝██║███████║
-╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═╝╚══════╝
-Drop-in auth service - no SaaS, no lock-in, just the banana.
+ █████╗ ██╗   ██╗████████╗██╗  ██╗██████╗  ██████╗ ██████╗ 
+██╔══██╗██║   ██║╚══██╔══╝██║  ██║╚════██╗██╔═████╗╚════██╗
+███████║██║   ██║   ██║   ███████║ █████╔╝██║██╔██║ █████╔╝
+██╔══██║██║   ██║   ██║   ██╔══██║ ╚═══██╗████╔╝██║██╔═══╝ 
+██║  ██║╚██████╔╝   ██║   ██║  ██║██████╔╝╚██████╔╝███████╗
+╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝
+Drop-in Dockerized auth. One config, no SaaS, no lock-in—just the banana.
 ```
 
 # Introduction
@@ -31,7 +31,7 @@ In your project, create an 'auth' folder for the service and just create 2 files
 ## Dockerfile
 
 ```Dockerfile
-FROM ezrafayet/aegis:v0.12.0
+FROM ezrafayet/auth302:v0.12.0
 COPY ./config.json /app/config.json
 ```
 

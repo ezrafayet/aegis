@@ -6,9 +6,9 @@ BINARY  := bin/auth302
 VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 LDFLAGS := -X '$(MODULE)/internal/infrastructure/httpserver.Version=$(VERSION)'
 
-.PHONY: help build fmt fmt-ci vet unit start stop kill
+.PHONY: help build fmt fmt-ci vet test start kill
 
-help: ## List targets
+help:
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*##/ {printf "  %-18s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 build: ## Build server binary into bin/auth302

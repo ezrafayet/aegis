@@ -1,10 +1,12 @@
 package jwtgen
 
 import (
-	"auth302/pkg/apperrors"
+	"errors"
 	"time"
 
-	"github.com/golang-jwt/jwt"
+	"auth302/pkg/apperrors"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func Generate(
@@ -40,16 +42,17 @@ func ReadClaims(accessToken string, secret string) (map[string]any, error) {
 		return []byte(secret), nil
 	})
 	if err != nil {
-		if validationError, ok := err.(*jwt.ValidationError); ok {
-			if validationError.Errors&jwt.ValidationErrorExpired != 0 {
-				return map[string]any{}, apperrors.ErrAccessTokenExpired
-			}
+		if errors.Is(err, jwt.ErrTokenExpired) {
+			return map[string]any{}, apperrors.ErrAccessTokenExpired
 		}
 		return map[string]any{}, apperrors.ErrAccessTokenInvalid
 	}
 	if !parsedToken.Valid {
 		return map[string]any{}, apperrors.ErrAccessTokenInvalid
 	}
-
-	return parsedToken.Claims.(jwt.MapClaims), nil
+	claims, ok := parsedToken.Claims.(jwt.MapClaims)
+	if !ok {
+		return map[string]any{}, apperrors.ErrAccessTokenInvalid
+	}
+	return claims, nil
 }
